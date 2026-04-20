@@ -43,5 +43,35 @@
     "af_pocket_clashscore": 5.49,
     "whole_ratio": 3.8,
     "pocket_ratio": 4.54
+  },
+  {
+    "name": "Ubiquitin",
+    "description": "Human ubiquitin \u2014 small, no ligand (centroid fallback)",
+    "experimental_pdb": "1UBQ.pdb",
+    "predicted_pdb": "AF-P0CG48-F1-model_v6.pdb",
+    "pocket_n_residues": 24,
+    "pocket_n_atoms_exp": 195,
+    "pocket_n_atoms_af": 195,
+    "exp_whole_clashscore": 39.39,
+    "exp_pocket_clashscore": 10.26,
+    "af_whole_clashscore": 3.51,
+    "af_pocket_clashscore": 0.0,
+    "whole_ratio": 11.23,
+    "pocket_ratio": 1025.64
+  },
+  {
+    "name": "LmPTR1",
+    "description": "Leishmania pteridine reductase 1 \u2014 antiparasitic target",
+    "experimental_pdb": "2BPR.pdb",
+    "predicted_pdb": "AF-Q01782-F1-model_v6.pdb",
+    "pocket_n_residues": 24,
+    "pocket_n_atoms_exp": 182,
+    "pocket_n_atoms_af": 163,
+    "exp_whole_clashscore": 18.87,
+    "exp_pocket_clashscore": 32.97,
+    "af_whole_clashscore": 5.14,
+    "af_pocket_clashscore": 6.13,
+    "whole_ratio": 3.67,
+    "pocket_ratio": 5.37
   }
 ]

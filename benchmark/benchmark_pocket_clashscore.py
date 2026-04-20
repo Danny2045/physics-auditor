@@ -11,15 +11,17 @@ where drug-design accuracy actually matters.
 from __future__ import annotations
 
 import json
-import sys
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 
 import jax.numpy as jnp
 import numpy as np
 
-from physics_auditor.causality.binding_site import BindingSite, extract_binding_site
-from physics_auditor.checks.clashes import ClashResult, check_clashes, get_vdw_radii_array_from_elements
+from physics_auditor.causality.binding_site import extract_binding_site
+from physics_auditor.checks.clashes import (
+    check_clashes,
+    get_vdw_radii_array_from_elements,
+)
 from physics_auditor.core.geometry import compute_distance_matrix
 from physics_auditor.core.parser import Structure, parse_pdb
 from physics_auditor.core.topology import build_bonded_mask, infer_bonds_from_topology
@@ -215,6 +217,21 @@ BENCHMARK_PAIRS = [
         # Subtract 678 so experimental residue 679 maps to AF residue 1, etc.
         "res_seq_offset": 678,
     },
+    {
+        "name": "Ubiquitin",
+        "experimental": "benchmark/structures/experimental/1UBQ.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P0CG48-F1-model_v6.pdb",
+        "description": "Human ubiquitin — small, no ligand (centroid fallback)",
+    },
+    {
+        "name": "LmPTR1",
+        "experimental": "benchmark/structures/experimental/2BPR.pdb",
+        "predicted": "benchmark/structures/predicted/AF-Q01782-F1-model_v6.pdb",
+        "description": "Leishmania pteridine reductase 1 — antiparasitic target",
+        # 2BPR uses PDB numbering 381-553; AF-Q01782 uses UniProt numbering 1-288.
+        # Subtract 380 so experimental residue 381 maps to AF residue 1, etc.
+        "res_seq_offset": 380,
+    },
 ]
 
 
@@ -244,7 +261,7 @@ def run_benchmark() -> list[dict]:
 
         if ligand_coords is None:
             print(f"  WARNING: No ligand found in {exp_path.name}")
-            print(f"  Using centroid-based pocket extraction (center of protein)")
+            print("  Using centroid-based pocket extraction (center of protein)")
             # Fall back to centroid-based extraction
             centroid = np.mean(exp_struct.coords, axis=0, keepdims=True)
             ligand_coords = centroid
@@ -288,7 +305,7 @@ def run_benchmark() -> list[dict]:
 
         print(f"\n  --- AlphaFold ({af_path.name}) ---")
         if len(af_atom_idx) == 0:
-            print(f"  WARNING: No matching pocket residues found in AF structure")
+            print("  WARNING: No matching pocket residues found in AF structure")
             continue
 
         af_result = compute_pocket_clashscore(
@@ -307,16 +324,16 @@ def run_benchmark() -> list[dict]:
         whole_ratio = (exp_result.whole_clashscore / max(af_result.whole_clashscore, 0.01))
         pocket_ratio = (exp_result.pocket_clashscore / max(af_result.pocket_clashscore, 0.01))
 
-        print(f"\n  --- Comparison ---")
+        print("\n  --- Comparison ---")
         print(f"  Whole-protein clashscore ratio (exp/AF): {whole_ratio:.1f}x")
         print(f"  Binding-site clashscore ratio (exp/AF):  {pocket_ratio:.1f}x")
 
         if pocket_ratio < whole_ratio * 0.5:
-            print(f"  >>> FINDING: AlphaFold advantage SHRINKS at the binding site")
+            print("  >>> FINDING: AlphaFold advantage SHRINKS at the binding site")
         elif pocket_ratio > whole_ratio * 1.5:
-            print(f"  >>> FINDING: AlphaFold advantage GROWS at the binding site")
+            print("  >>> FINDING: AlphaFold advantage GROWS at the binding site")
         else:
-            print(f"  >>> FINDING: AlphaFold advantage is SIMILAR at binding site vs whole protein")
+            print("  >>> FINDING: AlphaFold advantage is SIMILAR at binding site vs whole protein")
 
         results.append({
             "name": pair["name"],
@@ -337,7 +354,7 @@ def run_benchmark() -> list[dict]:
     # Summary table
     if results:
         print(f"\n\n{'='*70}")
-        print(f"  SUMMARY: Whole-Protein vs Binding-Site Clashscore")
+        print("  SUMMARY: Whole-Protein vs Binding-Site Clashscore")
         print(f"{'='*70}")
         print(f"  {'Protein':<12} {'Exp Whole':>10} {'Exp Pocket':>11} "
               f"{'AF Whole':>9} {'AF Pocket':>10} {'Whole Ratio':>12} {'Pocket Ratio':>13}")
