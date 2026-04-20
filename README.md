@@ -40,7 +40,7 @@ Physics Auditor answers all three questions.
 ## Quick Start
 
 ```bash
-pip install physics-auditor
+pip install git+https://github.com/Danny2045/physics-auditor.git
 
 # Validate a single structure
 physics-auditor validate structure.pdb
