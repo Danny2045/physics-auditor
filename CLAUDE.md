@@ -1,49 +1,38 @@
-# Physics Auditor — Project Context
+# Physics Auditor
 
-## What This Is
-An open-source physics validation and mechanistic explanation tool for AI-generated protein structures. Takes PDB/mmCIF files from Boltz-2, AlphaFold 3, Chai-1, RFdiffusion3, Protenix, or any structure predictor and produces a Trust Report with physics checks + causality analysis.
+Physics validation for AI-generated protein structures. JAX-based, 8 checks, CLI.
 
-## Strategic Position
-IsoDDE (Isomorphic Labs, Feb 2026) has internal physics violation filtering. The open ecosystem (Boltz-2, Chai-1, Protenix, OpenFold3) does not. This tool fills that gap AND adds a mechanistic causality layer that no one — including IsoDDE — provides: per-residue energy decomposition, binding-site divergence analysis, and selectivity attribution maps.
+## Key commands
+- `pip install -e ".[dev]"` to install
+- `pytest tests/ -v` to test (45 tests, all must pass)
+- `ruff check src/ tests/ --select E,F,I,W --ignore E501` must pass before commit
+- `physics-auditor validate <file.pdb>` to validate a structure
 
 ## Architecture
-- `src/physics_auditor/core/` — PDB parser, topology builder, JAX geometry/energy kernels
-- `src/physics_auditor/checks/` — 8 physics checks (clashes, bond geometry, ramachandran, peptide planarity, chirality, rotamers, LJ energy, disulfides) + composite scorer
-- `src/physics_auditor/causality/` — THE DIFFERENTIATOR. Binding site extraction, per-residue energy decomposition, selectivity attribution maps, local vs global divergence
-- `src/physics_auditor/report/` — JSON + HTML Trust Report generation
-- `src/physics_auditor/reference/` — Engh-Huber bond params, Ramachandran distributions, rotamer library, LJ parameters
+- `src/physics_auditor/core/` — parser, geometry, topology, energy (JAX kernels)
+- `src/physics_auditor/checks/` — clash detection
+- `src/physics_auditor/causality/` — binding site extraction, pocket comparison
+- `benchmark/` — experimental vs AI-predicted structure comparison
 
-## Key Design Decisions
-- All geometry/energy computations in JAX with @jax.jit for batch throughput
-- Distance matrix computed once, reused across all checks
-- Bonded pair masks precomputed from topology (static per structure)
-- Atom type parameters from AMBER ff14SB
-- For proteins up to ~1000 residues, full N×N distance matrix; neighbor lists for larger
-- CLI via typer, rich for terminal output
+## Current benchmark finding
+AlphaFold predictions score 4-11x better than experimental crystal structures on
+whole-protein clashscore, but the advantage shrinks 29-46% at the binding site.
+This means standard physics metrics cannot serve as quality filters for drug design.
 
-## Testing
-- `tests/fixtures/` contains known-good (high-res X-ray) and known-bad (perturbed) PDB files
-- Every check module has unit tests against these fixtures
-- Benchmark suite in `benchmarks/` for systematic evaluation
+## Active work: binding-site clashscore benchmark
+- benchmark/benchmark_pocket_clashscore.py runs the comparison
+- Known issue: 4HJO (HsHDAC8) uses PDB numbering starting at residue 679, AF uses UniProt numbering starting at 1. Offset is 678. Fix needed in extract_pocket_by_residue_numbers to auto-detect or manually apply offset.
+- Next checks to add: rotamer validation, per-residue RMSD comparison
 
-## Dependencies
-JAX (core compute), NumPy, Typer (CLI), Rich (terminal), Jinja2 (HTML reports), PyYAML (config)
-
-## Build Order
-1. PDB parser → internal Atoms representation
-2. Topology → bond graph, atom typing, mask generation
-3. JAX geometry kernels → distances, dihedrals, angles
-4. LJ energy kernel
-5. Individual physics checks (one at a time, with tests)
-6. Causality module — binding site extraction, energy decomposition, selectivity maps
-7. Composite score + Trust Report
-8. CLI
-9. Benchmark on calibration set
-10. Polish, README, package
-
-## Code Style
+## Code style
 - Type hints everywhere
 - Docstrings on public functions (NumPy style)
-- No magic numbers — all thresholds in config.py with clear names
+- No magic numbers — all thresholds in config.py
 - JAX arrays for computation, NumPy for I/O boundaries
 - Prefer functional style; classes only for data containers
+
+## Rules
+- Every commit must pass ruff and pytest
+- Never overclaim — state what the evidence supports
+- PDB files use fixed-width columns (not space-delimited)
+- Parser stops at first ENDMDL (NMR structures have multiple models)
