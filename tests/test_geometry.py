@@ -1,15 +1,14 @@
 """Tests for JAX geometry kernels."""
 
-import jax.numpy as jnp
-import numpy as np
-import pytest
 from pathlib import Path
 
+import jax.numpy as jnp
+import numpy as np
+
 from physics_auditor.core.geometry import (
-    compute_distance_matrix,
-    compute_dihedral_angles,
     compute_bond_angles,
-    compute_distances,
+    compute_dihedral_angles,
+    compute_distance_matrix,
     extract_backbone_dihedrals,
 )
 from physics_auditor.core.parser import parse_pdb

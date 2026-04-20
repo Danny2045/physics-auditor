@@ -9,8 +9,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from physics_auditor.core.parser import Structure, STANDARD_RESIDUES
-
+from physics_auditor.core.parser import Structure
 
 # Maximum covalent bond distances by element pair (Angstroms)
 # Generous thresholds to catch all real bonds without false positives
@@ -190,7 +189,7 @@ def infer_bonds_from_topology(structure: Structure) -> list[tuple[int, int]]:
         all_indices_to_check = set(non_protein_indices)
         # Include protein atoms near non-protein atoms for cross-bonds
         if len(non_protein_indices) < structure.n_atoms:
-            np_coords = structure.coords[non_protein_indices]
+
             for np_idx in non_protein_indices:
                 dists = np.linalg.norm(
                     structure.coords - structure.coords[np_idx], axis=1

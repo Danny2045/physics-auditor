@@ -1,14 +1,14 @@
 """Tests for topology builder — bond inference and mask generation."""
 
-import numpy as np
-import pytest
 from pathlib import Path
+
+import numpy as np
 
 from physics_auditor.core.parser import parse_pdb
 from physics_auditor.core.topology import (
-    infer_bonds_from_topology,
     build_bonded_mask,
     get_vdw_radii_array,
+    infer_bonds_from_topology,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"

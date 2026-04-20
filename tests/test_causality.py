@@ -1,16 +1,16 @@
 """Tests for causality binding site extraction and comparison."""
 
-import numpy as np
-import pytest
 from pathlib import Path
 
-from physics_auditor.core.parser import parse_pdb
+import numpy as np
+
 from physics_auditor.causality.binding_site import (
-    extract_binding_site,
-    compare_binding_sites,
     BindingSite,
     PocketComparison,
+    compare_binding_sites,
+    extract_binding_site,
 )
+from physics_auditor.core.parser import parse_pdb
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

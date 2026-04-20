@@ -14,7 +14,6 @@ from pathlib import Path
 
 import numpy as np
 
-
 # Standard amino acid 3-letter codes
 STANDARD_RESIDUES = frozenset({
     "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY",

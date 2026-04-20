@@ -13,7 +13,6 @@ import jax.numpy as jnp
 import numpy as np
 
 from physics_auditor.config import ClashConfig
-from physics_auditor.core.topology import get_vdw_radii_array
 
 
 @dataclass

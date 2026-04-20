@@ -16,8 +16,8 @@ from pathlib import Path
 
 import typer
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
+from rich.table import Table
 
 app = typer.Typer(
     name="physics-auditor",
@@ -37,14 +37,13 @@ def validate(
 ):
     """Validate one or more protein structures."""
     import jax.numpy as jnp
-    import numpy as np
 
-    from physics_auditor.config import load_config
-    from physics_auditor.core.parser import parse_pdb
-    from physics_auditor.core.topology import infer_bonds_from_topology, build_bonded_mask
-    from physics_auditor.core.geometry import compute_distance_matrix, extract_backbone_dihedrals
-    from physics_auditor.core.energy import run_lj_analysis
     from physics_auditor.checks.clashes import check_clashes
+    from physics_auditor.config import load_config
+    from physics_auditor.core.energy import run_lj_analysis
+    from physics_auditor.core.geometry import compute_distance_matrix, extract_backbone_dihedrals
+    from physics_auditor.core.parser import parse_pdb
+    from physics_auditor.core.topology import build_bonded_mask, infer_bonds_from_topology
 
     cfg = load_config(str(config) if config else None)
 

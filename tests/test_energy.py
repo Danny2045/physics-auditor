@@ -1,19 +1,18 @@
 """Tests for LJ energy computation and steric clash detection."""
 
-import jax.numpy as jnp
-import numpy as np
-import pytest
 from pathlib import Path
 
-from physics_auditor.core.parser import parse_pdb
-from physics_auditor.core.topology import infer_bonds_from_topology, build_bonded_mask
-from physics_auditor.core.geometry import compute_distance_matrix
-from physics_auditor.core.energy import (
-    run_lj_analysis,
-    compute_lj_energy_matrix,
-    get_lj_params_arrays,
-)
+import jax.numpy as jnp
+import numpy as np
+
 from physics_auditor.checks.clashes import check_clashes
+from physics_auditor.core.energy import (
+    get_lj_params_arrays,
+    run_lj_analysis,
+)
+from physics_auditor.core.geometry import compute_distance_matrix
+from physics_auditor.core.parser import parse_pdb
+from physics_auditor.core.topology import build_bonded_mask, infer_bonds_from_topology
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

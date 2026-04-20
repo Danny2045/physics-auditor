@@ -1,10 +1,11 @@
 """Tests for the PDB parser."""
 
-import numpy as np
-import pytest
 from pathlib import Path
 
-from physics_auditor.core.parser import parse_pdb, parse_pdb_string, Structure
+import numpy as np
+import pytest
+
+from physics_auditor.core.parser import parse_pdb, parse_pdb_string
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

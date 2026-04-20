@@ -11,7 +11,6 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-
 # AMBER ff14SB-like LJ parameters (sigma, epsilon) by element
 # sigma in Angstroms, epsilon in kcal/mol
 # These are simplified — a full implementation would use atom type assignments

@@ -13,11 +13,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import jax.numpy as jnp
 import numpy as np
 
-from physics_auditor.core.parser import Structure, Residue
-from physics_auditor.core.geometry import compute_distance_matrix
+from physics_auditor.core.parser import Residue, Structure
 
 
 @dataclass
