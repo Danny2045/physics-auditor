@@ -1,0 +1,47 @@
+[
+  {
+    "name": "HsDHODH",
+    "description": "Human DHODH \u2014 Kira ortholog, ESM-2 blind spot pair",
+    "experimental_pdb": "1MVS.pdb",
+    "predicted_pdb": "AF-Q02127-F1-model_v6.pdb",
+    "pocket_n_residues": 68,
+    "pocket_n_atoms_exp": 567,
+    "pocket_n_atoms_af": 524,
+    "exp_whole_clashscore": 45.4,
+    "exp_pocket_clashscore": 35.27,
+    "af_whole_clashscore": 3.97,
+    "af_pocket_clashscore": 5.73,
+    "whole_ratio": 11.43,
+    "pocket_ratio": 6.16
+  },
+  {
+    "name": "SmDHODH",
+    "description": "Parasite DHODH \u2014 30.8x selectivity target",
+    "experimental_pdb": "1D3H.pdb",
+    "predicted_pdb": "AF-G4VFD7-F1-model_v6.pdb",
+    "pocket_n_residues": 129,
+    "pocket_n_atoms_exp": 989,
+    "pocket_n_atoms_af": 963,
+    "exp_whole_clashscore": 32.74,
+    "exp_pocket_clashscore": 23.26,
+    "af_whole_clashscore": 5.16,
+    "af_pocket_clashscore": 5.19,
+    "whole_ratio": 6.35,
+    "pocket_ratio": 4.48
+  },
+  {
+    "name": "HsHDAC8",
+    "description": "Human HDAC8 \u2014 Kira ortholog for SmHDAC8",
+    "experimental_pdb": "4HJO.pdb",
+    "predicted_pdb": "AF-Q9BY41-F1-model_v6.pdb",
+    "pocket_n_residues": 46,
+    "pocket_n_atoms_exp": 361,
+    "pocket_n_atoms_af": 364,
+    "exp_whole_clashscore": 19.43,
+    "exp_pocket_clashscore": 24.93,
+    "af_whole_clashscore": 5.11,
+    "af_pocket_clashscore": 5.49,
+    "whole_ratio": 3.8,
+    "pocket_ratio": 4.54
+  }
+]
