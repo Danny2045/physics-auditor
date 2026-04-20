@@ -232,6 +232,33 @@ BENCHMARK_PAIRS = [
         # Subtract 380 so experimental residue 381 maps to AF residue 1, etc.
         "res_seq_offset": 380,
     },
+    {
+        "name": "HsABL1",
+        "experimental": "benchmark/structures/experimental/2HYY.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P00519-F1-model_v6.pdb",
+        "description": "Human ABL1 kinase with imatinib — cancer, tyrosine kinase",
+    },
+    {
+        "name": "HsAromatase",
+        "experimental": "benchmark/structures/experimental/3EQM.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P11511-F1-model_v6.pdb",
+        "description": "Human aromatase/CYP19A1 with androstenedione — metalloenzyme",
+    },
+    {
+        "name": "HsBRAF",
+        "experimental": "benchmark/structures/experimental/3OG7.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P15056-F1-model_v6.pdb",
+        "description": "Human BRAF kinase domain with inhibitor — cancer, Ser/Thr kinase",
+    },
+    {
+        "name": "CoV2Mpro",
+        "experimental": "benchmark/structures/experimental/5R82.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P0DTD1-F1-model_v6.pdb",
+        "description": "SARS-CoV-2 main protease with inhibitor — cysteine protease",
+        # 5R82 PDB residue 1 = UniProt 3264; AF fragment starts at UniProt 3267 (AF residue 1).
+        # Subtract 3 so experimental residue 4 maps to AF residue 1, etc.
+        "res_seq_offset": 3,
+    },
 ]
 
 
