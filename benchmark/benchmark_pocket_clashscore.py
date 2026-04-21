@@ -259,6 +259,42 @@ BENCHMARK_PAIRS = [
         # Subtract 3 so experimental residue 4 maps to AF residue 1, etc.
         "res_seq_offset": 3,
     },
+    {
+        "name": "HsAChE",
+        "experimental": "benchmark/structures/experimental/4EY7.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P22303-F1-model_v6.pdb",
+        "description": "Human acetylcholinesterase with donepezil — Alzheimer's, deep aromatic gorge",
+        # 4EY7 PDB residue 2 = UniProt 33; AF uses UniProt numbering 1-614.
+        # Subtract -31 (i.e., add 31) so PDB residue 4 maps to AF residue 35, etc.
+        "res_seq_offset": -31,
+    },
+    {
+        "name": "MmCOX2",
+        "experimental": "benchmark/structures/experimental/3LN1.pdb",
+        "predicted": "benchmark/structures/predicted/AF-Q05769-F1-model_v6.pdb",
+        "description": "Mouse COX-2 with celecoxib — inflammation, buried hydrophobic channel",
+    },
+    {
+        "name": "HsEGFR",
+        "experimental": "benchmark/structures/experimental/1M17.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P00533-F1-model_v6.pdb",
+        "description": "Human EGFR kinase with erlotinib — cancer, ATP-binding site",
+        # 1M17 PDB residue 671 = UniProt 695; AF uses UniProt numbering 1-1210.
+        # Subtract -24 (i.e., add 24) so PDB residue 672 maps to AF residue 696, etc.
+        "res_seq_offset": -24,
+    },
+    {
+        "name": "HsHMGCR",
+        "experimental": "benchmark/structures/experimental/1HWL.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P04035-F1-model_v6.pdb",
+        "description": "Human HMG-CoA reductase with statin — cardiovascular, large open site",
+    },
+    {
+        "name": "HsDPP4",
+        "experimental": "benchmark/structures/experimental/1X70.pdb",
+        "predicted": "benchmark/structures/predicted/AF-P27487-F1-model_v6.pdb",
+        "description": "Human DPP-4 with sitagliptin-like inhibitor — diabetes, beta-propeller",
+    },
 ]
 
 
