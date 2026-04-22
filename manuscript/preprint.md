@@ -1,6 +1,6 @@
 # Binding-Site Physics Quality in AI-Predicted Protein Structures Is Target-Dependent: A 14-Protein Benchmark
 
-**Danny Ngabonziza**
+**Daniel Ngabonziza**
 
 Independent researcher, Franklin, TN, USA
 
