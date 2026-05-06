@@ -92,9 +92,21 @@ def validate(
 
         runtime = time.time() - t0
 
-        # Compute preliminary composite (using available checks)
-        # Full composite will include all 8 checks — for now use clashes + LJ
-        composite = clash_result.subscore  # Simplified for v0.1
+        # LJ subscore: same sigmoid-like form as clashes, applied to
+        # "hot pairs per 1000 atoms" (LJ pair energy > 10 kcal/mol).
+        # Captures soft clashes that don't trigger the hard vdW-overlap rule
+        # but still indicate strain.
+        n_hot = int(lj_result["n_hot_pairs"])
+        hot_per_1000 = (n_hot / max(struct.n_atoms, 1)) * 1000.0
+        lj_subscore = 1.0 / (1.0 + (hot_per_1000 / 50.0) ** 2)
+
+        # Composite (v0.1): weighted blend of the two implemented checks.
+        # Weights from CompositeConfig, renormalized over implemented checks
+        # so the score remains in [0, 1] until the remaining 6 checks ship.
+        w_clash = cfg.composite.weight_clashes
+        w_lj = cfg.composite.weight_lj_energy
+        w_total = w_clash + w_lj
+        composite = (w_clash * clash_result.subscore + w_lj * lj_subscore) / w_total
 
         # Recommendation
         if composite >= cfg.composite.accept_threshold:
@@ -112,6 +124,14 @@ def validate(
             "file": str(path),
             "global_score": round(composite, 3),
             "recommendation": recommendation,
+            "composite_inputs": {
+                "implemented_checks": ["steric_clashes", "lennard_jones"],
+                "roadmap_checks": [
+                    "bond_geometry", "ramachandran", "peptide_planarity",
+                    "chirality", "rotamer_outliers", "disulfide_geometry",
+                ],
+                "formula": "weighted average of implemented subscores, weights renormalized",
+            },
             "checks": {
                 "steric_clashes": {
                     "n_clashes": clash_result.n_clashes,
@@ -123,6 +143,8 @@ def validate(
                 "lennard_jones": {
                     "total_energy_kcal": round(lj_result["total_energy"], 2),
                     "n_hot_pairs": lj_result["n_hot_pairs"],
+                    "hot_pairs_per_1000_atoms": round(hot_per_1000, 2),
+                    "subscore": round(lj_subscore, 3),
                 },
                 "backbone_dihedrals": {
                     "n_phi": len(dihedrals["phi"]["res_indices"]),
@@ -211,8 +233,12 @@ def _print_rich_report(report: dict, verbose: bool, rec_color: str) -> None:
 
     # LJ
     lj = checks["lennard_jones"]
-    lj_str = f"E={lj['total_energy_kcal']:.1f} kcal/mol, {lj['n_hot_pairs']} hot pairs"
-    table.add_row("Lennard-Jones", lj_str, "—")
+    lj_str = (
+        f"E={lj['total_energy_kcal']:.1f} kcal/mol, "
+        f"{lj['n_hot_pairs']} hot pairs "
+        f"({lj['hot_pairs_per_1000_atoms']:.1f}/1000 atoms)"
+    )
+    table.add_row("Lennard-Jones", lj_str, f"{lj['subscore']:.3f}")
 
     # Backbone
     bb = checks["backbone_dihedrals"]

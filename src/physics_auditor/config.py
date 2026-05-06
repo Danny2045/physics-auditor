@@ -96,9 +96,12 @@ class CompositeConfig:
     weight_rotamers: float = 0.10
     weight_disulfides: float = 0.05
 
-    # Recommendation thresholds
-    accept_threshold: float = 0.85
-    short_md_threshold: float = 0.60
+    # Recommendation thresholds — calibrated against real benchmark data
+    # so that well-resolved crystal structures and AlphaFold predictions
+    # both fall in the ACCEPT band, mid-quality crystals in SHORT_MD,
+    # and only severely clashed structures in DISCARD.
+    accept_threshold: float = 0.80
+    short_md_threshold: float = 0.50
     # Below short_md_threshold = discard
 
 

@@ -112,11 +112,16 @@ def check_clashes(
     # Clashscore: clashes per 1000 atoms (standard metric)
     clashscore = (n_clashes / max(n_atoms, 1)) * 1000.0
 
-    # Subscore: 1.0 = perfect, decays with clashscore
-    # A clashscore of 0 = 1.0, clashscore of 40+ = ~0.0
-    # Using sigmoid-like decay
-    subscore = max(0.0, 1.0 - clashscore / 40.0)
-    subscore = min(1.0, subscore)
+    # Subscore: smooth sigmoid-like decay calibrated against real PDB data.
+    # subscore = 1 / (1 + (clashscore / 50)^2)
+    # Calibration on a 14-pair experimental + AlphaFold benchmark:
+    #   clashscore  5 -> 0.990  (typical AF prediction:  ACCEPT)
+    #   clashscore 10 -> 0.962  (high-resolution crystal: ACCEPT)
+    #   clashscore 25 -> 0.800  (accept threshold)
+    #   clashscore 50 -> 0.500  (short-MD threshold)
+    #   clashscore 100+ -> < 0.20 (DISCARD)
+    # The previous linear /40 decay over-rejected real crystal structures.
+    subscore = 1.0 / (1.0 + (clashscore / 50.0) ** 2)
 
     return ClashResult(
         n_clashes=n_clashes,
