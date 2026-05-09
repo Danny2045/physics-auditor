@@ -6530,8 +6530,8 @@
   },
   "alphafold_decomposition": {
     "structure_name": "AF-P0DTD1-F1-model_v6",
-    "total_energy_kcal": -606.224,
-    "pocket_energy_kcal": 511.494,
+    "total_energy_kcal": -1671.198,
+    "pocket_energy_kcal": -553.48,
     "n_residues": 297,
     "n_pocket_residues": 97,
     "pocket_residue_indices": [
@@ -9599,32 +9599,21 @@
         "res_name": "CYS",
         "chain_id": "A",
         "res_seq": 297,
-        "energy_kcal": 1061.0856,
+        "energy_kcal": -3.8886,
         "n_atoms": 7,
         "is_in_pocket": true,
-        "n_hot_pairs": 3
+        "n_hot_pairs": 0
       }
     ]
   },
   "difference": {
     "name_a": "5R82",
     "name_b": "AF-P0DTD1-F1-model_v6",
-    "total_delta_kcal": -610.346,
-    "pocket_delta_kcal": 1019.301,
+    "total_delta_kcal": -1675.32,
+    "pocket_delta_kcal": -45.674,
     "n_aligned": 97,
     "n_pocket_aligned": 97,
     "top_n_by_abs_delta": [
-      {
-        "res_name_a": "GLN",
-        "res_name_b": "CYS",
-        "residue_index_a": 298,
-        "residue_index_b": 296,
-        "energy_a_kcal": -6.4751,
-        "energy_b_kcal": 1061.0856,
-        "delta_kcal": 1067.5607,
-        "is_in_pocket_a": true,
-        "is_in_pocket_b": true
-      },
       {
         "res_name_a": "PHE",
         "res_name_b": "ASP",
@@ -9723,20 +9712,20 @@
         "delta_kcal": 6.2302,
         "is_in_pocket_a": true,
         "is_in_pocket_b": true
+      },
+      {
+        "res_name_a": "LEU",
+        "res_name_b": "TRP",
+        "residue_index_a": 29,
+        "residue_index_b": 27,
+        "energy_a_kcal": -7.4146,
+        "energy_b_kcal": -13.4451,
+        "delta_kcal": -6.0305,
+        "is_in_pocket_a": true,
+        "is_in_pocket_b": true
       }
     ],
     "top_n_unfavorable_in_b": [
-      {
-        "res_name_a": "GLN",
-        "res_name_b": "CYS",
-        "residue_index_a": 298,
-        "residue_index_b": 296,
-        "energy_a_kcal": -6.4751,
-        "energy_b_kcal": 1061.0856,
-        "delta_kcal": 1067.5607,
-        "is_in_pocket_a": true,
-        "is_in_pocket_b": true
-      },
       {
         "res_name_a": "PHE",
         "res_name_b": "SER",
@@ -9833,6 +9822,17 @@
         "energy_a_kcal": -8.0814,
         "energy_b_kcal": -3.6672,
         "delta_kcal": 4.4142,
+        "is_in_pocket_a": true,
+        "is_in_pocket_b": true
+      },
+      {
+        "res_name_a": "GLN",
+        "res_name_b": "ALA",
+        "residue_index_a": 191,
+        "residue_index_b": 189,
+        "energy_a_kcal": -6.0894,
+        "energy_b_kcal": -1.7954,
+        "delta_kcal": 4.294,
         "is_in_pocket_a": true,
         "is_in_pocket_b": true
       }
@@ -11012,8 +11012,8 @@
         "residue_index_a": 298,
         "residue_index_b": 296,
         "energy_a_kcal": -6.4751,
-        "energy_b_kcal": 1061.0856,
-        "delta_kcal": 1067.5607,
+        "energy_b_kcal": -3.8886,
+        "delta_kcal": 2.5865,
         "is_in_pocket_a": true,
         "is_in_pocket_b": true
       }

@@ -5040,7 +5040,7 @@
   },
   "alphafold_decomposition": {
     "structure_name": "AF-P11511-F1-model_v6",
-    "total_energy_kcal": -1716.61,
+    "total_energy_kcal": -2781.478,
     "pocket_energy_kcal": -738.951,
     "n_residues": 503,
     "n_pocket_residues": 109,
@@ -10181,17 +10181,17 @@
         "res_name": "HIS",
         "chain_id": "A",
         "res_seq": 503,
-        "energy_kcal": 1061.7611,
+        "energy_kcal": -3.1067,
         "n_atoms": 11,
         "is_in_pocket": false,
-        "n_hot_pairs": 3
+        "n_hot_pairs": 0
       }
     ]
   },
   "difference": {
     "name_a": "3EQM",
     "name_b": "AF-P11511-F1-model_v6",
-    "total_delta_kcal": 586.535,
+    "total_delta_kcal": -478.333,
     "pocket_delta_kcal": -20.2,
     "n_aligned": 109,
     "n_pocket_aligned": 109,

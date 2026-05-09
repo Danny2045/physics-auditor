@@ -38,7 +38,7 @@ COVALENT_BOND_CUTOFFS: dict[tuple[str, str], float] = {
 MIN_BOND_DISTANCE = 0.4  # Angstroms
 
 # Standard backbone connectivity: N → CA → C → O, and C → next N
-BACKBONE_BONDS = [("N", "CA"), ("CA", "C"), ("C", "O")]
+BACKBONE_BONDS = [("N", "CA"), ("CA", "C"), ("C", "O"), ("C", "OXT")]
 
 # Simplified sidechain connectivity templates for standard residues
 # Maps residue name → list of (atom1, atom2) bonds
@@ -219,6 +219,53 @@ def infer_bonds_from_topology(structure: Structure) -> list[tuple[int, int]]:
 
                     if d <= cutoff:
                         bonds.add(tuple(sorted((real_i, real_j))))
+
+    # Disulfide-bond pass: detect S-S covalent bonds between cysteine
+    # sidechains that aren't sequential neighbors.
+    #
+    # Standard force fields (AMBER ff14SB, CHARMM36) treat S-S bonds at
+    # ~2.05 angstroms as covalent. The protein-template logic above only
+    # adds intra-residue bonds plus the next-residue peptide bond, so a
+    # disulfide between two CYS residues anywhere else in the chain is
+    # never inferred.  When that pair is < 2.5 angstroms apart, the LJ
+    # kernel sees it as a non-bonded clash and assigns hundreds of
+    # kcal/mol of repulsion.  This bug was surfaced by the per-residue
+    # energy decomposition on CoV2Mpro (CYS296 reporting +1067 kcal of
+    # spurious strain).
+    #
+    # Detection: any pair of CYS-SG sulfurs at 1.9-2.4 angstroms is a
+    # disulfide bond.  This window matches the AMBER force-field criterion
+    # and is wider than typical X-ray resolution but tight enough to avoid
+    # false positives from non-bonded sulfurs.
+    DISULFIDE_MIN = 1.9
+    DISULFIDE_MAX = 2.4
+    sg_indices: list[int] = []
+    rid_list = list(structure.residues.keys())
+    for ridx in range(structure.n_residues):
+        if ridx >= len(rid_list):
+            continue
+        residue = structure.residues[rid_list[ridx]]
+        if residue.res_name != "CYS":
+            continue
+        if "SG" not in residue.atoms:
+            continue
+        # Find the SG atom's flat-array index
+        for ai in range(structure.n_atoms):
+            if (structure.res_indices[ai] == ridx
+                    and structure.atom_names[ai] == "SG"):
+                sg_indices.append(ai)
+                break
+
+    if len(sg_indices) >= 2:
+        sg_coords = structure.coords[sg_indices]
+        sg_dist = _compute_distance_matrix_np(sg_coords)
+        for ii in range(len(sg_indices)):
+            for jj in range(ii + 1, len(sg_indices)):
+                d = sg_dist[ii, jj]
+                if DISULFIDE_MIN <= d <= DISULFIDE_MAX:
+                    real_i = sg_indices[ii]
+                    real_j = sg_indices[jj]
+                    bonds.add(tuple(sorted((real_i, real_j))))
 
     return sorted(bonds)
 

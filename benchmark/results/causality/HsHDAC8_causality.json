@@ -3197,7 +3197,7 @@
   },
   "alphafold_decomposition": {
     "structure_name": "AF-Q9BY41-F1-model_v6",
-    "total_energy_kcal": -1074.981,
+    "total_energy_kcal": -2137.998,
     "pocket_energy_kcal": -280.374,
     "n_residues": 377,
     "n_pocket_residues": 46,
@@ -7015,17 +7015,17 @@
         "res_name": "VAL",
         "chain_id": "A",
         "res_seq": 377,
-        "energy_kcal": 1060.7363,
+        "energy_kcal": -2.2806,
         "n_atoms": 8,
         "is_in_pocket": false,
-        "n_hot_pairs": 3
+        "n_hot_pairs": 0
       }
     ]
   },
   "difference": {
     "name_a": "4HJO",
     "name_b": "AF-Q9BY41-F1-model_v6",
-    "total_delta_kcal": 312.003,
+    "total_delta_kcal": -751.014,
     "pocket_delta_kcal": -26.831,
     "n_aligned": 46,
     "n_pocket_aligned": 46,

@@ -10,7 +10,7 @@
   },
   "experimental_decomposition": {
     "structure_name": "1MVS",
-    "total_energy_kcal": 629.701,
+    "total_energy_kcal": -433.277,
     "pocket_energy_kcal": -301.064,
     "n_residues": 258,
     "n_pocket_residues": 68,
@@ -1940,10 +1940,10 @@
         "res_name": "ASP",
         "chain_id": "A",
         "res_seq": 186,
-        "energy_kcal": 1078.7443,
+        "energy_kcal": 15.7675,
         "n_atoms": 9,
         "is_in_pocket": false,
-        "n_hot_pairs": 4
+        "n_hot_pairs": 1
       },
       {
         "residue_index": 186,
@@ -2669,7 +2669,7 @@
   },
   "alphafold_decomposition": {
     "structure_name": "AF-Q02127-F1-model_v6",
-    "total_energy_kcal": -1046.064,
+    "total_energy_kcal": -2111.093,
     "pocket_energy_kcal": -355.304,
     "n_residues": 395,
     "n_pocket_residues": 68,
@@ -6689,17 +6689,17 @@
         "res_name": "ARG",
         "chain_id": "A",
         "res_seq": 395,
-        "energy_kcal": 1059.2853,
+        "energy_kcal": -5.743,
         "n_atoms": 12,
         "is_in_pocket": false,
-        "n_hot_pairs": 3
+        "n_hot_pairs": 0
       }
     ]
   },
   "difference": {
     "name_a": "1MVS",
     "name_b": "AF-Q02127-F1-model_v6",
-    "total_delta_kcal": -1675.766,
+    "total_delta_kcal": -1677.816,
     "pocket_delta_kcal": -54.24,
     "n_aligned": 68,
     "n_pocket_aligned": 68,

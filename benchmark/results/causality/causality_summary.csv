@@ -1,7 +1,7 @@
 name,description,exp_total_kcal,af_total_kcal,exp_pocket_kcal,af_pocket_kcal,pocket_delta_kcal,n_pocket_aligned,top_unfav_res_in_af,top_fav_res_in_af
-HsDHODH,"Human DHODH — Kira ortholog, ESM-2 blind spot pair",629.7,-1046.06,-301.06,-355.3,-54.24,68,GLY112:+11.1,MET76:-31.0
-SmDHODH,Parasite DHODH — 30.8x selectivity target,-225.64,-953.91,-748.35,-695.41,52.83,128,GLU132:+8.0,PHE128:-18.9
-HsHDAC8,Human HDAC8 — Kira ortholog for SmHDAC8,-1386.98,-1074.98,-253.54,-280.37,-26.83,46,GLY98:+7.1,TYR17:-8.9
-LmPTR1,Leishmania pteridine reductase 1 — antiparasitic target,-633.26,-345.91,-108.2,-117.89,-9.69,24,ALA27:+6.2,VAL61:-14.1
-HsAromatase,Human aromatase/CYP19A1 with androstenedione — metalloenzyme,-2303.15,-1716.61,-718.75,-738.95,-20.2,109,PHE429:+3.0,ASP370:-6.1
-CoV2Mpro,SARS-CoV-2 main protease with inhibitor — cysteine protease,4.12,-606.22,-515.95,511.49,1019.3,97,CYS296:+1067.6,ASP291:-25.9
+HsDHODH,"Human DHODH — Kira ortholog, ESM-2 blind spot pair",-433.28,-2111.09,-301.06,-355.3,-54.24,68,GLY112:+11.1,MET76:-31.0
+SmDHODH,Parasite DHODH — 30.8x selectivity target,-1301.15,-2020.85,-748.35,-695.41,52.83,128,GLU132:+8.0,PHE128:-18.9
+HsHDAC8,Human HDAC8 — Kira ortholog for SmHDAC8,-1386.98,-2138.0,-253.54,-280.37,-26.83,46,GLY98:+7.1,TYR17:-8.9
+LmPTR1,Leishmania pteridine reductase 1 — antiparasitic target,-633.26,-1407.43,-108.2,-117.89,-9.69,24,ALA27:+6.2,VAL61:-14.1
+HsAromatase,Human aromatase/CYP19A1 with androstenedione — metalloenzyme,-2303.15,-2781.48,-718.75,-738.95,-20.2,109,PHE429:+3.0,ASP370:-6.1
+CoV2Mpro,SARS-CoV-2 main protease with inhibitor — cysteine protease,4.12,-1671.2,-515.95,-553.48,-45.67,97,SER109:+6.8,ASP291:-25.9

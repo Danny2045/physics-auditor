@@ -1775,7 +1775,7 @@
   },
   "alphafold_decomposition": {
     "structure_name": "AF-Q01782-F1-model_v6",
-    "total_energy_kcal": -345.908,
+    "total_energy_kcal": -1407.431,
     "pocket_energy_kcal": -117.891,
     "n_residues": 288,
     "n_pocket_residues": 24,
@@ -4681,17 +4681,17 @@
         "res_name": "ALA",
         "chain_id": "A",
         "res_seq": 288,
-        "energy_kcal": 1060.529,
+        "energy_kcal": -0.993,
         "n_atoms": 6,
         "is_in_pocket": false,
-        "n_hot_pairs": 3
+        "n_hot_pairs": 0
       }
     ]
   },
   "difference": {
     "name_a": "2BPR",
     "name_b": "AF-Q01782-F1-model_v6",
-    "total_delta_kcal": 287.35,
+    "total_delta_kcal": -774.172,
     "pocket_delta_kcal": -9.687,
     "n_aligned": 24,
     "n_pocket_aligned": 24,

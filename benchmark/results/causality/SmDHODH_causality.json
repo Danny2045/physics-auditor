@@ -10,7 +10,7 @@
   },
   "experimental_decomposition": {
     "structure_name": "1D3H",
-    "total_energy_kcal": -225.638,
+    "total_energy_kcal": -1301.147,
     "pocket_energy_kcal": -748.353,
     "n_residues": 667,
     "n_pocket_residues": 129,
@@ -3781,10 +3781,10 @@
         "res_name": "ARG",
         "chain_id": "A",
         "res_seq": 396,
-        "energy_kcal": 1072.3022,
+        "energy_kcal": -3.2068,
         "n_atoms": 12,
         "is_in_pocket": false,
-        "n_hot_pairs": 3
+        "n_hot_pairs": 0
       },
       {
         "residue_index": 364,
@@ -6820,7 +6820,7 @@
   },
   "alphafold_decomposition": {
     "structure_name": "AF-G4VFD7-F1-model_v6",
-    "total_energy_kcal": -953.911,
+    "total_energy_kcal": -2020.854,
     "pocket_energy_kcal": -695.412,
     "n_residues": 379,
     "n_pocket_residues": 128,
@@ -10740,17 +10740,17 @@
         "res_name": "SER",
         "chain_id": "A",
         "res_seq": 379,
-        "energy_kcal": 1066.8619,
+        "energy_kcal": -0.0808,
         "n_atoms": 7,
         "is_in_pocket": false,
-        "n_hot_pairs": 3
+        "n_hot_pairs": 0
       }
     ]
   },
   "difference": {
     "name_a": "1D3H",
     "name_b": "AF-G4VFD7-F1-model_v6",
-    "total_delta_kcal": -728.273,
+    "total_delta_kcal": -719.707,
     "pocket_delta_kcal": 52.828,
     "n_aligned": 128,
     "n_pocket_aligned": 128,
