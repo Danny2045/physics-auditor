@@ -239,3 +239,111 @@ def run_lj_analysis(
         "energy_matrix": energy_matrix,
         "n_hot_pairs": n_hot_pairs,
     }
+
+
+def per_residue_ligand_interaction_energy(
+    dist_matrix: jnp.ndarray,
+    elements: np.ndarray,
+    mask: jnp.ndarray,
+    res_indices: np.ndarray,
+    n_residues: int,
+    ligand_atom_indices: np.ndarray,
+    energy_cap: float = 1000.0,
+) -> dict:
+    """Per-residue LJ energy of protein-residue ↔ ligand interactions only.
+
+    Unlike :func:`run_lj_analysis`, which sums LJ energy over all atom
+    pairs in the structure (mostly protein-protein), this function
+    isolates the energy each protein residue contributes specifically
+    to its interaction with the ligand. This is the central operation
+    of selectivity-attribution: for a parasite target and its human
+    ortholog, both with the same (or comparable) compound bound,
+    compute this per-residue ligand-interaction energy on each side,
+    align the pocket residues, and rank the residues that drive the
+    selectivity difference.
+
+    Parameters
+    ----------
+    dist_matrix, elements, mask, res_indices, n_residues, energy_cap
+        Same as :func:`run_lj_analysis`. The mask is the bonded mask;
+        atoms covalently bonded to each other are excluded so the
+        function only sums non-bonded LJ interactions.
+    ligand_atom_indices : np.ndarray
+        Flat-array indices of atoms that belong to the ligand. Any
+        atom not in this set is treated as protein side. The function
+        sums LJ energy for pairs where one atom is in the ligand set
+        and the other is not.
+
+    Returns
+    -------
+    dict with keys:
+        'total_ligand_interaction_kcal' : float
+            Sum of all ligand-protein pairwise LJ energies.
+        'per_residue_ligand_interaction_kcal' : np.ndarray, shape (n_residues,)
+            For each residue, the sum of LJ energies between that
+            residue's atoms and any ligand atom. Residues with no
+            atoms near the ligand contribute zero.
+        'n_ligand_atoms' : int
+        'n_hot_protein_residues' : int
+            Residues where |ligand interaction| > 1 kcal/mol — a
+            simple count of "residues that meaningfully see the
+            ligand".
+
+    NON-CLAIMS:
+        - LJ-only. Electrostatics, H-bonds, solvation not modeled.
+        - Per-residue *attribution* means LJ sum, not free-energy
+          contribution. A favorable LJ contact may sit alongside an
+          unfavorable electrostatic contact not modeled here.
+        - The ligand_atom_indices must correctly enumerate all and
+          only the ligand atoms; cofactors (FMN, NADP), substrates
+          (orotate), and crystallographic additives (sulfate, water)
+          must be classified by the caller. This function does not
+          guess.
+    """
+    if len(ligand_atom_indices) == 0:
+        return {
+            "total_ligand_interaction_kcal": 0.0,
+            "per_residue_ligand_interaction_kcal": np.zeros(n_residues),
+            "n_ligand_atoms": 0,
+            "n_hot_protein_residues": 0,
+        }
+
+    sigma, epsilon = get_lj_params_arrays(elements)
+    sigma_jnp = jnp.array(sigma)
+    epsilon_jnp = jnp.array(epsilon)
+
+    energy_matrix = compute_lj_energy_matrix(
+        dist_matrix, sigma_jnp, sigma_jnp,
+        epsilon_jnp, epsilon_jnp, mask, energy_cap
+    )
+    energy_np = np.asarray(energy_matrix)
+
+    n_atoms = energy_np.shape[0]
+    # Boolean mask: which atoms are ligand atoms
+    is_ligand = np.zeros(n_atoms, dtype=bool)
+    is_ligand[np.asarray(ligand_atom_indices, dtype=np.int64)] = True
+
+    # For each protein atom, sum LJ energy across all ligand atoms.
+    # That gives per-atom protein-side interaction energy.
+    # Then aggregate to per-residue via np.add.at.
+    # We don't divide by 2 here because each cross pair is counted once
+    # in this asymmetric protein↔ligand setup (unlike the symmetric
+    # protein↔protein per-atom function which halves to avoid double-count).
+    protein_atom_ligand_interaction = energy_np[~is_ligand][:, is_ligand].sum(axis=1)
+    protein_atom_indices = np.where(~is_ligand)[0]
+
+    per_residue = np.zeros(n_residues, dtype=np.float64)
+    for k, pa_idx in enumerate(protein_atom_indices):
+        ri = int(res_indices[pa_idx])
+        if 0 <= ri < n_residues:
+            per_residue[ri] += protein_atom_ligand_interaction[k]
+
+    total = float(per_residue.sum())
+    n_hot = int(np.sum(np.abs(per_residue) > 1.0))
+
+    return {
+        "total_ligand_interaction_kcal": total,
+        "per_residue_ligand_interaction_kcal": per_residue,
+        "n_ligand_atoms": int(is_ligand.sum()),
+        "n_hot_protein_residues": n_hot,
+    }

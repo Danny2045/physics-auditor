@@ -20,6 +20,13 @@ from physics_auditor.causality.energy_decomp import (
     per_residue_decomposition,
     per_residue_difference,
 )
+from physics_auditor.causality.selectivity_map import (
+    SelectivityMap,
+    SelectivityResiduePair,
+    compute_selectivity_map,
+    find_ligand_atoms_by_resname,
+    selectivity_map_to_dict,
+)
 
 __all__ = [
     # Binding site
@@ -36,4 +43,10 @@ __all__ = [
     "difference_to_dict",
     "per_residue_decomposition",
     "per_residue_difference",
+    # Selectivity map
+    "SelectivityMap",
+    "SelectivityResiduePair",
+    "compute_selectivity_map",
+    "find_ligand_atoms_by_resname",
+    "selectivity_map_to_dict",
 ]
