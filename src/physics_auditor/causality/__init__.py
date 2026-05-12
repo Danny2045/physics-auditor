@@ -28,6 +28,10 @@ from physics_auditor.causality.selectivity_map import (
     selectivity_map_to_dict,
 )
 
+# Note: divergence is intentionally NOT eagerly imported at package-load
+# time because it pulls in torch + fair-esm (heavy, optional). Callers
+# import it explicitly: `from physics_auditor.causality.divergence import ...`
+
 __all__ = [
     # Binding site
     "BindingSite",
