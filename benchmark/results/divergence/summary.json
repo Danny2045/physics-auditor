@@ -1,0 +1,88 @@
+{
+  "model_name": "esm2_t33_650M_UR50D",
+  "slogan_being_quantified": "SmDHODH/HsDHODH share full-sequence ESM-2 cosine ~0.99 yet admit ~30x experimental compound selectivity.",
+  "pairs": [
+    {
+      "pair_name": "SmDHODH_vs_HsDHODH_UniProt",
+      "status": "full_sequence_only",
+      "target_source": "AF-G4VFD7 (SmDHODH UniProt sequence)",
+      "ortholog_source": "AF-Q02127 (HsDHODH UniProt sequence)",
+      "full_sequence_cosine": 0.989732,
+      "pocket_meanpool_cosine": null,
+      "pocket_subseq_cosine": null,
+      "divergence_amplification": null,
+      "n_pocket_residues_target": null,
+      "n_pocket_residues_ortholog": null,
+      "claims": [
+        "Full-sequence ESM-2 (esm2_t33_650M_UR50D) cosine between true SmDHODH (G4VFD7, 379 residues) and true HsDHODH (Q02127, 395 residues) is 0.989732.",
+        "Reproduces the Kira-cited high-similarity slogan from public UniProt sequences with no additional data."
+      ],
+      "notes": [
+        "Pocket-level divergence is not computed for this pair: no SmDHODH co-crystal in the repo to anchor pocket-residue indices via the compute_selectivity_map convention. A future PDB pull of e.g. 6FMD (SmDHODH+inhibitor) would enable the pocket leg of the comparison."
+      ]
+    },
+    {
+      "pair_name": "1D3H_vs_1MVS",
+      "status": "full",
+      "target_source": "1D3H (HsDHODH catalytic construct, Q02127 res 30+)",
+      "ortholog_source": "1MVS (HsDHFR)",
+      "full_sequence_cosine": 0.818188,
+      "pocket_meanpool_cosine": 0.552574,
+      "pocket_subseq_cosine": 0.979247,
+      "divergence_amplification": 0.265614,
+      "n_pocket_residues_target": 19,
+      "n_pocket_residues_ortholog": 19,
+      "claims": [
+        "Pocket cosine is lower than full-sequence cosine for this pair: full=0.818188, pocket_meanpool=0.552574, amplification=0.265614.",
+        "The amplification number is the operational quantity: it is the gap that whole-protein representations conceal."
+      ],
+      "notes": [
+        "This is a functional paralog comparison (HsDHODH vs HsDHFR), not an ortholog comparison. The selectivity_map dossier labels these 'SmDHODH' and 'HsDHODH'; that label is a mislabel \u2014 1D3H's SOURCE record is HOMO SAPIENS DHODH, and 1MVS is HOMO SAPIENS DHFR.",
+        "Pocket residue indices were transferred from benchmark/results/selectivity_maps/SmDHODH_vs_HsDHODH.json via res_seq lookup; alignment is therefore exactly the one compute_selectivity_map produced."
+      ]
+    },
+    {
+      "pair_name": "TbPTR1_vs_HsDHFR",
+      "status": "excluded",
+      "target_source": "",
+      "ortholog_source": "",
+      "full_sequence_cosine": null,
+      "pocket_meanpool_cosine": null,
+      "pocket_subseq_cosine": null,
+      "divergence_amplification": null,
+      "n_pocket_residues_target": null,
+      "n_pocket_residues_ortholog": null,
+      "claims": [],
+      "notes": [
+        "No Tb structure in repo (closest: AF-Q01782 = LmPTR1). Pairing LmPTR1 with the 1MVS HsDHFR sequence is technically possible but neither side has a co-crystal that anchors pocket-residue indices in the same evolutionary context as the SmDHODH pair, so the pocket-divergence number for this pair would not survive review. Functional paralog comparison, no clean pocket alignment available in this checkout."
+      ]
+    },
+    {
+      "pair_name": "LmPTR1_human_paralog",
+      "status": "excluded",
+      "target_source": "",
+      "ortholog_source": "",
+      "full_sequence_cosine": null,
+      "pocket_meanpool_cosine": null,
+      "pocket_subseq_cosine": null,
+      "divergence_amplification": null,
+      "n_pocket_residues_target": null,
+      "n_pocket_residues_ortholog": null,
+      "claims": [],
+      "notes": [
+        "LmPTR1 (AF-Q01782) has no clean human paralog co-crystal in the repo. HsDHFR (1MVS) is the closest enzyme-class paralog but the parasite side (Lm) is apo AF only, so pocket-residue indices can not be extracted by compute_selectivity_map convention."
+      ]
+    }
+  ],
+  "aggregate": {
+    "n_pairs_with_amplification": 1,
+    "mean_amplification": 0.265614,
+    "std_amplification": null,
+    "note": "Only one pair produced a full cosine triple in this checkout. \u03c3 is not reported because a single-sample standard deviation is not meaningful. Adding parasite co-crystals (e.g. 6FMD for SmDHODH) would lift n above 1 and unlock honest error bars."
+  },
+  "data_provenance": {
+    "structures_dir": "benchmark/structures/",
+    "selectivity_map_dossier": "benchmark/results/selectivity_maps/SmDHODH_vs_HsDHODH.json",
+    "esm_model": "esm2_t33_650M_UR50D"
+  }
+}
