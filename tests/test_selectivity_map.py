@@ -7,10 +7,15 @@ Two layers of testing:
    ligand contact. The selectivity map must attribute the gap to that
    residue.
 
-2. Real-data integration on the SmDHODH (1D3H) / HsDHODH (1MVS) pair
-   with their bound inhibitors A26 and DTM. Verifies the module
-   runs end-to-end on actual co-crystal data, with sensible energy
-   magnitudes and non-empty pocket residue lists.
+2. Real-data integration on the 1D3H / 1MVS pair with their bound
+   inhibitors A26 and DTM. Verifies the module runs end-to-end on
+   actual co-crystal data, with sensible energy magnitudes and
+   non-empty pocket residue lists.
+
+   NB: 1D3H is HsDHODH (catalytic construct of Q02127) and 1MVS is
+   HsDHFR — two different human enzymes. The integration test asserts
+   on per-residue *attribution* mechanics only; it does NOT assert
+   parasite-vs-human selectivity. See SELECTIVITY_FINDINGS.md.
 """
 
 from __future__ import annotations
@@ -219,30 +224,34 @@ class TestSerialization:
 
 
 class TestDHODHIntegration:
-    """End-to-end on the SmDHODH (1D3H) / HsDHODH (1MVS) pair with their
-    bound inhibitors A26 (parasite) and DTM (human).
+    """End-to-end on the 1D3H (HsDHODH catalytic construct + A26) / 1MVS
+    (HsDHFR + DTM) pair. The structures are committed in the benchmark
+    directory.
 
-    The structures are committed in the benchmark directory; this test is
-    the first time the selectivity map is run on real co-crystal data.
+    This is a functional-paralog comparison between two human enzymes,
+    not a parasite-vs-human selectivity comparison. The test verifies
+    only that per-residue attribution mechanics work on real co-crystal
+    data — sensible energies, non-empty pocket. Biology claims about
+    selectivity are out of scope for this test.
     """
 
-    def _smdhodh_path(self) -> Path:
+    def _hsdhodh_path(self) -> Path:
         return REPO_ROOT / "benchmark" / "structures" / "experimental" / "1D3H.pdb"
 
-    def _hsdhodh_path(self) -> Path:
+    def _hsdhfr_path(self) -> Path:
         return REPO_ROOT / "benchmark" / "structures" / "experimental" / "1MVS.pdb"
 
     def test_dhodh_pair_runs_end_to_end(self):
-        if not self._smdhodh_path().exists() or not self._hsdhodh_path().exists():
-            pytest.skip("DHODH benchmark structures not in this checkout")
+        if not self._hsdhodh_path().exists() or not self._hsdhfr_path().exists():
+            pytest.skip("DHODH/DHFR benchmark structures not in this checkout")
 
-        sm_dhodh = parse_pdb(self._smdhodh_path())
         hs_dhodh = parse_pdb(self._hsdhodh_path())
+        hs_dhfr = parse_pdb(self._hsdhfr_path())
 
         smap = compute_selectivity_map(
-            target_structure=sm_dhodh,
+            target_structure=hs_dhodh,
             target_ligand_resname="A26",
-            ortholog_structure=hs_dhodh,
+            ortholog_structure=hs_dhfr,
             ortholog_ligand_resname="DTM",
             pocket_cutoff=5.0,
         )
@@ -251,27 +260,25 @@ class TestDHODHIntegration:
         assert smap.n_aligned_pocket_residues > 10, (
             f"Pocket alignment too sparse: only "
             f"{smap.n_aligned_pocket_residues} aligned residues. "
-            f"DHODH active site should have at least 10 contact residues."
+            f"Either active site should have at least 10 contact residues."
         )
 
         # Both totals should be substantially negative (favorable) — these
         # are real inhibitors in real binding modes; LJ interaction in the
         # tens of -kcal/mol is expected.
         assert smap.total_target_interaction_kcal < -5.0, (
-            f"Target total LJ interaction not favorable: "
+            f"1D3H total LJ interaction not favorable: "
             f"{smap.total_target_interaction_kcal:.2f} kcal/mol. "
             f"Real inhibitor should give meaningful negative number."
         )
         assert smap.total_ortholog_interaction_kcal < -5.0, (
-            f"Ortholog total LJ interaction not favorable: "
+            f"1MVS total LJ interaction not favorable: "
             f"{smap.total_ortholog_interaction_kcal:.2f} kcal/mol."
         )
 
-        # Top target-selective residue list must be non-empty
+        # The ranked list must be non-empty. We do not assert the sign of
+        # the top delta — the comparison is between two different human
+        # enzymes binding two different chemotypes, so a "selective"
+        # interpretation of the ranking is not warranted.
         top_target = smap.top_n_target_selective(n=5)
         assert len(top_target) > 0
-        # And the top entry must show positive delta (target preferred)
-        # — but only if the two structures have genuinely different residue
-        # contacts; we assert weakly here.
-        # The point of this assertion is to confirm the math runs and
-        # produces real numbers, not to claim a specific biology result.

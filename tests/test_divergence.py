@@ -176,7 +176,7 @@ class TestDHODHIntegration:
     separately.
     """
 
-    DOSSIER = REPO_ROOT / "benchmark/results/selectivity_maps/SmDHODH_vs_HsDHODH.json"
+    DOSSIER = REPO_ROOT / "benchmark/results/selectivity_maps/HsDHODH_vs_HsDHFR_pocket_attribution.json"
     P1D3H = REPO_ROOT / "benchmark/structures/experimental/1D3H.pdb"
     P1MVS = REPO_ROOT / "benchmark/structures/experimental/1MVS.pdb"
 

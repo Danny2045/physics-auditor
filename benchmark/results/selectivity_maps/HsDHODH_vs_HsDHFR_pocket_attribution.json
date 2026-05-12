@@ -1,4 +1,10 @@
 {
+  "claims": {
+    "what_this_is": "Per-residue LJ-interaction attribution between 1D3H (HsDHODH catalytic construct, UniProt Q02127 residues 30+, bound to A26/teriflunomide) and 1MVS (HsDHFR, bound to a DTM pyrido[2,3-d]pyrimidine antifolate). Both PDB SOURCE records are HOMO SAPIENS.",
+    "what_this_is_not": "This is NOT a parasite-vs-human selectivity comparison. The two structures are two different human enzymes (DHODH and DHFR) binding two different inhibitor chemotypes.",
+    "supported_finding": "The tool surfaces a polar-to-polar residue substitution (HIS56 \u2194 GLU30 at one pair of aligned active-site positions) as the dominant per-residue LJ contributor between HsDHODH+A26 and HsDHFR+DTM. This is a sanity check on the per-residue attribution machinery, NOT a selectivity-design hypothesis.",
+    "pending_followup": "Rerun on a true parasite-DHODH co-crystal (candidates: 6Q86 if confirmed SmDHODH; PfDHODH co-crystals 4ORM/4RX0 as a published-orthology alternative) paired with an HsDHODH co-crystal carrying a comparable inhibitor chemotype. Until then, the per-residue selectivity claim is on hold."
+  },
   "target_name": "1D3H",
   "ortholog_name": "1MVS",
   "target_ligand_name": "A26",

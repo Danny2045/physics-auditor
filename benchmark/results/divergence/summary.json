@@ -38,7 +38,7 @@
       ],
       "notes": [
         "This is a functional paralog comparison (HsDHODH vs HsDHFR), not an ortholog comparison. The selectivity_map dossier labels these 'SmDHODH' and 'HsDHODH'; that label is a mislabel \u2014 1D3H's SOURCE record is HOMO SAPIENS DHODH, and 1MVS is HOMO SAPIENS DHFR.",
-        "Pocket residue indices were transferred from benchmark/results/selectivity_maps/SmDHODH_vs_HsDHODH.json via res_seq lookup; alignment is therefore exactly the one compute_selectivity_map produced."
+        "Pocket residue indices were transferred from benchmark/results/selectivity_maps/HsDHODH_vs_HsDHFR_pocket_attribution.json via res_seq lookup; alignment is therefore exactly the one compute_selectivity_map produced."
       ]
     },
     {
@@ -82,7 +82,7 @@
   },
   "data_provenance": {
     "structures_dir": "benchmark/structures/",
-    "selectivity_map_dossier": "benchmark/results/selectivity_maps/SmDHODH_vs_HsDHODH.json",
+    "selectivity_map_dossier": "benchmark/results/selectivity_maps/HsDHODH_vs_HsDHFR_pocket_attribution.json",
     "esm_model": "esm2_t33_650M_UR50D"
   }
 }

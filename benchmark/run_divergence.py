@@ -179,7 +179,7 @@ def run_1d3h_1mvs_structural_pair() -> PairResult:
     these "SmDHODH" and "HsDHODH" which is a mislabel inherited from
     earlier Kira notation.
     """
-    dossier = REPO_ROOT / "benchmark/results/selectivity_maps/SmDHODH_vs_HsDHODH.json"
+    dossier = REPO_ROOT / "benchmark/results/selectivity_maps/HsDHODH_vs_HsDHFR_pocket_attribution.json"
     p1d3h = REPO_ROOT / "benchmark/structures/experimental/1D3H.pdb"
     p1mvs = REPO_ROOT / "benchmark/structures/experimental/1MVS.pdb"
 
@@ -347,7 +347,7 @@ def main():
         "aggregate": aggregate_block,
         "data_provenance": {
             "structures_dir": "benchmark/structures/",
-            "selectivity_map_dossier": "benchmark/results/selectivity_maps/SmDHODH_vs_HsDHODH.json",
+            "selectivity_map_dossier": "benchmark/results/selectivity_maps/HsDHODH_vs_HsDHFR_pocket_attribution.json",
             "esm_model": MODEL_NAME,
         },
     }
