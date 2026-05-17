@@ -1,6 +1,6 @@
 # State of Physics Auditor
 
-**Snapshot anchor commit:** `96eac03` — *manuscript: update author name to Daniel Ngabonziza*
+**Snapshot anchor commit:** `e7064de` — *Merge pull request #1 from Danny2045/feat/pfdhodh-selectivity*
 **Snapshot date:** 2026-05-17
 **Repository:** [github.com/Danny2045/physics-auditor](https://github.com/Danny2045/physics-auditor)
 
@@ -13,8 +13,8 @@ This file is the canonical state-of-repository reference for Physics Auditor. It
 Specific guidance:
 
 - **Read this before starting any substantial work** on Physics Auditor. The Outstanding Work Register (§9) is the authoritative list of open findings; if you are about to open a PR, check there first to confirm your work is scoped to a real open finding and is not already partially done on an existing branch.
-- **This document is descriptive, not normative.** The [README](README.md) is the marketing-and-onboarding surface. [`CLAUDE.md`](CLAUDE.md) carries the four-line "Rules" block that is the closest thing this repository currently has to governance. The PfDHODH dossier's inline `claims` field (`benchmark/results/selectivity_maps/PfDHODH_vs_HsDHODH_selectivity.json` on `feat/pfdhodh-selectivity`) and the prose document next to it (`PFDHODH_SELECTIVITY_FINDINGS.md`) are the closest analogs to per-artifact provenance discipline. This file is descriptive: it tells you what *is*, not what *ought to be*.
-- **This document is updated periodically, not continuously.** Every line carries an implicit "as of commit `96eac03`". Branch lists, missing-file tables, finding-status grids, and per-artifact reproducibility lines can drift between snapshots. When you make a substantive structural change to the repository, update this file as part of the same PR; when you only fix code without changing the structure of what's reproducible, you may leave it for the next snapshot. The "Update protocol" section at the end (§11) describes the cadence in more detail.
+- **This document is descriptive, not normative.** The [README](README.md) is the marketing-and-onboarding surface. [`CLAUDE.md`](CLAUDE.md) carries the four-line "Rules" block that is the closest thing this repository currently has to governance. The PfDHODH dossier's inline `claims` field (`benchmark/results/selectivity_maps/PfDHODH_vs_HsDHODH_selectivity.json`, on master at the snapshot commit) and the prose document next to it (`PFDHODH_SELECTIVITY_FINDINGS.md`) are the closest analogs to per-artifact provenance discipline. This file is descriptive: it tells you what *is*, not what *ought to be*.
+- **This document is updated periodically, not continuously.** Every line carries an implicit "as of commit `e7064de`". Branch lists, missing-file tables, finding-status grids, and per-artifact reproducibility lines can drift between snapshots. When you make a substantive structural change to the repository, update this file as part of the same PR; when you only fix code without changing the structure of what's reproducible, you may leave it for the next snapshot. The "Update protocol" section at the end (§11) describes the cadence in more detail.
 - **Do not introduce new scientific claims or new metrics in this document.** If a number is not already documented in committed state (a result artifact, a findings doc, the manuscript), it does not belong here. This file is a faithful summary; it is not a place to publish.
 - **The Outstanding Work Register pairs every open finding with a "Natural next-PR scope" note.** Use those notes as starting points; refine them when you actually open the PR.
 - **Paired with Kira.** Physics Auditor is the structure-validation half of the platform Kira anchors. The corresponding state document lives at [`STATE_OF_KIRA.md`](https://github.com/Danny2045/Kira/blob/main/STATE_OF_KIRA.md) in the Kira repository. See §12.
@@ -23,20 +23,18 @@ Specific guidance:
 
 ## 1. Repository overview
 
-Physics Auditor is a JAX-based structure-validation toolkit for AI-generated protein-ligand complexes. It performs steric-clash detection and Lennard-Jones energy decomposition on parsed PDB structures, and on the headline branch it additionally performs per-residue selectivity attribution between a target protein and its ortholog.
+Physics Auditor is a JAX-based structure-validation toolkit for AI-generated protein-ligand complexes. It performs steric-clash detection, Lennard-Jones energy decomposition (including per-residue attribution), binding-pocket extraction and pairwise comparison, ESM-2 full-sequence-vs-pocket divergence amplification, and per-residue selectivity attribution between a target protein and its ortholog. The headline scientific result of the project — recovery of the published F188 / R265 / H185 antimalarial DHODH selectivity cluster blind, from a static LJ-only attribution between PfDHODH (4ORM, bound to DSM338) and HsDHODH (1D3H, bound to teriflunomide) — is on master.
 
 The repository contains, at the snapshot commit on `master`:
 
-- an **active engine** under `src/physics_auditor/` (17 Python files across 6 sub-packages, three of which are stubs at the snapshot commit),
+- an **active engine** under `src/physics_auditor/` (19 Python files across 7 sub-packages: `core/`, `checks/`, `causality/`, `utils/`, `reference/`, `report/`, plus the package root),
 - a **CLI** (`physics-auditor validate <file.pdb>` and `physics-auditor info <file.pdb>`) exposed via `pyproject.toml` `[project.scripts]`,
-- a **benchmark suite** under `benchmark/` (35 files, ~20.9 MB) — 33 PDB structures (18 experimental + 15 AlphaFold v6 predictions), one benchmark script (`benchmark_pocket_clashscore.py`), one result JSON (`pocket_clashscore_comparison.json`),
-- a **test suite** of 45 collected tests under `tests/` (all 45 pass; ruff clean),
+- a **benchmark suite** under `benchmark/` (54 files, ~22.8 MB) — 34 PDB structures (19 experimental including 4ORM + 15 AlphaFold v6 predictions), five benchmark scripts, and 16 result artifacts (the 14-pair clashscore JSON, six per-pair causality JSONs + a summary CSV + two findings documents, the ESM-2 divergence summary, the PfDHODH selectivity dossier + its findings doc, the HsDHODH-vs-HsDHFR functional-paralog stand-in + its findings doc),
+- a **test suite** of 92 collected tests + 1 skip under `tests/` (all pass; ruff clean),
 - a **manuscript** under `manuscript/` (`preprint.md` + `preprint.pdf`) reporting the 14-pair binding-site clashscore benchmark,
-- and a small set of **root files** (README, SETUP.md, CLAUDE.md, pyproject.toml, .gitignore, .github/workflows/ci.yml).
+- and a small set of **root files** (README, SETUP.md, CLAUDE.md, pyproject.toml, .gitignore, .github/workflows/ci.yml, this document).
 
 There is **no `docs/` directory** at the snapshot commit. Governance documents that exist in the sister repository (Kira's Scientific Constitution, Claim Inflation Audit, Disposition Plan) have no Physics Auditor counterpart yet — see Finding 5.
-
-The **headline scientific result of the project — per-residue Lennard-Jones selectivity attribution recovering the published PfDHODH selectivity cluster (HIS185, PHE188, ARG265) blind — lives on `feat/pfdhodh-selectivity` (PR #1, open since 2026-05-12), not on master.** §13 catalogs that work in full. This state document anchors to master and notes throughout where the unmerged branch carries additional content.
 
 The full module-level map is in §5 (Methodology map).
 
@@ -46,25 +44,26 @@ The full module-level map is in §5 (Methodology map).
 
 | Property | Value |
 |---|---|
-| Snapshot commit | `96eac03` |
+| Snapshot commit | `e7064de` |
 | Snapshot date | 2026-05-17 |
 | Main branch | `master` |
-| Tests collected (master) | 45 |
-| Tests passing (master) | 45 |
-| Tests skipped (master) | 0 |
-| Tests failing (master) | 0 |
-| Tests on `feat/pfdhodh-selectivity` (PR #1) | 92 passed, 1 skipped |
-| Committed files (tracked) on master | 67 |
-| Committed size on master | ~21.0 MB (overwhelmingly committed PDB structures under `benchmark/`) |
-| Active engine modules under `src/physics_auditor/` | 17 (`.py`) — of which 3 (`causality/divergence.py`, `causality/energy_decomp.py`, `causality/selectivity_map.py`) are 10-line stubs |
+| Tests collected | 92 + 1 skipped |
+| Tests passing | 92 |
+| Tests skipped | 1 |
+| Tests failing | 0 |
+| Committed files (tracked) | 95 |
+| Committed size | ~22.8 MB (overwhelmingly committed PDB structures under `benchmark/`) |
+| Active engine modules under `src/physics_auditor/` | 19 (`.py`) |
 | Implemented IsoDDE-style validation checks | 2 of 8 (steric clashes, Lennard-Jones energy) |
-| Benchmark PDB structures (master) | 33 (18 experimental + 15 AlphaFold v6 predicted) |
+| Benchmark PDB structures | 34 (19 experimental + 15 AlphaFold v6 predicted) |
+| Benchmark producing scripts | 5 (one clashscore, four under the causality/selectivity/divergence umbrella) |
+| Benchmark result artifacts | 16 |
 | Provenance sidecars (Kira-style `*_provenance.json`) | 0 |
-| Inline-`claims` artifacts | 2 on `feat/pfdhodh-selectivity` (the PfDHODH selectivity dossier and `divergence/summary.json`); 0 on master |
-| Merged PRs on master | 0 |
-| Open PRs | 1 (PR #1, `feat/pfdhodh-selectivity`) |
-| Merge commits on master | 0 |
-| Open findings registered by this document | 7 (all new; this is the first audit) |
+| Inline-`claims` result artifacts | 2 (`PfDHODH_vs_HsDHODH_selectivity.json`, `divergence/summary.json`) |
+| Merged PRs on master | 1 (PR #1) |
+| Open PRs | 1 (PR #2, this document) |
+| Merge commits on master | 1 (PR #1 merge at `e7064de`) |
+| Open findings registered by this document | 7 |
 | Governance documents (Scientific Constitution / Claim Inflation Audit / Disposition Plan) | 0 |
 | CI matrix | Python 3.11, 3.13 on Ubuntu (`.github/workflows/ci.yml`) |
 
@@ -77,64 +76,70 @@ The full module-level map is in §5 (Methodology map).
 - `origin` → `https://github.com/Danny2045/physics-auditor.git` (fetch + push)
 - Refspec: `+refs/heads/*:refs/remotes/origin/*` (standard)
 
-### 3.2 Full commit history on `master`
+### 3.2 Last 20 commits on `master`
 
-Master has 15 commits, all linear, **zero merge commits**. The full history is small enough to list:
+Master at the snapshot commit has 28 commits total. The 13 commits before `e7064de` are the contents of PR #1 (`feat/pfdhodh-selectivity`); everything before that was direct pushes during initial development.
 
 ```
+e7064de Merge pull request #1 from Danny2045/feat/pfdhodh-selectivity
+73bddb1 benchmark: PfDHODH-vs-HsDHODH selectivity attribution
+02c15aa benchmark: add 4ORM (PfDHODH bound to DSM338)
+d30be39 feat(utils): pdb_provenance — verify SOURCE before parse
+a19a2a2 fix(selectivity-map): relabel 1D3H/1MVS run — HsDHODH vs HsDHFR, not Sm/Hs
+e6ec67d benchmark: run_divergence.py — quantify Kira ESM-2 slogan with claims field
+51c961d test(causality): cover divergence.py — identity, synthetic, validation, real data
+91c5372 feat(causality): divergence.py — ESM-2 full vs pocket cosine
+e2d23f6 chore: ignore .claude/ local agents directory
+c55528e feat: selectivity-attribution map (per-residue compound preference)
+1e2d7a6 fix: topology gaps surfaced by causality layer (disulfide + C-term OXT)
+174c543 fix: parse_pdb_string also stops at first ENDMDL
+e685f7d test: restore test_regressions.py (lost in causality patch base)
+e4fabb9 feat: causality layer — per-residue LJ energy decomposition
 96eac03 manuscript: update author name to Daniel Ngabonziza
 f669792 manuscript: generate PDF from preprint markdown via pandoc
 c5d3173 manuscript: fix version references and verify data consistency
 cf392f8 manuscript: add Physics Auditor benchmark preprint draft v0.1
 c752aed benchmark: expand to 14 pairs across major drug target families
 4b0923a benchmark: expand to 9 pairs across diverse enzyme families
-a574218 benchmark: expand to 5 pairs with ubiquitin and LmPTR1
-81d644a benchmark: fix HDAC8 residue-numbering offset for AF pocket extraction
-e89486a docs: update CLAUDE.md with current benchmark context and active work
-fd9d2a2 benchmark: add experimental and AlphaFold structures with initial validation results
-a65d454 fix: stop parsing after first MODEL/ENDMDL to handle NMR ensembles
-2f26c9b docs: fix install command to use git+https (not on PyPI yet)
-46aeb70 chore: fix ruff lint (sort imports, remove unused)
-680e1d8 ci: add GitHub Actions workflow for lint and tests
-88c2ea9 Initial commit: Physics Auditor v0.1.0
 ```
+
+The full history before that (8 more commits) carries the initial benchmark expansion from 5 pairs to 9, the HDAC8 residue-numbering offset fix, the ENDMDL parser fix, the CLAUDE.md context update, the initial benchmark commit, install-command fix, ruff lint cleanup, CI workflow setup, and the initial commit (`88c2ea9`).
 
 ### 3.3 Merged PRs on master
 
-**Zero merged PRs.** Every commit on master is a direct push, not a merge. The repository has never used a PR workflow on master at the snapshot commit.
+- **PR #1** (`feat/pfdhodh-selectivity` → `master`, merged 2026-05-17 at `e7064de`). +68,135 / −14 lines, 36 files. Brings the headline PfDHODH selectivity attribution work, the three causality module implementations (`energy_decomp.py`, `divergence.py`, `selectivity_map.py`), `utils/pdb_provenance.py`, four new benchmark scripts, the 4ORM PDB structure, six new test files, and 15 new result artifacts. Merged with a merge commit, not squash. See §13 for the post-merge update record.
+
+This is the only PR merged into master at the snapshot commit.
 
 ### 3.4 Outstanding branches
 
 The following branches exist at the snapshot commit. **No branch is deleted by the PR that introduces this document.** Cleanup is left to deliberate follow-up PRs so that a human can confirm each deletion.
 
-#### Stack of unmerged feature branches (PR #1)
+#### Branches that are strict prefixes of the merged PR #1 stack (deletable)
 
-The four `feat/*` branches form a **strict linear stack ending at `feat/pfdhodh-selectivity`**. The longer branches subsume the shorter ones; the shortest contains the foundation of the causality layer, and each successive branch adds another increment of scope on top.
+Three local + remote branches formed the linear stack that ended at `feat/pfdhodh-selectivity`. Every commit on these branches is now reachable from `master` via the PR #1 merge. They carry no unique work and are candidates for deletion both locally and on `origin`.
 
-| Branch | Head commit | Ahead of master | Purpose | Pushed to origin? |
-|---|---|---:|---|---|
-| `feat/causality-energy-decomp` | `1e2d7a6` | 4 | First end-to-end implementation of the per-residue LJ energy decomposition. Also restores `tests/test_regressions.py` and fixes a parser ENDMDL handling bug in `parse_pdb_string` (parity with the master-side `parse_pdb` fix at `a65d454`). | Yes |
-| `feat/selectivity-map` | `e2d23f6` | 6 | Adds the selectivity-attribution map (per-residue compound preference); adds `.claude/` to `.gitignore`. | Yes |
-| `feat/divergence` | `a19a2a2` | 10 | Adds `causality/divergence.py` (ESM-2 full-sequence vs pocket cosine via fair-esm), the `run_divergence.py` benchmark, and the **mislabel-correction commit `a19a2a2`** that relabeled the original 1D3H/1MVS selectivity run as HsDHODH vs HsDHFR (two different human enzymes), not Sm/Hs. | Yes |
-| `feat/pfdhodh-selectivity` | `73bddb1` | 13 | **PR #1 head.** Adds `utils/pdb_provenance.py` (the SOURCE-record gate that exists in response to the mislabel incident), commits the PfDHODH structure `4ORM.pdb`, and runs the chemotype-matched PfDHODH-vs-HsDHODH selectivity attribution end-to-end. | Yes |
+| Branch | Local + origin? | Subsumed by |
+|---|---|---|
+| `feat/causality-energy-decomp` (head `1e2d7a6`) | Both | PR #1 merge at `e7064de` |
+| `feat/selectivity-map` (head `e2d23f6`) | Both | PR #1 merge at `e7064de` |
+| `feat/divergence` (head `a19a2a2`) | Both | PR #1 merge at `e7064de` |
 
-PR #1 is **+68,135 / −14 lines, 36 files**, opened 2026-05-12. It is the only PR on the repository. Mergeability: **MERGEABLE** at the snapshot commit (the audit branch was created from master after this PR was opened; nothing on master has touched any file in the PR since).
-
-When PR #1 merges, the three shorter `feat/*` branches above (`feat/causality-energy-decomp`, `feat/selectivity-map`, `feat/divergence`) **become deletable** — they are strict prefixes of `feat/pfdhodh-selectivity` and carry no unique work. Cleanup belongs in a follow-up PR.
+The PR #1 head branch `feat/pfdhodh-selectivity` itself was **already deleted from `origin` at merge time** (standard GitHub post-merge cleanup) and remains locally only — also a candidate for deletion.
 
 #### Pushed bug-fix branch (Finding 4)
 
 | Branch | Head commit | Ahead of master | Purpose | Pushed to origin? |
 |---|---|---:|---|---|
-| `fixes/technical-pass-1` | `dd9d085` | 2 | Clash subscore recalibration (linear `1 − clashscore/40` → sigmoidal `1 / (1 + (clashscore/50)^2)` with `accept=0.80`, `short_md=0.50`), O(N) rewrite of `extract_binding_site`, `parse_pdb_string` ENDMDL fix (independently reapplied on the feat stack), LJ subscore wired into the CLI composite via renormalized weights, `core/energy.py` docstring fix (`n_hot_pairs` not `n_clashing_pairs`), and a 135-line regression test suite. | **Yes — pushed by Phase 2 of the audit producing this document.** Was local-only when the audit began; pushing eliminated the data-loss risk. |
+| `fixes/technical-pass-1` | `dd9d085` | 2 | Clash subscore recalibration (linear `1 − clashscore/40` → sigmoidal `1 / (1 + (clashscore/50)^2)` with `accept=0.80`, `short_md=0.50`), O(N) rewrite of `extract_binding_site`, `parse_pdb_string` ENDMDL fix (already independently applied as commit `174c543` on the merged feat stack), LJ subscore wired into the CLI composite via renormalized weights, `core/energy.py` docstring fix (`n_hot_pairs` not `n_clashing_pairs`), and a 135-line regression test suite. | **Yes — pushed by Phase 2 of the audit producing this document.** Was local-only when the audit began; pushing eliminated the data-loss risk. |
 
-This branch needs to be rebased against current master and opened as a PR — likely conflicting in `binding_site.py` against the causality-layer changes on the feat stack, and in `cli.py` against the composite wiring. See Finding 4.
+This branch needs to be rebased against the post-merge master and opened as a PR. With PR #1 now merged, the rebase will conflict against the causality-layer changes in `binding_site.py` (commit `e4fabb9`) and against the `test_regressions.py` independently restored on the feat stack at `e685f7d`. See Finding 4.
 
 #### Branch introduced by this document
 
 | Branch | Head commit | Ahead of master | Purpose |
 |---|---|---:|---|
-| `audit/state-of-physics-auditor-document` | (this document's commit) | 1 | Commits this state-of-repository reference. |
+| `audit/state-of-physics-auditor-document` | (this document's commit) | 1+ | Commits and maintains this state-of-repository reference. PR #2. |
 
 ### 3.5 Submodules
 
@@ -144,33 +149,37 @@ None. The repository is self-contained.
 
 ## 4. File tree inventory
 
-The repository has **67 committed files** totaling **~21.0 MB** at the snapshot commit on `master`. The size is dominated by committed PDB structures (~20.5 MB across 33 files under `benchmark/structures/`); the active source tree is small.
+The repository has **95 committed files** totaling **~22.8 MB** at the snapshot commit on `master`. The size is dominated by committed PDB structures (~21.0 MB across 34 files under `benchmark/structures/`); the active source tree is small.
 
 ### 4.1 Top-level directory breakdown
 
 | Top-level dir | Files | Committed bytes |
 |---|---:|---:|
-| `benchmark/` | 35 | 20,862,086 |
-| `src/` | 17 | 68,303 |
-| `tests/` | 7 | 25,344 |
+| `benchmark/` | 54 | 22,842,520 |
+| `src/` | 19 | 116,967 |
+| `tests/` | 13 | 78,828 |
 | `manuscript/` | 2 | 76,432 |
+| `STATE_OF_PHYSICS_AUDITOR.md` | 1 | (this file) |
 | `.github/` | 1 | 505 |
-| Root files (`README.md`, `SETUP.md`, `CLAUDE.md`, `pyproject.toml`, `.gitignore`) | 5 | 16,132 |
+| Root files (`README.md`, `SETUP.md`, `CLAUDE.md`, `pyproject.toml`, `.gitignore`) | 5 | 16,401 |
 
 ### 4.2 `benchmark/` sub-breakdown
 
 | Sub-directory | Files | Purpose |
 |---|---:|---|
-| `benchmark/` (root) | 1 | `benchmark_pocket_clashscore.py` (14-pair clashscore script) |
+| `benchmark/` (root) | 5 | `benchmark_pocket_clashscore.py` + four `run_*.py` scripts (causality decomposition, divergence, selectivity map, PfDHODH selectivity) |
 | `benchmark/results/` | 1 | `pocket_clashscore_comparison.json` (14 entries) |
-| `benchmark/structures/experimental/` | 18 | Crystal PDBs: 1D3H, 1HSG, 1HWL, 1M17, 1MVS, 1UBQ, 1X70, 2BPR, 2HYY, 2QWF, 2X99, 3EQM, 3LN1, 3NJW, 3OG7, 4EY7, 4HJO, 5R82 |
-| `benchmark/structures/predicted/` | 15 | AlphaFold Database v6 predictions, one per benchmark pair |
+| `benchmark/results/causality/` | 9 | Six per-pair `*_causality.json` (HsDHODH, SmDHODH, HsHDAC8, LmPTR1, HsAromatase, CoV2Mpro), `causality_summary.csv`, `CAUSALITY_FINDINGS.md`, `TOPOLOGY_FIXES.md` |
+| `benchmark/results/divergence/` | 1 | `summary.json` (ESM-2 full-sequence-vs-pocket cosines, with inline `claims` per pair) |
+| `benchmark/results/selectivity_maps/` | 4 | `PfDHODH_vs_HsDHODH_selectivity.json` (headline result, with inline `claims`), `PFDHODH_SELECTIVITY_FINDINGS.md`, `HsDHODH_vs_HsDHFR_pocket_attribution.json` (the corrected functional-paralog stand-in), `SELECTIVITY_FINDINGS.md` |
+| `benchmark/structures/experimental/` | 19 | Crystal PDBs: 1D3H, 1HSG, 1HWL, 1M17, 1MVS, 1UBQ, 1X70, 2BPR, 2HYY, 2QWF, 2X99, 3EQM, 3LN1, 3NJW, 3OG7, 4EY7, 4HJO, 4ORM, 5R82 |
+| `benchmark/structures/predicted/` | 15 | AlphaFold Database v6 predictions, one per 14-pair-benchmark pair |
 | `benchmark/structures/predicted/boltz2/` | 0 | Empty placeholder for future Boltz-2 predictions |
 | `benchmark/structures/predicted/chai1/` | 0 | Empty placeholder for future Chai-1 predictions |
 
-Three of the 18 experimental PDBs (1HSG, 2QWF, 3NJW) are committed but not referenced by the 14-pair benchmark script. They are present for ad-hoc use; no committed code reads them.
+Three of the 19 experimental PDBs (1HSG, 2QWF, 3NJW) are committed but not referenced by any benchmark script. They are present for ad-hoc use.
 
-The 14-pair benchmark pairs the following experimental ↔ AlphaFold structures (in benchmark order):
+The 14-pair clashscore benchmark pairs the following experimental ↔ AlphaFold structures (in benchmark order):
 
 ```
 HsDHODH      1MVS  ↔ AF-Q02127  (Q02127)
@@ -201,51 +210,58 @@ src/physics_auditor/
 │   ├── parser.py         (PDB parser → flat numpy arrays; stops at first ENDMDL)
 │   ├── topology.py       (bond inference + bonded-pair mask + vdW radii)
 │   ├── geometry.py       (JAX distance matrix, dihedrals, bond angles, backbone φ/ψ/ω)
-│   └── energy.py         (Lennard-Jones kernel: total, per-atom, per-residue)
+│   └── energy.py         (Lennard-Jones kernel: total, per-atom, per-residue, per-residue-vs-ligand)
 ├── checks/
 │   ├── __init__.py
 │   └── clashes.py        (steric clash detection + ClashResult dataclass + clashscore)
 ├── causality/
 │   ├── __init__.py
 │   ├── binding_site.py   (pocket extraction + pairwise sequence-identity comparison)
-│   ├── divergence.py     ← STUB on master (10 lines)
-│   ├── energy_decomp.py  ← STUB on master (10 lines)
-│   └── selectivity_map.py← STUB on master (10 lines)
+│   ├── divergence.py     (ESM-2 full-sequence vs pocket cosine via fair-esm)
+│   ├── energy_decomp.py  (per-residue LJ decomposition + per-residue difference between structures)
+│   └── selectivity_map.py(per-residue ligand-LJ attribution between target and ortholog)
+├── utils/
+│   ├── __init__.py
+│   └── pdb_provenance.py (verify_pdb_source — the SOURCE-record gate)
 ├── reference/
 │   └── __init__.py       (1-line placeholder; no reference data committed)
 └── report/
     └── __init__.py       (1-line placeholder; no HTML/JSON reporter beyond CLI)
 ```
 
-The three stub modules under `causality/` are implemented on `feat/pfdhodh-selectivity` — see §13. `reference/` and `report/` are empty docstring-only packages on both master and the feat branch.
+`reference/` and `report/` are still empty docstring-only packages.
 
-### 4.4 `tests/` map (master)
+### 4.4 `tests/` map
 
 ```
 tests/
 ├── fixtures/
-│   ├── clashing.pdb   (test fixture, 975 B)
-│   └── tri_ala.pdb    (test fixture, 1.3 KB)
-├── test_parser.py     (TestParsePDB)
-├── test_topology.py   (TestBondInference, TestBondedMask, TestVdWRadii)
-├── test_geometry.py   (TestDistanceMatrix, TestDihedralAngles, TestBondAngles, TestBackboneDihedrals)
-├── test_energy.py     (TestLJEnergy, TestClashDetection)
-└── test_causality.py  (TestBindingSiteExtraction, TestPocketComparison)
+│   ├── clashing.pdb        (test fixture, 975 B)
+│   └── tri_ala.pdb         (test fixture, 1.3 KB)
+├── test_parser.py          (TestParsePDB)
+├── test_topology.py        (TestBondInference, TestBondedMask, TestVdWRadii)
+├── test_geometry.py        (TestDistanceMatrix, TestDihedralAngles, TestBondAngles, TestBackboneDihedrals)
+├── test_energy.py          (TestLJEnergy, TestClashDetection)
+├── test_causality.py       (TestBindingSiteExtraction, TestPocketComparison)
+├── test_disulfide.py       (S-S bond inference via the topology cutoff)
+├── test_divergence.py      (identity, synthetic, validation, real-data ESM-2 cosines; one skipped test gated on a heavy model download)
+├── test_energy_decomp.py   (per-residue decomposition + per-residue difference)
+├── test_pdb_provenance.py  (real-file match, real-file mismatch, missing file, malformed SOURCE — uses 1D3H and 4ORM as real fixtures)
+├── test_regressions.py     (regressions surfaced during the causality patch base)
+└── test_selectivity_map.py (compute_selectivity_map end-to-end + ranking helpers)
 ```
 
-45 tests. `pytest tests/ -q` returns `45 passed in 0.81s`; `ruff check src/ tests/ --select E,F,I,W --ignore E501` returns `All checks passed!`.
-
-On `feat/pfdhodh-selectivity` the test count rises to 92 passed + 1 skipped, via six additional test files: `test_disulfide.py`, `test_divergence.py`, `test_energy_decomp.py`, `test_pdb_provenance.py`, `test_regressions.py`, `test_selectivity_map.py`.
+92 passing tests, 1 skipped. `pytest tests/ -q` returns `92 passed, 1 skipped in 1.58s`; `ruff check src/ tests/ --select E,F,I,W --ignore E501` returns `All checks passed!`. CLAUDE.md still says *"45 tests, all must pass"* — that line is out of date and is tracked in §10.
 
 ---
 
 ## 5. Methodology map
 
-Module-level map at master commit `96eac03`. Functions and classes listed are those exposed at the module surface; private helpers are omitted unless load-bearing.
+Module-level map at master commit `e7064de`. Functions and classes listed are those exposed at the module surface; private helpers are omitted unless load-bearing.
 
 ### `src/physics_auditor/core/parser.py`
 
-- **Purpose:** PDB file parser → flat numpy arrays suitable for vectorized JAX computation. Stops at the first `ENDMDL` so NMR ensembles do not concatenate all models.
+- **Purpose:** PDB file parser → flat numpy arrays suitable for vectorized JAX computation. Stops at the first `ENDMDL` so NMR ensembles do not concatenate all models. `parse_pdb_string` (the string-API counterpart) carries the same ENDMDL behavior since commit `174c543`.
 - **Public surface:** `Atom`, `Residue`, `Chain`, `Structure` dataclasses; `parse_pdb(path, keep_hydrogens, keep_altloc)`, `parse_pdb_string(pdb_string, name, ...)`.
 - **Reads:** PDB files.
 - **Writes:** none.
@@ -253,11 +269,11 @@ Module-level map at master commit `96eac03`. Functions and classes listed are th
 
 ### `src/physics_auditor/core/topology.py`
 
-- **Purpose:** Infers covalent bonds (residue templates + peptide bonds + distance-based fallback for ligands), builds the non-bonded mask (default excludes 1-2 and 1-3 pairs), provides vdW radii lookups.
+- **Purpose:** Infers covalent bonds (residue templates + peptide bonds + distance-based fallback for ligands), builds the non-bonded mask (default excludes 1-2 and 1-3 pairs), provides vdW radii lookups. Disulfide bonds are inferred via the `S-S 2.6 Å` cutoff in `COVALENT_BOND_CUTOFFS`.
 - **Public surface:** `infer_bonds_from_topology(structure)`, `build_bonded_mask(n_atoms, bonds, exclude_neighbors=3)`, `build_1_4_mask(n_atoms, bonds)`, `get_vdw_radius(element)`, `get_vdw_radii_array(structure)`; module-level constants `COVALENT_BOND_CUTOFFS`, `BACKBONE_BONDS`, `SIDECHAIN_BONDS` (templates for the 20 standard amino acids plus MSE), `VDW_RADII` (Bondi 1964 / AMBER values).
 - **Reads:** none.
 - **Writes:** none.
-- **Test coverage:** `tests/test_topology.py`.
+- **Test coverage:** `tests/test_topology.py`, plus `tests/test_disulfide.py` for the S-S inference path.
 
 ### `src/physics_auditor/core/geometry.py`
 
@@ -270,7 +286,8 @@ Module-level map at master commit `96eac03`. Functions and classes listed are th
 ### `src/physics_auditor/core/energy.py`
 
 - **Purpose:** Lennard-Jones kernel using Lorentz-Berthelot combining rules and element-level (not atom-type-level) σ/ε parameters.
-- **Public surface:** `get_lj_params_arrays(elements)`, `@jax.jit compute_lj_energy_matrix(...)`, `compute_total_lj_energy()`, `compute_per_atom_lj_energy()`, `compute_per_residue_lj_energy()`, `run_lj_analysis(...)`. The last returns a dict with `total_energy`, `per_atom_energy`, `per_residue_energy`, `energy_matrix`, `n_hot_pairs` (pairs with E > 10 kcal/mol — the docstring on master says `n_clashing_pairs`; the key was renamed but the docstring was not, fixed on `fixes/technical-pass-1`).
+- **Public surface:** `get_lj_params_arrays(elements)`, `@jax.jit compute_lj_energy_matrix(...)`, `compute_total_lj_energy()`, `compute_per_atom_lj_energy()`, `compute_per_residue_lj_energy()`, `run_lj_analysis(...)`, `per_residue_ligand_interaction_energy(...)` (used by the selectivity-map module).
+- **Note:** `run_lj_analysis` returns a dict with `total_energy`, `per_atom_energy`, `per_residue_energy`, `energy_matrix`, `n_hot_pairs` (pairs with E > 10 kcal/mol — the docstring on master says `n_clashing_pairs`; the key was renamed but the docstring was not, fixed on `fixes/technical-pass-1`).
 - **Reads:** none.
 - **Writes:** none.
 - **Test coverage:** `tests/test_energy.py::TestLJEnergy`.
@@ -292,13 +309,40 @@ Module-level map at master commit `96eac03`. Functions and classes listed are th
 - **Writes:** none.
 - **Test coverage:** `tests/test_causality.py`.
 
-### `src/physics_auditor/causality/divergence.py`, `energy_decomp.py`, `selectivity_map.py` (master)
+### `src/physics_auditor/causality/energy_decomp.py`
 
-- **Status at snapshot commit:** All three are **10-line TODO stubs**.
-  - `divergence.py`: docstring + `from __future__ import annotations`. Marker text: *"TODO: Implement after binding_site and energy_decomp are tested."*
-  - `energy_decomp.py`: same shape. Marker text: *"TODO: Implement after LJ kernel integration tests pass."*
-  - `selectivity_map.py`: same shape. Marker text: *"TODO: Implement after energy decomposition and binding site modules are tested."*
-- **Status on `feat/pfdhodh-selectivity`:** fully implemented; see §13.
+- **Purpose:** Per-residue Lennard-Jones decomposition and per-residue difference between two homologous structures at aligned pocket positions. Powers the causality benchmark (`run_causality_decomposition.py`).
+- **Public surface:** `per_residue_decomposition(structure, pocket_residue_indices=None)`, `per_residue_difference(target, ortholog, alignment=None)`, `decomposition_to_dict(...)`, `difference_to_dict(...)`.
+- **Reads:** none.
+- **Writes:** none.
+- **Test coverage:** `tests/test_energy_decomp.py`.
+
+### `src/physics_auditor/causality/selectivity_map.py`
+
+- **Purpose:** End-to-end per-residue selectivity attribution between a target and its ortholog, each with bound ligand. Produces the PfDHODH headline result.
+- **Public surface:** `compute_selectivity_map(target_structure, target_ligand_resname, ortholog_structure, ortholog_ligand_resname, pocket_cutoff=5.0) -> SelectivityMap`; the `SelectivityMap` dataclass with `SelectivityResiduePair` entries; convenience methods `top_n_target_selective(n)`, `top_n_ortholog_selective(n)`; `selectivity_map_to_dict(smap, top_n=15)` for dossier serialization.
+- **Module docstring carries a `NON-CLAIMS` block.** It states explicitly that the module computes LJ-only attribution (no electrostatics, hydrogen bonds, solvation, or entropy), that two compared structures must have ligands in comparable poses (the module does not align ligand poses), that the default sequential pocket alignment is appropriate only for closely homologous pockets, that different compounds on each side conflate residue chemistry with compound geometry, and that the per-residue numbers are not free energies.
+- **Reads:** none.
+- **Writes:** none.
+- **Test coverage:** `tests/test_selectivity_map.py`.
+
+### `src/physics_auditor/causality/divergence.py`
+
+- **Purpose:** ESM-2 full-sequence-vs-pocket cosine divergence, operationalizing the slogan *"SmDHODH and HsDHODH share full-sequence ESM-2 cosine 0.9897 yet admit ~30× experimental compound selectivity for the parasite."*
+- **Public surface:** `compute_divergence(target_sequence, ortholog_sequence, target_pocket_indices, ortholog_pocket_indices, model_name="esm2_t33_650M_UR50D") -> DivergenceResult`. Returns three cosine numbers per pair: `full_sequence_cosine`, `pocket_meanpool_cosine`, `pocket_subseq_cosine`; the reported "divergence amplification" is `full − pocket_meanpool`.
+- **Module docstring carries a `NON-CLAIMS` block.** Cosines are not free energies; pocket indices are caller-supplied 0-based positions and the caller is responsible for ensuring they reference the supplied sequence; results depend on the ESM-2 layer used and the model name is pinned in the output.
+- **Reads:** ESM-2 model weights (downloaded by `fair-esm` on first use; not committed).
+- **Writes:** none.
+- **Test coverage:** `tests/test_divergence.py` (one test skipped pending the heavy model download).
+
+### `src/physics_auditor/utils/pdb_provenance.py`
+
+- **Purpose:** SOURCE-record provenance gate. Reads a PDB file's `SOURCE` records, extracts `ORGANISM_SCIENTIFIC`, and raises `ValueError` on any mismatch with the caller's expected organism. The module docstring records the May 2026 mislabeling incident (commit `a19a2a2`) as the reason the helper exists.
+- **Public surface:** `verify_pdb_source(path: Path, expected_organism: str) -> None`.
+- **Enforcement scope:** The gate is called by `benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py` before any PDB parse. **`parse_pdb()` does not call it.** Most other benchmark scripts do not call it either. See Finding 2.
+- **Reads:** PDB files (as text, for the SOURCE block; `parse_pdb` does the actual ATOM parsing).
+- **Writes:** none.
+- **Test coverage:** `tests/test_pdb_provenance.py` (real-file match, real-file mismatch, missing file, malformed SOURCE — uses 1D3H and 4ORM as real fixtures).
 
 ### `src/physics_auditor/cli.py`
 
@@ -330,7 +374,7 @@ Module-level map at master commit `96eac03`. Functions and classes listed are th
 | Chirality (L-AA verification) | (no module) | **Absent.** `ChiralityConfig` exists. |
 | Rotamer outliers | (no module) | **Absent.** `RotamerConfig` exists. No rotamer library committed. |
 | Lennard-Jones energy | `core/energy.py` | **Implemented** (not in `checks/` namespace, but functionally available; not folded into the CLI composite at master) |
-| Disulfide geometry | (no module) | **Absent.** `DisulfideConfig` exists. `tests/test_disulfide.py` on `feat/pfdhodh-selectivity` references behavior in `topology.py` (the `S-S 2.6 Å` covalent cutoff), not a dedicated check module. |
+| Disulfide geometry | (no module) | **Absent.** `DisulfideConfig` exists. `tests/test_disulfide.py` exercises the `S-S 2.6 Å` covalent cutoff in `topology.py`, not a dedicated check module. |
 
 **2 of 8 checks implemented.** The other six are scaffolding only. See Finding 3.
 
@@ -338,19 +382,24 @@ Module-level map at master commit `96eac03`. Functions and classes listed are th
 
 ## 6. Expected-but-uncommitted file registry
 
-A grep across `src/`, `tests/`, and `benchmark/` for hardcoded paths surfaces every file the active code expects to find. **At master commit `96eac03`, every referenced path is committed.** The repository commits its PDB inputs directly into the tree (~21 MB across `benchmark/structures/`) instead of relying on a download step, which eliminates the entire class of expected-but-missing-data failures.
+A grep across `src/`, `tests/`, and `benchmark/` for hardcoded paths surfaces every file the active code expects to find. **At master commit `e7064de`, every referenced path is committed.** The repository commits its PDB inputs directly into the tree (~21 MB across `benchmark/structures/`) instead of relying on a download step, which eliminates the entire class of expected-but-missing-data failures.
 
 | Reference site | Path | Status |
 |---|---|---|
 | `benchmark/benchmark_pocket_clashscore.py` `BENCHMARK_PAIRS` | 14× `benchmark/structures/experimental/*.pdb` | All committed |
 | same | 14× `benchmark/structures/predicted/AF-*-F1-model_v6.pdb` | All committed |
 | same | `benchmark/results/pocket_clashscore_comparison.json` | Committed |
+| `benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py` | `benchmark/structures/experimental/{4ORM,1D3H}.pdb` | Both committed |
+| `benchmark/run_causality_decomposition.py`, `run_divergence.py`, `run_selectivity_map.py` | various PDBs under `benchmark/structures/` plus their result JSONs | All committed; six pairs covered for causality (8 skipped at memory budget — see §7.4) |
 | `tests/test_parser.py:112` | `/nonexistent/path.pdb` | Intentional negative-test sentinel; not a real path |
+| `tests/test_pdb_provenance.py` | `1D3H.pdb`, `4ORM.pdb` (real fixtures) | Both committed |
 | `benchmark/structures/predicted/{boltz2,chai1}/` | (empty placeholder dirs) | No code references them; reserved for future predictors |
 
 Three experimental PDBs (1HSG, 2QWF, 3NJW) are committed but not referenced by any committed code — they appear to be reserved for ad-hoc use.
 
 `reference/` advertises (in its package docstring) "ideal bond parameters, Ramachandran distributions, rotamer libraries, LJ params" but **commits none** of those reference datasets. Implementing the six missing checks (Finding 3) requires populating this directory; the current state is descriptive of an intent, not of any data.
+
+ESM-2 model weights (`esm2_t33_650M_UR50D`) used by `causality/divergence.py` are not committed; `fair-esm` downloads them on first use. This is the only external dependency the repository pulls at runtime.
 
 ---
 
@@ -358,22 +407,22 @@ Three experimental PDBs (1HSG, 2QWF, 3NJW) are committed but not referenced by a
 
 This section documents which committed artifacts can be regenerated from committed inputs by committed code, and which cannot.
 
-### 7.1 PfDHODH selectivity attribution dossier (on `feat/pfdhodh-selectivity`, **not** on master)
+### 7.1 PfDHODH selectivity attribution dossier
 
 - **Artifact:** `benchmark/results/selectivity_maps/PfDHODH_vs_HsDHODH_selectivity.json`
 - **Producing script:** `benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py`
 - **Inputs:** `benchmark/structures/experimental/4ORM.pdb` (committed in `02c15aa`) and `benchmark/structures/experimental/1D3H.pdb` (committed earlier).
-- **Provenance gate:** Yes. The script calls `verify_pdb_source(PF_DHODH_PDB, "PLASMODIUM FALCIPARUM")` and `verify_pdb_source(HS_DHODH_PDB, "HOMO SAPIENS")` before parsing. Both SOURCE records were confirmed independently during the audit (4ORM → `PLASMODIUM FALCIPARUM` strain 3D7; 1D3H → `HOMO SAPIENS`).
-- **Reproducibility check (executed during the audit):** The script was re-run from the committed inputs. The regenerated JSON matched the committed dossier **byte-for-byte** (`git diff --stat` returned empty). The headline result — pocket Δ +12.78 kcal/mol; top-ranked target-selective residues HIS185 (+4.34), PHE188 (+3.32), VAL532 (+3.01), PHE227 (+2.07), LEU531 (+1.69); ARG265 at rank 6 (+1.50) — is fully reproducible from committed state.
+- **Provenance gate:** Yes. The script calls `verify_pdb_source(PF_DHODH_PDB, "PLASMODIUM FALCIPARUM")` and `verify_pdb_source(HS_DHODH_PDB, "HOMO SAPIENS")` before parsing. Both SOURCE records have been confirmed independently (4ORM → `PLASMODIUM FALCIPARUM` strain 3D7; 1D3H → `HOMO SAPIENS`).
+- **Reproducibility check (executed on master at `e7064de`):** The script was re-run from the committed inputs against current master. The regenerated JSON matched the committed dossier **byte-for-byte** (`git diff --stat HEAD -- benchmark/results/selectivity_maps/PfDHODH_vs_HsDHODH_selectivity.json` returned empty). The headline result — pocket Δ +12.78 kcal/mol; top-ranked target-selective residues HIS185 (+4.34), PHE188 (+3.32), VAL532 (+3.01), PHE227 (+2.07), LEU531 (+1.69); ARG265 at rank 6 (+1.50) — is fully reproducible from committed state on master.
 - **Claims discipline:** The dossier carries an inline top-level `claims` field with four keys (`what_this_is`, `what_this_is_not`, `supported_finding`, `pending_followup`). The prose findings document next to it (`PFDHODH_SELECTIVITY_FINDINGS.md`) restates the same framing with a literature cross-check section explicitly naming the F188/R265/H185 cluster from the Phillips/Rathod DSM-series antimalarial literature.
 
-### 7.2 14-pair binding-site clashscore benchmark (on master)
+### 7.2 14-pair binding-site clashscore benchmark
 
 - **Artifact:** `benchmark/results/pocket_clashscore_comparison.json` (14 pair entries)
 - **Producing script:** `benchmark/benchmark_pocket_clashscore.py`
 - **Inputs:** 28 PDBs (14 experimental + 14 AlphaFold v6 predictions), all committed under `benchmark/structures/`.
 - **Provenance gate:** **None.** The script reads PDBs via `parse_pdb()` directly; `verify_pdb_source` is not called. See Finding 2.
-- **Reproducibility check:** **Not re-executed in this audit.** The script does not require any external downloads and has no random sampling, so byte-identical regeneration is expected but not verified here. A future PR closing Finding 1 will need to re-run this benchmark with corrected labels and confirm bit-identity (or document any drift).
+- **Reproducibility check:** Not re-executed at the snapshot. The script does not require any external downloads and has no random sampling, so byte-identical regeneration is expected but not verified here. A future PR closing Finding 1 will re-run this benchmark with corrected labels and confirm bit-identity (or document any drift).
 - **Mislabel issue:** Pair 2 is labeled `SmDHODH` but uses `1D3H.pdb` whose SOURCE record reads `HOMO SAPIENS`. The structure is the catalytic construct of HsDHODH (UniProt Q02127), not the parasite enzyme. The AlphaFold side (`AF-G4VFD7-F1-model_v6.pdb`) is the true SmDHODH; the experimental side is mislabeled. The mislabel propagates into `manuscript/preprint.md` Table 1. See Finding 1.
 
 ### 7.3 14-pair benchmark manuscript
@@ -382,22 +431,31 @@ This section documents which committed artifacts can be regenerated from committ
 - **Inputs:** the 14-pair clashscore JSON above, plus narrative prose.
 - **Reproducibility:** The PDF is generated from the markdown via `pandoc` per commit `f669792`. The numeric content depends on the upstream clashscore JSON; correcting Finding 1 will require regenerating both the JSON and the manuscript.
 
-### 7.4 Causality decomposition (on `feat/pfdhodh-selectivity`)
+### 7.4 Causality decomposition
 
 - **Artifacts:** `benchmark/results/causality/{HsDHODH,SmDHODH,HsHDAC8,LmPTR1,HsAromatase,CoV2Mpro}_causality.json` (6 of the 14 benchmark pairs), `causality_summary.csv`, `CAUSALITY_FINDINGS.md`, `TOPOLOGY_FIXES.md`.
 - **Producing script:** `benchmark/run_causality_decomposition.py`.
-- **Coverage gap:** **6 of 14 pairs.** `CAUSALITY_FINDINGS.md` records that 8 pairs were skipped due to a 4500-atom memory budget on the JAX distance matrix. Closing this gap requires either pocket-restricted decomposition, chunked computation, or raising the budget on a larger machine — see Finding 7.
+- **Coverage gap:** **6 of 14 pairs.** `CAUSALITY_FINDINGS.md` records that 8 pairs were skipped due to a 4500-atom memory budget on the JAX distance matrix. Closing this gap requires either pocket-restricted decomposition, chunked computation, or raising the budget on a larger machine — see §10.
+- **Provenance gate:** None. The script reads PDBs via `parse_pdb()`. See Finding 2.
 
-### 7.5 ESM-2 divergence (on `feat/pfdhodh-selectivity`)
+### 7.5 ESM-2 divergence
 
 - **Artifact:** `benchmark/results/divergence/summary.json`.
 - **Producing script:** `benchmark/run_divergence.py`.
 - **Headline number:** `full_sequence_cosine = 0.989732` for the true SmDHODH (G4VFD7) vs HsDHODH (Q02127) UniProt sequences — matches the Kira-cited "0.9897" slogan to four decimals.
 - **Pocket-level leg:** Only computed for the 1D3H↔1MVS pair (HsDHODH catalytic construct vs HsDHFR — a functional-paralog pair, not an ortholog pair). The true ortholog pocket-divergence number is **not yet computable from in-repo structures** because no parasite-side DHODH co-crystal is committed.
+- **External dependency:** ESM-2 model weights are downloaded by `fair-esm` on first use; one test (in `tests/test_divergence.py`) is skipped pending this download.
 
-### 7.6 Test fixtures and CLI golden outputs
+### 7.6 HsDHODH-vs-HsDHFR functional-paralog selectivity stand-in
 
-- **Fixtures:** `tests/fixtures/{tri_ala,clashing}.pdb` are tiny hand-crafted PDBs used by 45 of 45 tests. They are not regenerated; they are the inputs.
+- **Artifacts:** `benchmark/results/selectivity_maps/HsDHODH_vs_HsDHFR_pocket_attribution.json`, `SELECTIVITY_FINDINGS.md`.
+- **Producing script:** `benchmark/run_selectivity_map.py`.
+- **Framing:** This is the **corrected** version of the run that was originally written up as "SmDHODH vs HsDHODH" before the 2026-05-11 mislabel review (commit `a19a2a2`). The numerical content is valid; the framing is now honest: 1D3H is the HsDHODH catalytic construct (UniProt Q02127) and 1MVS is HsDHFR (a different human enzyme). The pair is a functional paralog comparison, not an ortholog comparison.
+- **Provenance gate:** Not yet wired into this script. See Finding 2.
+
+### 7.7 Test fixtures and CLI golden outputs
+
+- **Fixtures:** `tests/fixtures/{tri_ala,clashing}.pdb` are tiny hand-crafted PDBs. They are not regenerated; they are the inputs.
 - **CLI golden outputs:** `SETUP.md` documents expected CLI output for `physics-auditor validate tests/fixtures/{tri_ala,clashing}.pdb` (score 1.000 / 0.000, clashscore 0.0 / 400.0). These are not encoded as tests.
 
 ---
@@ -415,7 +473,7 @@ The full governance surface at the snapshot commit is the four-line **"Rules" bl
 
 There is **no `docs/` directory** at the snapshot commit. There is no Scientific Constitution. There is no Claim Inflation Audit. There is no Disposition Plan.
 
-The closest existing analog to per-artifact claim discipline is the inline `claims` field used by two artifacts on `feat/pfdhodh-selectivity`:
+The closest existing analog to per-artifact claim discipline is the inline `claims` field used by two artifacts on master:
 
 1. `benchmark/results/selectivity_maps/PfDHODH_vs_HsDHODH_selectivity.json` carries a top-level `claims` object with four keys (`what_this_is`, `what_this_is_not`, `supported_finding`, `pending_followup`). The accompanying `PFDHODH_SELECTIVITY_FINDINGS.md` document includes explicit "Non-claims" and "Honesty note on the literature cross-check" sections.
 2. `benchmark/results/divergence/summary.json` carries per-pair `claims` lists and a `notes` field documenting known caveats.
@@ -429,29 +487,27 @@ The README makes a number of claims; verdict against the code as it stands at th
 | Claim in README | Verdict |
 |---|---|
 | *"Physics Validation (8 checks)"* listing clashes, bond geometry, Ramachandran, peptide planarity, chirality, rotamer outliers, Lennard-Jones, disulfide geometry | **Overclaims.** 2 of 8 implemented. `SETUP.md`'s "What's next" table acknowledges 6 are not built. README and SETUP.md contradict each other. See Finding 3. |
-| *"Mechanistic Causality"* — per-residue energy decomposition, binding-site comparison, selectivity attribution | **Master = absent or stub.** Pocket extraction + sequence-identity comparison are implemented; the other three are stubs on master. Implemented on `feat/pfdhodh-selectivity`. |
+| *"Mechanistic Causality"* — per-residue energy decomposition, binding-site comparison, selectivity attribution | **Accurate.** All three are implemented at master: `causality/energy_decomp.py`, `causality/binding_site.py`, `causality/selectivity_map.py`. |
 | *"Trust Report — JSON (for pipelines) + HTML (for humans)"* | **HTML not implemented.** `report/__init__.py` is a 1-line placeholder; CLI emits JSON and rich-text only. See Finding 7. |
 | *"Per-residue heatmaps and binding-site annotations"* | **Not implemented.** No plotting code in the repository. See Finding 7. |
 | *"Composite physics score (0–1)"* + *"accept / run short MD / discard"* | Implemented, but the composite is `clash_result.subscore` only — the CLI's own comment marks this as "simplified for v0.1." `fixes/technical-pass-1` wires in the LJ subscore. |
-| `physics-auditor selectivity --target ... --ortholog ... --ligand ...` (Quick Start example) | **Subcommand does not exist.** `cli.py` registers only `validate` and `info`. See Finding 7. |
+| `physics-auditor selectivity --target ... --ortholog ... --ligand ...` (Quick Start example) | **Subcommand does not exist.** `cli.py` registers only `validate` and `info`. The selectivity machinery exists as a script (`benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py`), not a CLI subcommand. See Finding 7. |
 | *"Why Not Molprobity? 1. Calibrated for AI structures."* | **Unverified.** No calibration data is committed. The current thresholds (clashscore decay to zero by 40 clashes/1000 atoms; `accept=0.85`, `short_md=0.60`) appear to be defaults. `fixes/technical-pass-1` recalibrates these against the 14-pair benchmark. |
 | `pip install git+https://github.com/Danny2045/physics-auditor.git` | Works. |
 
 ### 8.3 CLAUDE.md accuracy
 
-`CLAUDE.md` opens with `"JAX-based, 8 checks, CLI"` — same overclaim as the README. The architecture section accurately reflects master. The "Active work" section documents the HDAC8 residue-numbering offset issue as if it were open; it was in fact closed by commit `81d644a` and the offset is correctly applied (`pocket_n_residues=46` in the JSON confirms this). The note is stale but harmless.
+`CLAUDE.md` opens with `"JAX-based, 8 checks, CLI"` — same overclaim as the README. The architecture section still names only the master-pre-PR-1 surface (`parser`, `geometry`, `topology`, `energy`, `checks/clashes`, `causality/binding-site`, `benchmark/`) and is missing the post-merge additions (`utils/pdb_provenance`, `causality/{energy_decomp,divergence,selectivity_map}`). The "Key commands" line still says *"45 tests, all must pass"* — wrong post-merge; the actual count is 92 + 1 skipped. The "Active work" section also documents the HDAC8 residue-numbering offset issue as if it were open; it was in fact closed by commit `81d644a`. These are routine post-merge maintenance items tracked in §10.
 
 ### 8.4 SETUP.md accuracy
 
-`SETUP.md` is **the most accurate top-level document.** Its "What's next" table (lines 252–267) cleanly separates implemented modules from planned ones and is consistent with the code at master. Its expected pytest output ("45 tests, all pass") matches reality.
+`SETUP.md` is **the most accurate top-level document.** Its "What's next" table cleanly separates implemented modules from planned ones. Some entries that were "planned" when SETUP.md was written are now implemented (the causality stack, `selectivity_map`, `energy_decomp`, `divergence`); SETUP.md has not been updated to reflect this. Its expected pytest output ("45 tests, all pass") matches the pre-merge state, not the current 92 + 1 skipped.
 
 ---
 
 ## 9. Outstanding work register
 
-The repository carries **seven** findings at the snapshot commit. **All seven are new** — this is the first state-of-repository audit of Physics Auditor, so the numbering starts at 1 and is independent of the Kira finding numbers.
-
-Each finding pairs current status with a "Natural next-PR scope" line. The scope lines are suggestions for the future PR that closes the finding; they are not commitments and the engineer who picks up the work is expected to refine them.
+The repository carries **seven** findings at the snapshot commit. **All seven are originally surfaced by this audit.** Each finding pairs current status with a "Natural next-PR scope" line. The scope lines are suggestions for the future PR that closes the finding; they are not commitments and the engineer who picks up the work is expected to refine them.
 
 ### Finding 1 — Mislabel propagation in master-published benchmark and manuscript
 
@@ -461,7 +517,7 @@ Each finding pairs current status with a "Natural next-PR scope" line. The scope
 
 The mislabel propagates into `manuscript/preprint.md` Table 1, where the "SmDHODH" row reads `1D3H | G4VFD7 | …` — pairing a human PDB with a parasite UniProt ID. The same conflation is in the producing script's `BENCHMARK_PAIRS` description string: *"Parasite DHODH — 30.8x selectivity target."*
 
-The mislabel was originally caught and recorded during the `feat/divergence` review on 2026-05-11 (commit `a19a2a2`: *"relabel 1D3H/1MVS run — HsDHODH vs HsDHFR, not Sm/Hs"*) for a *different* result artifact (the early HsDHODH-vs-HsDHFR selectivity-map run). It was not propagated back to the master-side benchmark or to the manuscript, and the master-side `parse_pdb()` function still has no provenance gate (see Finding 2).
+The mislabel was originally caught and recorded during the `feat/divergence` review on 2026-05-11 (commit `a19a2a2`: *"relabel 1D3H/1MVS run — HsDHODH vs HsDHFR, not Sm/Hs"*) for a *different* result artifact (the early HsDHODH-vs-HsDHFR selectivity-map run, now `benchmark/results/selectivity_maps/HsDHODH_vs_HsDHFR_pocket_attribution.json`). The 14-pair benchmark and the manuscript were not updated; PR #1 added the provenance machinery and used it correctly for the PfDHODH run, but did not retro-fix the master-side artifacts.
 
 **Natural next-PR scope:** Relabel the affected entries — pair 2 in `pocket_clashscore_comparison.json` becomes either the true HsDHODH-vs-HsDHODH pair (if `AF-Q02127` is the right AF model) or is split into two pairs (one HsDHODH with 1MVS/Q02127, one true SmDHODH using an AF-only "experimental" stand-in or a different parasite-DHODH crystal if one exists in the PDB). Regenerate the JSON (which should be bit-identical for every entry except pair 2 once labels are fixed). Update `manuscript/preprint.md` Table 1 and any narrative references. Add a call to `verify_pdb_source` to `benchmark_pocket_clashscore.py`'s pair iteration so the mislabel cannot recur. Consider whether the manuscript needs to be re-bumped to a new draft version with an acknowledgments note about the relabel.
 
@@ -469,11 +525,11 @@ The mislabel was originally caught and recorded during the `feat/divergence` rev
 
 **Status:** Open. Policy/enforcement gap.
 
-`src/physics_auditor/utils/pdb_provenance.py` (on `feat/pfdhodh-selectivity`) implements `verify_pdb_source(path, expected_organism)`, which reads the PDB file's `SOURCE` records, extracts `ORGANISM_SCIENTIFIC`, and raises `ValueError` on any mismatch. The docstring asserts the policy explicitly:
+`src/physics_auditor/utils/pdb_provenance.py` implements `verify_pdb_source(path, expected_organism)`, which reads the PDB file's `SOURCE` records, extracts `ORGANISM_SCIENTIFIC`, and raises `ValueError` on any mismatch. The docstring asserts the policy explicitly:
 
 > *"every PDB ingestion path must call `verify_pdb_source(path, expected_organism)` before parsing."*
 
-In practice, the gate is called by exactly one consumer: `benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py`. **`src/physics_auditor/core/parser.py:parse_pdb()` does not call it**, and every other benchmark script (`benchmark_pocket_clashscore.py`, `run_causality_decomposition.py`, `run_divergence.py`, `run_selectivity_map.py`) reads PDBs via `parse_pdb()` without the provenance check. The mislabel that surfaced as Finding 1 is precisely the class of mistake the gate was built to prevent — but the gate is not enforced where it would have caught it.
+In practice, the gate is called by exactly one consumer at the snapshot commit: `benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py`. **`src/physics_auditor/core/parser.py:parse_pdb()` does not call it**, and every other benchmark script (`benchmark_pocket_clashscore.py`, `run_causality_decomposition.py`, `run_divergence.py`, `run_selectivity_map.py`) reads PDBs via `parse_pdb()` without the provenance check. The mislabel that surfaced as Finding 1 is precisely the class of mistake the gate was built to prevent — but the gate is not enforced where it would have caught it.
 
 **Natural next-PR scope:** Decide between three policies and implement consistently:
 
@@ -494,11 +550,13 @@ The README advertises "Physics Validation (8 checks)" listing steric clashes, bo
 - No `checks/{bond_geometry,ramachandran,peptide_planarity,chirality,rotamers,disulfides}.py` files exist at the snapshot commit.
 - `reference/__init__.py` advertises "ideal bond parameters, Ramachandran distributions, rotamer libraries, LJ params" but **commits no reference data** beyond the LJ element-level σ/ε constants embedded directly in `core/energy.py`.
 
-`SETUP.md`'s "What's next" table (lines 252–267) is honest about this. The README contradicts SETUP.md.
+`SETUP.md`'s "What's next" table is honest about this. The README contradicts SETUP.md.
 
 The CLI itself flags the gap inline at `cli.py:96`:
 
 > *"Full composite will include all 8 checks — for now use clashes + LJ. Simplified for v0.1."*
+
+PR #1's contribution — the causality stack and the selectivity-attribution machinery — closes the README's claims about *causality* but does not touch the eight-validation-check claim.
 
 **Natural next-PR scope (split):**
 
@@ -507,23 +565,23 @@ The CLI itself flags the gap inline at `cli.py:96`:
 
 ### Finding 4 — `fixes/technical-pass-1` was local-only
 
-**Status:** Operationally mitigated by this document's PR (branch pushed to origin); implementation work still open.
+**Status:** Operationally mitigated (branch pushed to origin); rebase + PR still pending against the post-merge tree.
 
-The branch was created on 2026-05-06 and remained local-only through the snapshot date. **Phase 2 of the audit producing this document pushed it to `origin/fixes/technical-pass-1`** to eliminate the data-loss risk. The branch is now durable; it still needs to be rebased, conflict-resolved, and merged.
+The branch was created on 2026-05-06 and remained local-only until the audit producing this document pushed it to `origin/fixes/technical-pass-1`. The branch is now durable; it still needs to be rebased, conflict-resolved, and merged.
 
 The branch carries (per commit `0b3e16e`):
 
 - **Clash subscore recalibration.** Linear `1 − clashscore/40` (which made every experimental crystal in the 14-pair benchmark — clashscore 11–56 — fall in DISCARD or SHORT_MD, contradicting the tool's own positioning) is replaced with sigmoidal `1 / (1 + (clashscore/50)^2)` and thresholds shift to `accept=0.80`, `short_md=0.50`.
 - **`extract_binding_site` rewrite.** O(N) via vectorized `np.isin` instead of the original O(N·P) inner scan. Material for large structures (e.g. MmCOX2 at 33k atoms).
-- **`parse_pdb_string` ENDMDL fix.** The string-API counterpart to the master commit `a65d454` fix on `parse_pdb`. **Already independently reapplied on the feat stack at commit `174c543`** — this part of the technical-pass branch is redundant against `feat/pfdhodh-selectivity` and will not conflict.
+- **`parse_pdb_string` ENDMDL fix.** The string-API counterpart to the master commit `a65d454` fix on `parse_pdb`. **Already independently applied to master as commit `174c543`** via the PR #1 merge — this part of the technical-pass branch is redundant and will resolve cleanly during rebase.
 - **LJ subscore wiring.** `n_hot_pairs_per_1000_atoms` becomes a real subscore with the same sigmoidal decay; it is folded into the composite via renormalized `CompositeConfig` weights and surfaced in both JSON and the rich-text panel. The CLI now reports `roadmap_checks` (the planned but unimplemented checks) alongside the active subscores.
 - **`core/energy.py` docstring fix.** The `n_hot_pairs` / `n_clashing_pairs` key-name mismatch is corrected.
-- **`tests/test_regressions.py`.** 135-line regression test suite for the calibration and wiring above. Note: a file by the same name was independently created on the feat stack at `e685f7d` (*"test: restore test_regressions.py (lost in causality patch base)"*) — the two files are not the same, and a rebase will need to merge them carefully.
+- **`tests/test_regressions.py`.** 135-line regression test suite for the calibration and wiring above. A different `tests/test_regressions.py` was independently restored on the merged feat stack at commit `e685f7d` (*"test: restore test_regressions.py (lost in causality patch base)"*); the rebase must merge the two test files.
 
-**Natural next-PR scope:** Rebase `fixes/technical-pass-1` against current master (after PR #1 merges; conflicts will be heavier against the post-merge tree because of the causality-layer changes). Likely conflict points:
+**Natural next-PR scope:** Rebase `fixes/technical-pass-1` against the post-merge master at `e7064de`. Expected conflict points:
 
 - `src/physics_auditor/causality/binding_site.py` — O(N) rewrite vs. the causality-layer's modifications to the same file (commit `e4fabb9`).
-- `src/physics_auditor/cli.py` — composite wiring vs. (presently unchanged) CLI on the feat stack.
+- `src/physics_auditor/cli.py` — composite wiring vs. CLI on master (CLI was not touched by PR #1).
 - `tests/test_regressions.py` — two independent versions must be reconciled.
 
 Open as a PR titled along the lines of *"fix: technical pass — clash subscore calibration, O(N) pocket, LJ composite wiring"*, request review, merge.
@@ -532,7 +590,7 @@ Open as a PR titled along the lines of *"fix: technical pass — clash subscore 
 
 **Status:** Open.
 
-Unlike Kira, Physics Auditor has no Scientific Constitution, no Claim Inflation Audit, no Disposition Plan, no `docs/` directory. The only governance content is the four-line "Rules" block in `CLAUDE.md`. The PfDHODH dossier's inline `claims` field and the `PFDHODH_SELECTIVITY_FINDINGS.md` "Non-claims" section are the only per-artifact claim discipline currently practiced.
+Unlike Kira, Physics Auditor has no Scientific Constitution, no Claim Inflation Audit, no Disposition Plan, no `docs/` directory. The only governance content is the four-line "Rules" block in `CLAUDE.md`. The PfDHODH dossier's inline `claims` field and the `PFDHODH_SELECTIVITY_FINDINGS.md` "Non-claims" section (both now on master via PR #1) are the only per-artifact claim discipline currently practiced.
 
 **Natural next-PR scope:** Decide between three options and implement:
 
@@ -540,7 +598,7 @@ Unlike Kira, Physics Auditor has no Scientific Constitution, no Claim Inflation 
 2. **Write a Physics-Auditor-specific governance document.** Narrower scope, focused on structure-validation claims: distinguishing "the code computed X" from "X is a property of the underlying structure" from "X has biological meaning." Generalize the PfDHODH dossier's `claims` schema (`what_this_is`, `what_this_is_not`, `supported_finding`, `pending_followup`) into a schema every new result artifact must follow; add a pytest gate that rejects new `benchmark/results/**/*.json` files lacking a `claims` field with the required keys.
 3. **Defer.** Document the dependency on Kira's governance in this state document (already done in §8.1 and §12) and revisit when the bridge interface (Finding 6) is implemented and demands shared discipline.
 
-Option (2) is the most consistent with the discipline already in place on `feat/pfdhodh-selectivity`. The schema is small enough to write in one sitting; the gate is small enough to implement as a single pytest.
+Option (2) is the most consistent with the discipline already in place. The schema is small enough to write in one sitting; the gate is small enough to implement as a single pytest.
 
 ### Finding 6 — Bridge interface to Kira absent on both sides
 
@@ -552,20 +610,20 @@ The PfDHODH dossier JSON format (with the `claims` field) is the closest existin
 
 **Natural next-PR scope:** Design `StructureAuditRequest` and `StructureAuditResult` as frozen dataclasses in `src/physics_auditor/bridge/` (or `src/physics_auditor/contracts/`). `StructureAuditRequest` carries: target PDB path or content, optional ortholog PDB, ligand identification (HETATM resname or coords), the expected organism per structure (for the provenance gate), and the audit type (`validate`, `selectivity`, `causality_decomposition`). `StructureAuditResult` carries: the existing dossier fields, the `claims` schema from Finding 5, a `code_git_sha` field, and a `computed_at_utc` field. Implement a `handle_request(req: StructureAuditRequest) -> StructureAuditResult` entry point that dispatches to existing machinery. Add a Kira-side glue PR that issues `StructureAuditRequest`s and persists `StructureAuditResult`s as Kira's existing provenance-sidecar pattern. The two PRs should land within a release of each other.
 
-### Finding 7 — README accuracy gaps beyond the eight-check claim
+### Finding 7 — README accuracy gaps (post-merge residual)
 
-**Status:** Open.
+**Status:** Open, scope trimmed since PR #1 merged.
 
-The README claims three additional features that do not exist in committed code at master:
+PR #1 brought the causality stack and the selectivity-attribution machinery onto master, which retires the README's previous overclaim about *causality and selectivity*. Three residual inaccuracies remain at the snapshot commit:
 
-- **`physics-auditor selectivity` CLI subcommand.** The Quick Start block shows `physics-auditor selectivity --target parasite.pdb --ortholog human.pdb --ligand compound.sdf`. The subcommand does not exist; `cli.py` registers only `validate` and `info`. The selectivity work on `feat/pfdhodh-selectivity` is exposed as a *script* (`benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py`), not a CLI subcommand.
+- **`physics-auditor selectivity` CLI subcommand.** The Quick Start block shows `physics-auditor selectivity --target parasite.pdb --ortholog human.pdb --ligand compound.sdf`. The subcommand does not exist; `cli.py` registers only `validate` and `info`. The selectivity machinery is exposed as a script (`benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py`), not a CLI subcommand.
 - **HTML reports.** The README lists "JSON (for pipelines) + HTML (for humans)" under Trust Report. `report/__init__.py` is a 1-line docstring placeholder; no HTML generator exists.
 - **Per-residue heatmaps and binding-site annotations.** No plotting code exists in the repository.
 
 **Natural next-PR scope:** Rewrite the README to match what the code does at master. Either:
 
 1. **Demote the unimplemented features** to a "Planned" or "Roadmap" section parallel to `SETUP.md`'s "What's next" table, or
-2. **Implement them as part of the README rewrite PR** — `physics-auditor selectivity` is a small wrapper around the existing `compute_selectivity_map` machinery on the feat stack; HTML reports are a Jinja2 template against the existing JSON dossier (jinja2 is already declared in `pyproject.toml`); heatmaps need a plotting dependency to be added.
+2. **Implement them as part of the README rewrite PR** — `physics-auditor selectivity` is a small wrapper around the now-on-master `compute_selectivity_map` machinery; HTML reports are a Jinja2 template against the existing JSON dossier (jinja2 is already declared in `pyproject.toml`); heatmaps need a plotting dependency to be added.
 
 Option (1) is the doc-only, immediately-actionable form and is the natural pair with the doc-only half of Finding 3.
 
@@ -573,13 +631,13 @@ Option (1) is the doc-only, immediately-actionable form and is the natural pair 
 
 | Finding | Status | Origin |
 |---|---|---|
-| 1. Mislabel propagation (1D3H labeled "SmDHODH" in master benchmark + manuscript) | Open | **New — surfaced by this audit** |
-| 2. `verify_pdb_source` built but not enforced | Open | **New — surfaced by this audit** |
-| 3. Eight-check suite is two checks (README contradicts SETUP.md) | Open | **New — surfaced by this audit** |
-| 4. `fixes/technical-pass-1` was local-only | Branch now pushed; rebase + PR pending | **New — surfaced by this audit; operationally mitigated by this PR** |
-| 5. No governance documents | Open | **New — surfaced by this audit** |
-| 6. Bridge interface (`StructureAuditRequest` / `StructureAuditResult`) absent on both sides | Open | **New — surfaced by this audit** |
-| 7. README accuracy gaps beyond the eight-check claim | Open | **New — surfaced by this audit** |
+| 1. Mislabel propagation (1D3H labeled "SmDHODH" in master benchmark + manuscript) | Open | **Surfaced by this audit** |
+| 2. `verify_pdb_source` built but not enforced | Open | **Surfaced by this audit** |
+| 3. Eight-check suite is two checks (README contradicts SETUP.md) | Open | **Surfaced by this audit** |
+| 4. `fixes/technical-pass-1` was local-only | Branch pushed; rebase + PR pending | **Surfaced by this audit; operationally mitigated by Phase 2** |
+| 5. No governance documents | Open | **Surfaced by this audit** |
+| 6. Bridge interface (`StructureAuditRequest` / `StructureAuditResult`) absent on both sides | Open | **Surfaced by this audit** |
+| 7. README accuracy gaps (selectivity CLI, HTML, heatmaps) | Open, scope trimmed post-PR-1 | **Surfaced by this audit** |
 
 ---
 
@@ -587,16 +645,15 @@ Option (1) is the doc-only, immediately-actionable form and is the natural pair 
 
 These are the things the audit producing this document surfaced that do not have an answer in committed state. They are decisions for human review, not actions.
 
-1. **PR #1 size and review strategy.** The PfDHODH selectivity PR is +68,135 / −14 lines across 36 files. The bulk is the committed `4ORM.pdb` plus six new test files plus three new module implementations plus four new benchmark scripts plus eight new result artifacts. Splitting for review is defensible but would fragment the artifact-to-code coupling that the PR currently preserves. Decision: is one PR acceptable, or should the merge be staged?
-2. **CLAUDE.md test-count claim post-merge.** `CLAUDE.md` line 6 says *"45 tests, all must pass"*. After PR #1 merges, this rises to 92 + 1 skipped. The CLAUDE.md update was not part of the PR scope; it needs a follow-up.
-3. **What does `test_disulfide.py` on the feat stack actually test?** No `checks/disulfides.py` exists on any branch. The test either exercises the `S-S 2.6 Å` covalent cutoff in `topology.py::COVALENT_BOND_CUTOFFS` (i.e. it's an integration test of bond inference, not of a missing module), or it is an unfinished stub. Worth a careful read in the PR that closes Finding 3.
-4. **CI matrix coverage.** `.github/workflows/ci.yml` runs on Python 3.11 and 3.13 only. `pyproject.toml` declares `requires-python = ">=3.10"`. Either 3.10 and 3.12 should be added to the matrix, or `requires-python` should be tightened.
-5. **Boltz-2 and Chai-1 placeholder directories.** `benchmark/structures/predicted/{boltz2,chai1}/` are empty. The manuscript's "Limitations" section says extending the benchmark to these predictors is a natural next step. No code references them. Should the directories stay (as a visible roadmap signal) or be removed (until there is something to commit)?
-6. **Causality decomposition coverage on the feat stack.** Only 6 of the 14 benchmark pairs ran to completion; 8 were skipped at the 4500-atom memory budget per `CAUSALITY_FINDINGS.md`. Is the right path forward (a) pocket-restricted decomposition (only compute LJ for `pocket × rest_of_protein` pairs), (b) chunked computation, (c) raising the budget on a larger machine? Each has different scientific implications for what "per-residue decomposition" means on a 33k-atom structure.
-7. **True-ortholog pocket-divergence number.** The divergence runner produces `full_sequence_cosine = 0.989732` for true SmDHODH vs HsDHODH UniProt sequences, but the pocket leg is unmeasured because no parasite-side DHODH co-crystal is committed. Is the right path to commit `6FMD` (SmDHODH + inhibitor co-crystal, per the divergence module's own note) and rerun?
-8. **Should the 14-pair benchmark re-run as part of Finding 1, or should the relabel be doc-only?** The clashscore numbers are valid for the underlying structures; only the *labels* are wrong. A purely-doc fix (relabel the JSON entries and the manuscript table) is defensible. A full re-run with the provenance gate enforced is more thorough but may produce drift on the JSON if any other unrelated changes have crept into the codebase between the original benchmark and now.
-9. **Disposition of the `feat/*` branch stack post-merge.** Once PR #1 merges, the three shorter `feat/*` branches (`feat/causality-energy-decomp`, `feat/selectivity-map`, `feat/divergence`) become strict prefixes of merged master and carry no unique work. Should they be deleted in a single follow-up PR, or left as historical pointers?
-10. **`reference/` data sourcing.** Closing Finding 3 requires committing Engh-Huber bond ideals (small, well-known), a Ramachandran distribution (small, multiple published sources, license-permissive options exist), and a rotamer library (Dunbrack or similar — license review needed). The disulfide-geometry data is small enough to hardcode. What is the right balance between vendoring these and depending on an external package?
+1. **CLAUDE.md is out of date post-merge.** Line 6 still says *"45 tests, all must pass"*; the actual count is 92 + 1 skipped. The architecture section is missing the post-PR-1 additions (`utils/pdb_provenance`, `causality/{energy_decomp,divergence,selectivity_map}`). The "Active work" section documents the HDAC8 offset issue as if it were open; it has been closed. This is a small follow-up PR; it was not part of PR #1's scope.
+2. **What does `test_disulfide.py` actually test?** No `checks/disulfides.py` exists. The test exercises the `S-S 2.6 Å` covalent cutoff in `topology.py::COVALENT_BOND_CUTOFFS` (i.e. it's an integration test of bond inference, not of a missing check module). Closing Finding 3's disulfide check should keep the test or expand it.
+3. **CI matrix coverage.** `.github/workflows/ci.yml` runs on Python 3.11 and 3.13 only. `pyproject.toml` declares `requires-python = ">=3.10"`. Either 3.10 and 3.12 should be added to the matrix, or `requires-python` should be tightened.
+4. **Boltz-2 and Chai-1 placeholder directories.** `benchmark/structures/predicted/{boltz2,chai1}/` are empty. The manuscript's "Limitations" section says extending the benchmark to these predictors is a natural next step. No code references them. Should the directories stay (as a visible roadmap signal) or be removed (until there is something to commit)?
+5. **Causality decomposition coverage.** Only 6 of the 14 benchmark pairs ran to completion; 8 were skipped at the 4500-atom memory budget per `CAUSALITY_FINDINGS.md`. Is the right path forward (a) pocket-restricted decomposition (only compute LJ for `pocket × rest_of_protein` pairs), (b) chunked computation, (c) raising the budget on a larger machine? Each has different scientific implications for what "per-residue decomposition" means on a 33k-atom structure.
+6. **True-ortholog pocket-divergence number.** The divergence runner produces `full_sequence_cosine = 0.989732` for true SmDHODH vs HsDHODH UniProt sequences, but the pocket leg is unmeasured because no parasite-side DHODH co-crystal is committed. Is the right path to commit `6FMD` (SmDHODH + inhibitor co-crystal, per the divergence module's own note) and rerun?
+7. **Should the 14-pair benchmark re-run as part of Finding 1, or should the relabel be doc-only?** The clashscore numbers are valid for the underlying structures; only the *labels* are wrong. A purely-doc fix (relabel the JSON entries and the manuscript table) is defensible. A full re-run with the provenance gate enforced is more thorough but may produce drift on the JSON if any other unrelated changes have crept into the codebase between the original benchmark and now.
+8. **Disposition of the now-stale `feat/*` branches.** With PR #1 merged, `feat/causality-energy-decomp`, `feat/selectivity-map`, `feat/divergence`, and locally-still-present `feat/pfdhodh-selectivity` are all strict prefixes of merged master. Should they be deleted in a single follow-up PR, or left as historical pointers?
+9. **`reference/` data sourcing.** Closing Finding 3 requires committing Engh-Huber bond ideals (small, well-known), a Ramachandran distribution (small, multiple published sources, license-permissive options exist), and a rotamer library (Dunbrack or similar — license review needed). The disulfide-geometry data is small enough to hardcode. What is the right balance between vendoring these and depending on an external package?
 
 ---
 
@@ -604,7 +661,8 @@ These are the things the audit producing this document surfaced that do not have
 
 This document is intended to be refreshed periodically, not continuously.
 
-- **When to update inline (same PR):** when your PR changes the structure of what is committed or what is reproducible — adding a new active-code dependency on a data file, adding a new provenance pattern, changing the test count by more than a handful, opening or closing a numbered finding, merging or deleting a branch listed in §3.4. Notably: when PR #1 merges, this document must be updated to (a) reanchor to the new merge-commit SHA, (b) shift §13's "headline scientific work on the feat branch" content into the main body where appropriate, (c) update the test-count dashboard, (d) update Finding 4's expected conflicts now that the feat-stack changes are on master.
+- **When to update inline (same PR):** when your PR changes the structure of what is committed or what is reproducible — adding a new active-code dependency on a data file, adding a new provenance pattern, changing the test count by more than a handful, opening or closing a numbered finding, merging or deleting a branch listed in §3.4. Notably: when a major PR merges, this document must be re-anchored to the new merge-commit SHA, the test-count dashboard must be updated, the per-artifact reproducibility section must be re-verified against the post-merge tree, and any sections that distinguished "on master" from "on a feature branch" must be collapsed.
+- **Example of inline update (this document's history):** an earlier version of this document, anchored to pre-PR-1 master at `96eac03`, treated the PfDHODH selectivity work as living on the open feat branch. When PR #1 merged at `e7064de` on 2026-05-17, the document was re-anchored on the same audit branch (PR #2): snapshot commit updated, methodology map sections that distinguished "stub on master" from "implemented on feat branch" collapsed into a single on-master view, the per-artifact reproducibility check for the PfDHODH dossier was re-run on the post-merge tree (still byte-identical), and Finding 7's scope was trimmed to the residual inaccuracies that PR #1 did not address. See §13 for the post-merge update record.
 - **When to defer to the next snapshot:** small documentation tweaks, bug fixes in already-tested code paths, formatting and lint cleanups.
 - **When to produce a new snapshot:** at least once per major milestone (e.g. after closing two or more findings), or whenever the divergence between this document and reality becomes uncomfortable enough to slow down a new contributor. Re-run the per-file inventories (§4), the per-artifact reproducibility checks (§7), and the eight-check status table (§5). Bump the snapshot commit hash and date at the top.
 - **What this document does *not* track:** ephemeral task lists, in-progress branches that have not yet been pushed to origin, chat-level discussion. Those belong in the PR description, in branch-level commit messages, or in scratchpad notes outside the repository. Once a branch is pushed to origin, it becomes visible to this document and may be listed in §3.4 at the next snapshot.
@@ -623,89 +681,34 @@ When the bridge interface lands (Finding 6), this section should be expanded wit
 
 ---
 
-## 13. Headline scientific work on `feat/pfdhodh-selectivity` (PR #1, unmerged)
+## 13. Post-merge update record
 
-This section catalogs the contents of PR #1 (head: `feat/pfdhodh-selectivity` @ `73bddb1`, opened 2026-05-12, mergeable at the snapshot commit). The work is **not on master at the snapshot commit**; this state document anchors to master, where the work has not yet landed. When PR #1 merges, the contents of this section should be folded into the main body of the document and §13 itself removed in a follow-up PR.
+This document was first committed against master at `96eac03` (pre-PR-1) on 2026-05-17, treating the PfDHODH selectivity work as living on the unmerged `feat/pfdhodh-selectivity` branch (PR #1, open since 2026-05-12). PR #1 merged into master later the same day at `e7064de`. This section records the re-anchoring update applied immediately after that merge.
 
-### 13.1 The PfDHODH selectivity result
+**Changes captured by the re-anchor:**
 
-The headline scientific result of the project is the per-residue Lennard-Jones selectivity attribution between *Plasmodium falciparum* DHODH (PDB `4ORM`, bound to the triazolopyrimidine antimalarial **2V6 / DSM338** from the DSM compound series) and *Homo sapiens* DHODH (PDB `1D3H`, bound to **A26 / teriflunomide**). Both ligands compete at the same quinone-tunnel subsite of DHODH; the chemotypes differ, the binding subsite is shared, which is the correct substrate for an ortholog selectivity-attribution run.
+- **Anchor commit:** `96eac03` → `e7064de`.
+- **Master log:** 15 commits, all linear, zero merge commits → 28 commits, the most recent being a merge commit. §3.2 was rewritten to show the post-merge log.
+- **Merged-PR count:** 0 → 1.
+- **File inventory:** 67 files / ~21.0 MB → 95 files / ~22.8 MB. §4.1 and §4.2 were rewritten to reflect the new totals. The PR brought `4ORM.pdb` plus 19 other tracked files into `benchmark/`.
+- **Source tree:** §4.3's tree no longer marks any module as "STUB on master." `causality/divergence.py`, `causality/energy_decomp.py`, and `causality/selectivity_map.py` are real implementations on master. A new `utils/` subpackage was added (`__init__.py` + `pdb_provenance.py`).
+- **Test suite:** 45 tests → 92 + 1 skipped. §4.4 was expanded to list the six new test files.
+- **Methodology map (§5):** the master-vs-feat-branch distinction was collapsed into a single on-master view. New module entries were written for `causality/energy_decomp.py`, `causality/selectivity_map.py`, `causality/divergence.py`, and `utils/pdb_provenance.py`. Each carries a note on its `NON-CLAIMS` docstring where applicable.
+- **Per-artifact reproducibility (§7):** the PfDHODH dossier check was re-executed against the post-merge tree on master `e7064de`. `python benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py` regenerated `benchmark/results/selectivity_maps/PfDHODH_vs_HsDHODH_selectivity.json` and `git diff --stat` returned empty — bit-identical regeneration confirmed directly on master. Sections that previously called out specific result artifacts as "branch-only" have been rewritten to drop that qualifier.
+- **Governance audit (§8.2):** the README accuracy table no longer marks "Mechanistic Causality" as overclaiming — the three referenced modules are now implemented on master. The three residual inaccuracies (selectivity CLI, HTML reports, per-residue heatmaps) are tracked as Finding 7.
+- **Findings (§9):**
+  - Findings 1, 3, 5, 6 are unchanged in substance; their references to *"on `feat/pfdhodh-selectivity`"* have been updated to *"on master"* where applicable.
+  - Finding 2's scope is unchanged but broader-reach now: the provenance gate is publicly visible on master and still unenforced at `parse_pdb()` and in most benchmark scripts.
+  - Finding 4 records that `fixes/technical-pass-1` was pushed to origin during Phase 2 of the audit; the rebase target is now the post-merge master, and the `parse_pdb_string` ENDMDL fix has already been independently applied to master via commit `174c543` (so that part of the technical-pass branch is now redundant).
+  - Finding 7 was originally a four-item list; the *"Mechanistic Causality"* item has been retired (PR #1 implemented it) and the finding's title was renamed to *"README accuracy gaps (post-merge residual)"*.
+- **Open questions (§10):** the pre-merge questions about PR #1 size and review strategy are retired. The pre-merge question about "CLAUDE.md test-count claim post-merge" is now Open Question 1 — it is an actual stale claim, not a hypothetical. Open Question 8 (disposition of the `feat/*` stack) now references real branches that can be deleted.
+- **Outstanding branches (§3.4):** the four `feat/*` branches that previously formed an unmerged stack are now reachable from master via the PR #1 merge. They are catalogued as candidates for deletion; `feat/pfdhodh-selectivity` was already removed from `origin` automatically at merge time.
 
-Headline numbers from `benchmark/results/selectivity_maps/PfDHODH_vs_HsDHODH_selectivity.json`:
+**What did not change:**
 
-- Aligned pocket residues: 19.
-- Total PfDHODH (4ORM) ligand LJ interaction: −44.73 kcal/mol.
-- Total HsDHODH (1D3H) ligand LJ interaction: −29.57 kcal/mol.
-- Pocket-level delta (HsDHODH − PfDHODH): **+12.78 kcal/mol** favoring the parasite.
+- Findings 1, 3, 5, 6 in substance.
+- The structure of the document (sections, ordering, dashboard format).
+- The "How to use this document" and "Update protocol" sections, except for an update to the implicit-as-of commit reference and an added example of inline update history.
+- The "Paired with Kira" section — the Kira snapshot date is the same day; the two snapshots remain coherent.
 
-Top-ranked target-selective (parasite-preferred) residues:
-
-| Rank | 4ORM residue | 1D3H residue | Δ kcal/mol |
-|--:|---|---|--:|
-| 1 | **HIS185** | ALA59 | **+4.339** |
-| 2 | **PHE188** | THR63 | **+3.321** |
-| 3 | VAL532 | PRO364 | +3.006 |
-| 4 | PHE227 | VAL134 | +2.067 |
-| 5 | LEU531 | GLY363 | +1.688 |
-| 6 | **ARG265** | TYR356 | **+1.497** |
-
-The three positions in **bold** — **HIS185, PHE188, ARG265** — are the published F188 / R265 / H185 cluster cited in the antimalarial DHODH literature (Phillips & Rathod and successors; the DSM1 → DSM74 → DSM265 → DSM338 lineage) as the residues that drive PfDHODH-vs-HsDHODH selectivity for the triazolopyrimidine series. All three are recovered as target-selective by a static LJ-only attribution, with HIS185 at rank 1, PHE188 at rank 2, and ARG265 at rank 6.
-
-The producing script (`benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py`) was re-executed during the audit producing this document. The regenerated JSON matched the committed dossier **byte-for-byte**; the headline result is fully reproducible from committed inputs on the branch.
-
-### 13.2 Causality module implementations (move-stubs-to-real-code on the branch)
-
-PR #1 implements all three causality stubs that are 10-line TODOs on master:
-
-- **`src/physics_auditor/causality/energy_decomp.py`** (332 lines). `per_residue_decomposition()` (decomposes an LJ analysis into per-residue contributions with binding-site flags), `per_residue_difference()` (between two homologous structures at aligned pocket positions), `decomposition_to_dict()`, `difference_to_dict()`.
-- **`src/physics_auditor/causality/selectivity_map.py`** (334 lines). `compute_selectivity_map(target_structure, target_ligand_resname, ortholog_structure, ortholog_ligand_resname, pocket_cutoff=5.0)` returns a `SelectivityMap` dataclass with `SelectivityResiduePair` entries; `selectivity_map_to_dict()` serializes the dossier; convenience methods `top_n_target_selective(n)` and `top_n_ortholog_selective(n)`.
-- **`src/physics_auditor/causality/divergence.py`** (306 lines). `compute_divergence()` runs ESM-2 (default model `esm2_t33_650M_UR50D`) and produces three cosine numbers per pair: `full_sequence_cosine` (mean-pooled over the whole sequence), `pocket_meanpool_cosine` (mean restricted to pocket positions of the same forward pass), `pocket_subseq_cosine` (separate forward pass on the pocket residues as a standalone subsequence). The reported "divergence amplification" is `full − pocket_meanpool`.
-
-Each module's docstring carries a `NON-CLAIMS` block stating what the module does *not* claim (LJ-only attribution; no electrostatics, hydrogen bonds, solvation, entropy; per-residue energies are not free energies; sequential pocket alignment is the default and structurally-divergent pockets require an explicit alignment; etc.).
-
-`core/energy.py` is extended with `per_residue_ligand_interaction_energy()`, used by `selectivity_map.py`.
-
-### 13.3 PDB provenance gate (the safety scaffold)
-
-`src/physics_auditor/utils/pdb_provenance.py` (92 lines) implements `verify_pdb_source(path, expected_organism) -> None`. The module's docstring records the May 2026 mislabeling incident (commit `a19a2a2`) as the reason the helper exists:
-
-> *"In May 2026 a selectivity-attribution run was committed under the framing 'SmDHODH vs HsDHODH' while one of the two inputs (1MVS) was in fact HsDHFR. The mislabeling was caught only after the run shipped, and the dossier had to be corrected in commit a19a2a2. This module exists so that class of mistake cannot recur."*
-
-The gate is called by `benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py` before any PDB parse. It is **not enforced** at the `parse_pdb()` level — this is Finding 2.
-
-### 13.4 New benchmark scripts and result artifacts
-
-Beyond the master-side `benchmark_pocket_clashscore.py`, the branch adds four producing scripts and 15 result artifacts:
-
-| Script | Output |
-|---|---|
-| `benchmark/run_causality_decomposition.py` | `benchmark/results/causality/{HsDHODH,SmDHODH,HsHDAC8,LmPTR1,HsAromatase,CoV2Mpro}_causality.json` (6 of 14 pairs — 8 skipped at memory budget), `causality_summary.csv`, `CAUSALITY_FINDINGS.md`, `TOPOLOGY_FIXES.md` |
-| `benchmark/run_divergence.py` | `benchmark/results/divergence/summary.json` (full-sequence cosine reproduces the Kira-cited 0.9897 slogan for true SmDHODH/HsDHODH UniProt sequences) |
-| `benchmark/run_selectivity_map.py` | `benchmark/results/selectivity_maps/HsDHODH_vs_HsDHFR_pocket_attribution.json` and `SELECTIVITY_FINDINGS.md` (the corrected functional-paralog stand-in run) |
-| `benchmark/run_pfdhodh_vs_hsdhodh_selectivity.py` | `benchmark/results/selectivity_maps/PfDHODH_vs_HsDHODH_selectivity.json` and `PFDHODH_SELECTIVITY_FINDINGS.md` (the headline result, §13.1) |
-
-### 13.5 Test coverage on the branch
-
-Tests rise from 45 (master) to **92 passed + 1 skipped** on `feat/pfdhodh-selectivity`. New test files:
-
-- `tests/test_disulfide.py`
-- `tests/test_divergence.py`
-- `tests/test_energy_decomp.py`
-- `tests/test_pdb_provenance.py` (real-file match, real-file mismatch, missing file, malformed `SOURCE`; uses 1D3H and 4ORM as real fixtures)
-- `tests/test_regressions.py` (note: a name collision with `fixes/technical-pass-1`'s `test_regressions.py` — see Finding 4)
-- `tests/test_selectivity_map.py`
-
-### 13.6 Committed structures and inputs added by the branch
-
-- `benchmark/structures/experimental/4ORM.pdb` (PfDHODH bound to DSM338; 556 KB; SOURCE record `PLASMODIUM FALCIPARUM` strain 3D7) — committed in `02c15aa`.
-
-### 13.7 What this work means for the state document
-
-When PR #1 merges:
-
-- The §13 stub modules in §5's methodology map become real entries with documented public surfaces.
-- The dashboard test count updates from 45 to ~92.
-- Finding 4's expected conflicts (against the post-merge tree) become heavier; the rebase plan needs to account for the now-merged causality-layer changes.
-- Findings 1, 2, and 7 remain open exactly as written — they are master-side issues that the feat branch does not address.
-- Finding 5 (governance) and Finding 6 (bridge interface) remain unaffected.
-- §13 of this document is folded into the main body and removed in the same PR that re-anchors the snapshot commit.
+When the next major PR merges (likely Finding 1's cleanup PR, or `fixes/technical-pass-1` once rebased and reviewed), §13 should be replaced with a fresh post-merge update record for that event, and the snapshot anchor commit at the top of the document should be bumped accordingly.
