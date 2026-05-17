@@ -1,0 +1,465 @@
+{
+  "claims": {
+    "what_this_is": "Parasite-vs-human DHODH selectivity attribution between PfDHODH (4ORM, bound to DSM-series antimalarial 2V6/DSM338, a triazolopyrimidine) and HsDHODH (1D3H, bound to A26/teriflunomide). Both are quinone-site competitive inhibitors of dihydroorotate dehydrogenase. The compared structures are true orthologs with chemotype-matched inhibitors \u2014 the proper substrate for the selectivity-attribution machinery.",
+    "what_this_is_not": "This is NOT a free energy of binding. The reported per-residue values are Lennard-Jones interaction energy contributions only \u2014 electrostatics, hydrogen bonds, solvation, and entropy are not modeled. The pocket alignment is sequential within each pocket's residue index list; no structural superposition was performed. Different inhibitor chemotypes on each side means part of any delta reflects compound geometry, not residue chemistry alone.",
+    "supported_finding": "End-to-end run of compute_selectivity_map on a verified parasite-vs-human DHODH co-crystal pair with chemotype-matched quinone-site inhibitors. Output is the per-residue LJ-attribution dossier this module is designed to produce; the literature cross-check against the published PfDHODH selectivity story is reported in PFDHODH_SELECTIVITY_FINDINGS.md alongside this dossier.",
+    "pending_followup": "Extend to SmDHODH (Schistosoma mansoni) if a co-crystal with a quinone-site inhibitor becomes available \u2014 that would close the loop on the original Kira 30x-selectivity slogan (SmDHODH vs HsDHODH at full sequence cosine 0.9897). Validate the ranked residues against the published PfDHODH selectivity literature (notably the F188/R265/H185 cluster from the Phillips/Rathod series). Consider structure-based pocket alignment (e.g., TM-align) in place of sequential pairing for divergent pockets."
+  },
+  "target_name": "4ORM",
+  "ortholog_name": "1D3H",
+  "target_ligand_name": "2V6",
+  "ortholog_ligand_name": "A26",
+  "n_aligned_pocket_residues": 19,
+  "total_target_interaction_kcal": -44.734,
+  "total_ortholog_interaction_kcal": -29.574,
+  "pocket_target_interaction_kcal": -38.074,
+  "pocket_ortholog_interaction_kcal": -25.299,
+  "pocket_delta_kcal": 12.776,
+  "top_n_target_selective": [
+    {
+      "res_name_target": "HIS",
+      "res_name_ortholog": "ALA",
+      "res_seq_target": 185,
+      "res_seq_ortholog": 59,
+      "energy_target_kcal": -5.7923,
+      "energy_ortholog_kcal": -1.4536,
+      "delta_kcal": 4.3387
+    },
+    {
+      "res_name_target": "PHE",
+      "res_name_ortholog": "THR",
+      "res_seq_target": 188,
+      "res_seq_ortholog": 63,
+      "energy_target_kcal": -3.6778,
+      "energy_ortholog_kcal": -0.3565,
+      "delta_kcal": 3.3213
+    },
+    {
+      "res_name_target": "VAL",
+      "res_name_ortholog": "PRO",
+      "res_seq_target": 532,
+      "res_seq_ortholog": 364,
+      "energy_target_kcal": -4.2899,
+      "energy_ortholog_kcal": -1.2839,
+      "delta_kcal": 3.006
+    },
+    {
+      "res_name_target": "PHE",
+      "res_name_ortholog": "VAL",
+      "res_seq_target": 227,
+      "res_seq_ortholog": 134,
+      "energy_target_kcal": -2.4923,
+      "energy_ortholog_kcal": -0.425,
+      "delta_kcal": 2.0673
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "GLY",
+      "res_seq_target": 531,
+      "res_seq_ortholog": 363,
+      "energy_target_kcal": -2.4189,
+      "energy_ortholog_kcal": -0.7312,
+      "delta_kcal": 1.6876
+    },
+    {
+      "res_name_target": "ARG",
+      "res_name_ortholog": "TYR",
+      "res_seq_target": 265,
+      "res_seq_ortholog": 356,
+      "energy_target_kcal": -1.9972,
+      "energy_ortholog_kcal": -0.5003,
+      "delta_kcal": 1.4969
+    },
+    {
+      "res_name_target": "ILE",
+      "res_name_ortholog": "TYR",
+      "res_seq_target": 263,
+      "res_seq_ortholog": 147,
+      "energy_target_kcal": -1.292,
+      "energy_ortholog_kcal": -0.2405,
+      "delta_kcal": 1.0515
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "MET",
+      "res_seq_target": 172,
+      "res_seq_ortholog": 43,
+      "energy_target_kcal": -1.7591,
+      "energy_ortholog_kcal": -0.9302,
+      "delta_kcal": 0.829
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "GLN",
+      "res_seq_target": 176,
+      "res_seq_ortholog": 47,
+      "energy_target_kcal": -1.1421,
+      "energy_ortholog_kcal": -0.5019,
+      "delta_kcal": 0.6401
+    },
+    {
+      "res_name_target": "GLY",
+      "res_name_ortholog": "PRO",
+      "res_seq_target": 181,
+      "res_seq_ortholog": 52,
+      "energy_target_kcal": -2.3221,
+      "energy_ortholog_kcal": -1.9456,
+      "delta_kcal": 0.3764
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "VAL",
+      "res_seq_target": 240,
+      "res_seq_ortholog": 143,
+      "energy_target_kcal": -0.5645,
+      "energy_ortholog_kcal": -0.3332,
+      "delta_kcal": 0.2312
+    },
+    {
+      "res_name_target": "CYS",
+      "res_name_ortholog": "LEU",
+      "res_seq_target": 175,
+      "res_seq_ortholog": 46,
+      "energy_target_kcal": -0.5335,
+      "energy_ortholog_kcal": -0.3834,
+      "delta_kcal": 0.1502
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "MET",
+      "res_seq_target": 197,
+      "res_seq_ortholog": 111,
+      "energy_target_kcal": -0.4148,
+      "energy_ortholog_kcal": -0.5454,
+      "delta_kcal": -0.1306
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "PHE",
+      "res_seq_target": 189,
+      "res_seq_ortholog": 98,
+      "energy_target_kcal": -1.0856,
+      "energy_ortholog_kcal": -1.5776,
+      "delta_kcal": -0.492
+    },
+    {
+      "res_name_target": "CYS",
+      "res_name_ortholog": "HIS",
+      "res_seq_target": 184,
+      "res_seq_ortholog": 56,
+      "energy_target_kcal": -3.1012,
+      "energy_ortholog_kcal": -3.8221,
+      "delta_kcal": -0.7209
+    }
+  ],
+  "top_n_ortholog_selective": [
+    {
+      "res_name_target": "TYR",
+      "res_name_ortholog": "THR",
+      "res_seq_target": 528,
+      "res_seq_ortholog": 360,
+      "energy_target_kcal": -0.8996,
+      "energy_ortholog_kcal": -3.9532,
+      "delta_kcal": -3.0536
+    },
+    {
+      "res_name_target": "ILE",
+      "res_name_ortholog": "LEU",
+      "res_seq_target": 272,
+      "res_seq_ortholog": 359,
+      "energy_target_kcal": -0.6377,
+      "energy_ortholog_kcal": -3.0568,
+      "delta_kcal": -2.4191
+    },
+    {
+      "res_name_target": "GLU",
+      "res_name_ortholog": "ALA",
+      "res_seq_target": 182,
+      "res_seq_ortholog": 55,
+      "energy_target_kcal": -1.0911,
+      "energy_ortholog_kcal": -1.9231,
+      "delta_kcal": -0.832
+    },
+    {
+      "res_name_target": "ILE",
+      "res_name_ortholog": "ARG",
+      "res_seq_target": 237,
+      "res_seq_ortholog": 136,
+      "energy_target_kcal": -0.5289,
+      "energy_ortholog_kcal": -1.3353,
+      "delta_kcal": -0.8064
+    },
+    {
+      "res_name_target": "CYS",
+      "res_name_ortholog": "HIS",
+      "res_seq_target": 184,
+      "res_seq_ortholog": 56,
+      "energy_target_kcal": -3.1012,
+      "energy_ortholog_kcal": -3.8221,
+      "delta_kcal": -0.7209
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "PHE",
+      "res_seq_target": 189,
+      "res_seq_ortholog": 98,
+      "energy_target_kcal": -1.0856,
+      "energy_ortholog_kcal": -1.5776,
+      "delta_kcal": -0.492
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "MET",
+      "res_seq_target": 197,
+      "res_seq_ortholog": 111,
+      "energy_target_kcal": -0.4148,
+      "energy_ortholog_kcal": -0.5454,
+      "delta_kcal": -0.1306
+    },
+    {
+      "res_name_target": "CYS",
+      "res_name_ortholog": "LEU",
+      "res_seq_target": 175,
+      "res_seq_ortholog": 46,
+      "energy_target_kcal": -0.5335,
+      "energy_ortholog_kcal": -0.3834,
+      "delta_kcal": 0.1502
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "VAL",
+      "res_seq_target": 240,
+      "res_seq_ortholog": 143,
+      "energy_target_kcal": -0.5645,
+      "energy_ortholog_kcal": -0.3332,
+      "delta_kcal": 0.2312
+    },
+    {
+      "res_name_target": "GLY",
+      "res_name_ortholog": "PRO",
+      "res_seq_target": 181,
+      "res_seq_ortholog": 52,
+      "energy_target_kcal": -2.3221,
+      "energy_ortholog_kcal": -1.9456,
+      "delta_kcal": 0.3764
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "GLN",
+      "res_seq_target": 176,
+      "res_seq_ortholog": 47,
+      "energy_target_kcal": -1.1421,
+      "energy_ortholog_kcal": -0.5019,
+      "delta_kcal": 0.6401
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "MET",
+      "res_seq_target": 172,
+      "res_seq_ortholog": 43,
+      "energy_target_kcal": -1.7591,
+      "energy_ortholog_kcal": -0.9302,
+      "delta_kcal": 0.829
+    },
+    {
+      "res_name_target": "ILE",
+      "res_name_ortholog": "TYR",
+      "res_seq_target": 263,
+      "res_seq_ortholog": 147,
+      "energy_target_kcal": -1.292,
+      "energy_ortholog_kcal": -0.2405,
+      "delta_kcal": 1.0515
+    },
+    {
+      "res_name_target": "ARG",
+      "res_name_ortholog": "TYR",
+      "res_seq_target": 265,
+      "res_seq_ortholog": 356,
+      "energy_target_kcal": -1.9972,
+      "energy_ortholog_kcal": -0.5003,
+      "delta_kcal": 1.4969
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "GLY",
+      "res_seq_target": 531,
+      "res_seq_ortholog": 363,
+      "energy_target_kcal": -2.4189,
+      "energy_ortholog_kcal": -0.7312,
+      "delta_kcal": 1.6876
+    }
+  ],
+  "residues": [
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "MET",
+      "res_seq_target": 172,
+      "res_seq_ortholog": 43,
+      "energy_target_kcal": -1.7591,
+      "energy_ortholog_kcal": -0.9302,
+      "delta_kcal": 0.829
+    },
+    {
+      "res_name_target": "CYS",
+      "res_name_ortholog": "LEU",
+      "res_seq_target": 175,
+      "res_seq_ortholog": 46,
+      "energy_target_kcal": -0.5335,
+      "energy_ortholog_kcal": -0.3834,
+      "delta_kcal": 0.1502
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "GLN",
+      "res_seq_target": 176,
+      "res_seq_ortholog": 47,
+      "energy_target_kcal": -1.1421,
+      "energy_ortholog_kcal": -0.5019,
+      "delta_kcal": 0.6401
+    },
+    {
+      "res_name_target": "GLY",
+      "res_name_ortholog": "PRO",
+      "res_seq_target": 181,
+      "res_seq_ortholog": 52,
+      "energy_target_kcal": -2.3221,
+      "energy_ortholog_kcal": -1.9456,
+      "delta_kcal": 0.3764
+    },
+    {
+      "res_name_target": "GLU",
+      "res_name_ortholog": "ALA",
+      "res_seq_target": 182,
+      "res_seq_ortholog": 55,
+      "energy_target_kcal": -1.0911,
+      "energy_ortholog_kcal": -1.9231,
+      "delta_kcal": -0.832
+    },
+    {
+      "res_name_target": "CYS",
+      "res_name_ortholog": "HIS",
+      "res_seq_target": 184,
+      "res_seq_ortholog": 56,
+      "energy_target_kcal": -3.1012,
+      "energy_ortholog_kcal": -3.8221,
+      "delta_kcal": -0.7209
+    },
+    {
+      "res_name_target": "HIS",
+      "res_name_ortholog": "ALA",
+      "res_seq_target": 185,
+      "res_seq_ortholog": 59,
+      "energy_target_kcal": -5.7923,
+      "energy_ortholog_kcal": -1.4536,
+      "delta_kcal": 4.3387
+    },
+    {
+      "res_name_target": "PHE",
+      "res_name_ortholog": "THR",
+      "res_seq_target": 188,
+      "res_seq_ortholog": 63,
+      "energy_target_kcal": -3.6778,
+      "energy_ortholog_kcal": -0.3565,
+      "delta_kcal": 3.3213
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "PHE",
+      "res_seq_target": 189,
+      "res_seq_ortholog": 98,
+      "energy_target_kcal": -1.0856,
+      "energy_ortholog_kcal": -1.5776,
+      "delta_kcal": -0.492
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "MET",
+      "res_seq_target": 197,
+      "res_seq_ortholog": 111,
+      "energy_target_kcal": -0.4148,
+      "energy_ortholog_kcal": -0.5454,
+      "delta_kcal": -0.1306
+    },
+    {
+      "res_name_target": "PHE",
+      "res_name_ortholog": "VAL",
+      "res_seq_target": 227,
+      "res_seq_ortholog": 134,
+      "energy_target_kcal": -2.4923,
+      "energy_ortholog_kcal": -0.425,
+      "delta_kcal": 2.0673
+    },
+    {
+      "res_name_target": "ILE",
+      "res_name_ortholog": "ARG",
+      "res_seq_target": 237,
+      "res_seq_ortholog": 136,
+      "energy_target_kcal": -0.5289,
+      "energy_ortholog_kcal": -1.3353,
+      "delta_kcal": -0.8064
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "VAL",
+      "res_seq_target": 240,
+      "res_seq_ortholog": 143,
+      "energy_target_kcal": -0.5645,
+      "energy_ortholog_kcal": -0.3332,
+      "delta_kcal": 0.2312
+    },
+    {
+      "res_name_target": "ILE",
+      "res_name_ortholog": "TYR",
+      "res_seq_target": 263,
+      "res_seq_ortholog": 147,
+      "energy_target_kcal": -1.292,
+      "energy_ortholog_kcal": -0.2405,
+      "delta_kcal": 1.0515
+    },
+    {
+      "res_name_target": "ARG",
+      "res_name_ortholog": "TYR",
+      "res_seq_target": 265,
+      "res_seq_ortholog": 356,
+      "energy_target_kcal": -1.9972,
+      "energy_ortholog_kcal": -0.5003,
+      "delta_kcal": 1.4969
+    },
+    {
+      "res_name_target": "ILE",
+      "res_name_ortholog": "LEU",
+      "res_seq_target": 272,
+      "res_seq_ortholog": 359,
+      "energy_target_kcal": -0.6377,
+      "energy_ortholog_kcal": -3.0568,
+      "delta_kcal": -2.4191
+    },
+    {
+      "res_name_target": "TYR",
+      "res_name_ortholog": "THR",
+      "res_seq_target": 528,
+      "res_seq_ortholog": 360,
+      "energy_target_kcal": -0.8996,
+      "energy_ortholog_kcal": -3.9532,
+      "delta_kcal": -3.0536
+    },
+    {
+      "res_name_target": "LEU",
+      "res_name_ortholog": "GLY",
+      "res_seq_target": 531,
+      "res_seq_ortholog": 363,
+      "energy_target_kcal": -2.4189,
+      "energy_ortholog_kcal": -0.7312,
+      "delta_kcal": 1.6876
+    },
+    {
+      "res_name_target": "VAL",
+      "res_name_ortholog": "PRO",
+      "res_seq_target": 532,
+      "res_seq_ortholog": 364,
+      "energy_target_kcal": -4.2899,
+      "energy_ortholog_kcal": -1.2839,
+      "delta_kcal": 3.006
+    }
+  ]
+}

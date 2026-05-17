@@ -500,6 +500,9 @@ def parse_pdb_string(pdb_string: str, name: str = "unknown",
             atom = _parse_pdb_line(line, is_hetatm=False)
         elif record == "HETATM":
             atom = _parse_pdb_line(line, is_hetatm=True)
+        elif record == "ENDMDL":
+            # Stop at first model in NMR ensembles
+            break
         else:
             continue
 

@@ -45,6 +45,13 @@ dev = [
     "pytest-cov>=4.0",
     "ruff>=0.1",
 ]
+# ESM-2 backed analyses (currently: causality/divergence.py). Heavy and
+# optional — install with `pip install -e ".[esm]"` if you need the
+# divergence runner. The bio-builder conda env has these resolved.
+esm = [
+    "fair-esm>=2.0.0",
+    "torch>=2.0",
+]
 
 [project.scripts]
 physics-auditor = "physics_auditor.cli:app"
