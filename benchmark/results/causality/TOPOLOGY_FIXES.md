@@ -1,3 +1,16 @@
+## Audit note (PR fix/benchmark-mislabel-pair1-and-causality-artifacts — PR-A1)
+
+The pair labels used in the tables below ("HsDHODH", "SmDHODH", "HsHDAC8", "LmPTR1") are the original BENCHMARK_PAIRS labels at the time this document was written. PR-A1's identity audit found four of them mismatched the underlying experimental input:
+
+- "HsDHODH" pair used 1MVS, which is **HsDHFR** (P00374). Dossier renamed `HsDHFR_causality.json`.
+- "SmDHODH" pair used 1D3H, which is **HsDHODH** (Q02127). Dossier renamed `HsDHODH_causality.json`.
+- "HsHDAC8" pair used 4HJO, which is **EGFR kinase domain** (P00533). Dossier renamed `EGFR_4HJO_causality.json`.
+- "LmPTR1" pair used 2BPR, which is **DnaK** from *E. coli* (P0A6Y8). Dossier renamed `DnaK_2BPR_causality.json`.
+
+The AF (predicted-side) models in each pair were genuine: pair 1's AF model is real HsDHODH, pair 2's is real SmDHODH, pair 3's is real HsHDAC8, pair 5's is real LmPTR1. The mismatch is on the experimental side. Tables below now use the corrected pair names. The kcal numbers themselves are unchanged. See STATE_OF_PHYSICS_AUDITOR.md Findings 1, 8, 9.
+
+---
+
 # Topology fixes from the causality run — May 2026
 
 The first run of the causality layer surfaced two distinct topology
@@ -68,10 +81,10 @@ the board:
 
 | Pair | Before (kcal) | After (kcal) | Δ |
 |---|---:|---:|---:|
-| HsDHODH AF | −1046 | −2111 | −1065 |
-| SmDHODH AF | −954 | −2021 | −1067 |
-| HsHDAC8 AF | −1075 | −2138 | −1063 |
-| LmPTR1 AF | −346 | −1407 | −1061 |
+| HsDHFR AF (was "HsDHODH"; AF model AF-Q02127 is genuine HsDHODH) | −1046 | −2111 | −1065 |
+| HsDHODH AF (was "SmDHODH"; AF model AF-G4VFD7 is genuine SmDHODH) | −954 | −2021 | −1067 |
+| EGFR_4HJO AF (was "HsHDAC8"; AF model AF-Q9BY41 is genuine HsHDAC8) | −1075 | −2138 | −1063 |
+| DnaK_2BPR AF (was "LmPTR1"; AF model AF-Q01782 is genuine LmPTR1) | −346 | −1407 | −1061 |
 | HsAromatase AF | −1717 | −2781 | −1064 |
 | CoV2Mpro AF | −606 | −1671 | −1065 |
 
@@ -86,10 +99,10 @@ The pocket-delta numbers (the headline causality result) are
 
 | Pair | Pocket Δ before | Pocket Δ after |
 |---|---:|---:|
-| HsDHODH | −54.24 | −54.24 |
-| SmDHODH | +52.83 | +52.83 |
-| HsHDAC8 | −26.83 | −26.83 |
-| LmPTR1 | −9.69 | −9.69 |
+| HsDHFR (was "HsDHODH") | −54.24 | −54.24 |
+| HsDHODH (was "SmDHODH") | +52.83 | +52.83 |
+| EGFR_4HJO (was "HsHDAC8") | −26.83 | −26.83 |
+| DnaK_2BPR (was "LmPTR1") | −9.69 | −9.69 |
 | HsAromatase | −20.20 | −20.20 |
 | **CoV2Mpro** | **+1019.30** | **−45.67** |
 
@@ -97,10 +110,14 @@ CoV2Mpro now reports a sane −45.67 kcal pocket delta with SER109
 as the top unfavorable residue (+6.8 kcal). That's a normal
 apo-vs-holo pocket signal. The +1019 was an artifact.
 
-The top-residue findings for the other five pairs (HsHDAC8 TYR94,
-HsDHODH GLY112, SmDHODH GLU132, etc.) are unchanged. Those
-residues are correctly identified by the layer, with or without
-this fix.
+The top-residue findings for the other five pairs (EGFR_4HJO
+TYR94 [was "HsHDAC8 TYR94"; residue in 4HJO = EGFR kinase domain,
+not HDAC8], HsDHFR GLY112 [was "HsDHODH GLY112"; residue in 1MVS
+= HsDHFR], HsDHODH GLU132 [was "SmDHODH GLU132"; residue in 1D3H
+= HsDHODH], etc.) are unchanged. Those residues are correctly
+identified at the atomic level by the layer; the protein-family
+attributions for the relabeled pairs need to be re-derived (see
+CAUSALITY_FINDINGS.md audit note).
 
 ## Non-claims
 
