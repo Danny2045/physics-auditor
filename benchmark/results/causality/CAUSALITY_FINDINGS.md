@@ -1,3 +1,18 @@
+## Audit note (PR fix/benchmark-mislabel-pair1-and-causality-artifacts — PR-A1)
+
+The original document referred to inputs as "SmDHODH", "HsDHODH", "LmPTR1", and "HsHDAC8". Identity audit during PR-A1 revealed:
+
+- 1D3H originally labeled "SmDHODH" is actually **HsDHODH** (UniProt Q02127, HOMO SAPIENS).
+- 1MVS originally labeled "HsDHODH" is actually **HsDHFR** (UniProt P00374, HOMO SAPIENS).
+- 2BPR originally labeled "LmPTR1" is actually **DnaK** (UniProt P0A6Y8, Escherichia coli — an NMR heat-shock chaperone).
+- 4HJO originally labeled "HsHDAC8" is actually **EGFR kinase domain** (UniProt P00533, HOMO SAPIENS).
+
+Labels in the prose below have been corrected where they refer to data computed from these inputs. The underlying per-residue energy numbers are unchanged. The biological *interpretations* attached to those numbers (e.g. "Zn²⁺-coordinating residue", "FMN-dependent oxidoreductase", "parasite-vs-human asymmetry", references to the Kira 30.8× selectivity slogan) rested on the original labels; where the label was wrong, the interpretation is invalidated even though the numbers are correct. Such interpretations are flagged inline below but not deleted, so the audit trail is preserved. References to external concepts (e.g. the future SmDHODH/HsDHODH selectivity-map target on line 131) are left as-is because they refer to the published Kira target, not to the local data.
+
+See STATE_OF_PHYSICS_AUDITOR.md Findings 1, 8, 9.
+
+---
+
 # Causality layer first run — May 2026
 
 The first end-to-end run of `physics_auditor.causality.energy_decomp`
@@ -7,8 +22,14 @@ what it means for next steps.
 
 ## Scope of this run
 
-- **6 of 14 pairs ran** to completion: HsDHODH, SmDHODH, HsHDAC8,
-  LmPTR1, HsAromatase, CoV2Mpro.
+- **6 of 14 pairs ran** to completion (using the original BENCHMARK_PAIRS
+  labels, which PR-A1 has since corrected — see audit note above): the
+  six dossier files are now `HsDHFR_causality.json` (was HsDHODH; input
+  1MVS = HsDHFR), `HsDHODH_causality.json` (was SmDHODH; input 1D3H =
+  HsDHODH), `EGFR_4HJO_causality.json` (was HsHDAC8; input 4HJO = EGFR),
+  `DnaK_2BPR_causality.json` (was LmPTR1; input 2BPR = DnaK from E. coli),
+  `HsAromatase_causality.json` (clean), and `CoV2Mpro_causality.json`
+  (clean).
 - **8 of 14 pairs skipped** due to memory budget (4500 atoms).
   See "Skipped pairs" below.
 - For each pair that ran, both structures were decomposed into
@@ -34,20 +55,46 @@ deltas, and the top three favorable in AF are ASP370 (−6.1), HIS474
 six in this run; the apo-vs-holo distortion is broadly distributed
 rather than concentrated.
 
-For **HsHDAC8** (zinc metalloenzyme): TYR94 +7.1 — favorable in
-exp, much less so in AF — almost certainly a Zn²⁺-coordinating
-residue. The Zn²⁺ is missing from the apo prediction, so the
-residue's environment differs.
+For the **EGFR_4HJO row** (originally labeled "HsHDAC8"; input
+is 4HJO = EGFR kinase domain, not HDAC8): TYR94 +7.1 — favorable
+in exp, much less so in AF. **The original Zn²⁺-coordinating
+interpretation below is invalidated by the PR-A1 audit**: EGFR is
+a Ser/Thr kinase, not a zinc metalloenzyme; there is no Zn²⁺ in
+4HJO to coordinate. The residue-level number is correct for the
+underlying atomic data; the biological interpretation must be re-
+derived as an EGFR kinase-domain finding (likely a residue
+involved in the inhibitor-binding interaction). *Original text,
+preserved for audit:* "TYR94 +7.1 — favorable in exp, much less
+so in AF — almost certainly a Zn²⁺-coordinating residue. The Zn²⁺
+is missing from the apo prediction, so the residue's environment
+differs."
 
-For **HsDHODH / SmDHODH** (FMN-dependent oxidoreductase): the
-parasite-vs-human asymmetry is striking. **HsDHODH pocket gets
-54 kcal more favorable in AF** (better packing without the FMN
-constraint), while **SmDHODH pocket gets 53 kcal *less* favorable
-in AF**. Same enzyme family, opposite signs at the pocket level.
+For **HsDHFR (input 1MVS, originally labeled "HsDHODH") / HsDHODH
+(input 1D3H, originally labeled "SmDHODH")**: **the original
+"FMN-dependent oxidoreductase" / "parasite-vs-human asymmetry" /
+Kira 30.8× selectivity framing below is invalidated by the PR-A1
+audit.** This is not a parasite-vs-human comparison and not an
+ortholog comparison — it is HsDHFR (folate metabolism, NADPH-
+dependent) vs HsDHODH (pyrimidine biosynthesis, FMN-dependent),
+two unrelated human enzymes. The per-residue numbers are correct;
+the cross-enzyme delta does *not* support the Kira selectivity
+slogan, which refers to *real* SmDHODH (UniProt G4VFD7) vs HsDHODH
+(UniProt Q02127). *Original text, preserved for audit:*
+"For HsDHODH / SmDHODH (FMN-dependent oxidoreductase): the
+parasite-vs-human asymmetry is striking. HsDHODH pocket gets
+54 kcal more favorable in AF (better packing without the FMN
+constraint), while SmDHODH pocket gets 53 kcal *less* favorable
+in AF. Same enzyme family, opposite signs at the pocket level.
 This is exactly the kind of fine-grained asymmetry that whole-
 protein clashscore can't see — and it's the empirical fingerprint
-behind the "ESM-2 cosine 0.9897 yet 30.8× selectivity" observation
-from Kira.
+behind the 'ESM-2 cosine 0.9897 yet 30.8× selectivity' observation
+from Kira."
+
+Relabeled deltas: **HsDHFR (1MVS) pocket gets 54 kcal more
+favorable in AF**, **HsDHODH (1D3H) pocket gets 53 kcal less
+favorable in AF**. These are not paired observations of the same
+enzyme; they describe two different enzymes and cannot be
+interpreted as a "same enzyme family, opposite signs" pattern.
 
 ### 2. CoV2Mpro and HsAChE expose a real topology bug
 

@@ -25,6 +25,7 @@ from physics_auditor.checks.clashes import (
 from physics_auditor.core.geometry import compute_distance_matrix
 from physics_auditor.core.parser import Structure, parse_pdb
 from physics_auditor.core.topology import build_bonded_mask, infer_bonds_from_topology
+from physics_auditor.utils.pdb_provenance import verify_pdb_source
 
 
 @dataclass
@@ -198,63 +199,93 @@ def extract_pocket_by_residue_numbers(
 BENCHMARK_PAIRS = [
     {
         "name": "HsDHODH",
-        "experimental": "benchmark/structures/experimental/1MVS.pdb",
-        "predicted": "benchmark/structures/predicted/AF-Q02127-F1-model_v6.pdb",
-        "description": "Human DHODH — Kira ortholog, ESM-2 blind spot pair",
-    },
-    {
-        "name": "SmDHODH",
         "experimental": "benchmark/structures/experimental/1D3H.pdb",
-        "predicted": "benchmark/structures/predicted/AF-G4VFD7-F1-model_v6.pdb",
-        "description": "Parasite DHODH — 30.8x selectivity target",
+        "predicted": "benchmark/structures/predicted/AF-Q02127-F1-model_v6.pdb",
+        "description": (
+            "Human DHODH crystal (1D3H) vs HsDHODH AlphaFold (Q02127) — "
+            "true intra-protein comparison"
+        ),
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
     },
-    {
-        "name": "HsHDAC8",
-        "experimental": "benchmark/structures/experimental/4HJO.pdb",
-        "predicted": "benchmark/structures/predicted/AF-Q9BY41-F1-model_v6.pdb",
-        "description": "Human HDAC8 — Kira ortholog for SmHDAC8",
-        # 4HJO uses PDB numbering 679-960; AF-Q9BY41 uses UniProt numbering 1-377.
-        # Subtract 678 so experimental residue 679 maps to AF residue 1, etc.
-        "res_seq_offset": 678,
-    },
+    # Pair 2 withdrawn in PR-A. Original entry paired 1D3H with AF-G4VFD7
+    # (SmDHODH AF model) under the label "SmDHODH". But 1D3H is HsDHODH
+    # (UniProt Q02127, HOMO SAPIENS per SOURCE), not Schistosoma mansoni
+    # DHODH. Restoring this row as a true PfDHODH-vs-HsDHODH comparison
+    # requires committing AF-Q08210 (PfDHODH AlphaFold) and extending the
+    # BENCHMARK_PAIRS schema to support multi-segment res_seq_offset
+    # (4ORM construct: UNP residues 158-383 + 414-569 with a gap at
+    # 384-413). Tracked as PR-B. See STATE_OF_PHYSICS_AUDITOR.md Finding 1.
+    #
+    # Pair 3 withdrawn in PR-A. Original entry paired 4HJO with AF-Q9BY41
+    # (HsHDAC8 AF model) under the label "HsHDAC8". But 4HJO is EGFR
+    # (UniProt P00533, kinase domain residues 696-1022 per DBREF), not
+    # HsHDAC8. The COMPND MOLECULE field reads EPIDERMAL GROWTH FACTOR
+    # RECEPTOR. The previous row's res_seq_offset=678 was the symptom of
+    # the wrong-PDB error (679-start is EGFR kinase-domain PDB numbering,
+    # not HDAC8 numbering; HDAC8 is only 377 residues and cannot have
+    # residues 679-960). Restoring this row requires substituting 4HJO
+    # with a real HsHDAC8 crystal (e.g., 1T64, 1T67, 2V5W). Tracked as
+    # PR-D. See STATE_OF_PHYSICS_AUDITOR.md Finding 9.
     {
         "name": "Ubiquitin",
         "experimental": "benchmark/structures/experimental/1UBQ.pdb",
         "predicted": "benchmark/structures/predicted/AF-P0CG48-F1-model_v6.pdb",
         "description": "Human ubiquitin — small, no ligand (centroid fallback)",
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
     },
-    {
-        "name": "LmPTR1",
-        "experimental": "benchmark/structures/experimental/2BPR.pdb",
-        "predicted": "benchmark/structures/predicted/AF-Q01782-F1-model_v6.pdb",
-        "description": "Leishmania pteridine reductase 1 — antiparasitic target",
-        # 2BPR uses PDB numbering 381-553; AF-Q01782 uses UniProt numbering 1-288.
-        # Subtract 380 so experimental residue 381 maps to AF residue 1, etc.
-        "res_seq_offset": 380,
-    },
+    # Pair 5 withdrawn in PR-A. Original entry paired 2BPR with AF-Q01782
+    # (LmPTR1 AF model) under the label "LmPTR1". But 2BPR is DnaK, an
+    # NMR structure of a heat-shock chaperone from Escherichia coli (UniProt
+    # P0A6Y8 per DBREF), not Leishmania major pteridine reductase. The
+    # experimental input is wrong protein and wrong organism. Restoring
+    # this row requires substituting 2BPR with a real LmPTR1 crystal
+    # (e.g., 1E7W). Tracked as PR-C. See STATE_OF_PHYSICS_AUDITOR.md
+    # Finding 8.
     {
         "name": "HsABL1",
         "experimental": "benchmark/structures/experimental/2HYY.pdb",
         "predicted": "benchmark/structures/predicted/AF-P00519-F1-model_v6.pdb",
         "description": "Human ABL1 kinase with imatinib — cancer, tyrosine kinase",
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
     },
     {
         "name": "HsAromatase",
         "experimental": "benchmark/structures/experimental/3EQM.pdb",
         "predicted": "benchmark/structures/predicted/AF-P11511-F1-model_v6.pdb",
         "description": "Human aromatase/CYP19A1 with androstenedione — metalloenzyme",
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
     },
     {
         "name": "HsBRAF",
         "experimental": "benchmark/structures/experimental/3OG7.pdb",
         "predicted": "benchmark/structures/predicted/AF-P15056-F1-model_v6.pdb",
-        "description": "Human BRAF kinase domain with inhibitor — cancer, Ser/Thr kinase",
+        "description": (
+            "BRAF kinase domain crystallized as AKAP9-BRAF fusion construct "
+            "(3OG7 DBREF: Q5IBP5 residues 1175-1446 = BRAF kinase domain). "
+            "Measurements are real BRAF kinase pocket atoms including V600E "
+            "and the PLX4032/vemurafenib binding pocket. See "
+            "STATE_OF_PHYSICS_AUDITOR.md Finding 10 for construct-artifact "
+            "discussion."
+        ),
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
     },
     {
         "name": "CoV2Mpro",
         "experimental": "benchmark/structures/experimental/5R82.pdb",
         "predicted": "benchmark/structures/predicted/AF-P0DTD1-F1-model_v6.pdb",
         "description": "SARS-CoV-2 main protease with inhibitor — cysteine protease",
+        # 5R82 SOURCE line is wrapped: "ORGANISM_SCIENTIFIC: SEVERE ACUTE
+        # RESPIRATORY SYNDROME CORONAVIRUS" with the trailing "2;" on the
+        # next SOURCE line. verify_pdb_source reads single lines, so the
+        # experimental gate uses the truncated string; the AF model has
+        # the full "...CORONAVIRUS 2" on one line.
+        "expected_organism_experimental": "SEVERE ACUTE RESPIRATORY SYNDROME CORONAVIRUS",
+        "expected_organism_predicted": "SEVERE ACUTE RESPIRATORY SYNDROME CORONAVIRUS 2",
         # 5R82 PDB residue 1 = UniProt 3264; AF fragment starts at UniProt 3267 (AF residue 1).
         # Subtract 3 so experimental residue 4 maps to AF residue 1, etc.
         "res_seq_offset": 3,
@@ -264,6 +295,8 @@ BENCHMARK_PAIRS = [
         "experimental": "benchmark/structures/experimental/4EY7.pdb",
         "predicted": "benchmark/structures/predicted/AF-P22303-F1-model_v6.pdb",
         "description": "Human acetylcholinesterase with donepezil — Alzheimer's, deep aromatic gorge",
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
         # 4EY7 PDB residue 2 = UniProt 33; AF uses UniProt numbering 1-614.
         # Subtract -31 (i.e., add 31) so PDB residue 4 maps to AF residue 35, etc.
         "res_seq_offset": -31,
@@ -273,12 +306,16 @@ BENCHMARK_PAIRS = [
         "experimental": "benchmark/structures/experimental/3LN1.pdb",
         "predicted": "benchmark/structures/predicted/AF-Q05769-F1-model_v6.pdb",
         "description": "Mouse COX-2 with celecoxib — inflammation, buried hydrophobic channel",
+        "expected_organism_experimental": "MUS MUSCULUS",
+        "expected_organism_predicted": "MUS MUSCULUS",
     },
     {
         "name": "HsEGFR",
         "experimental": "benchmark/structures/experimental/1M17.pdb",
         "predicted": "benchmark/structures/predicted/AF-P00533-F1-model_v6.pdb",
         "description": "Human EGFR kinase with erlotinib — cancer, ATP-binding site",
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
         # 1M17 PDB residue 671 = UniProt 695; AF uses UniProt numbering 1-1210.
         # Subtract -24 (i.e., add 24) so PDB residue 672 maps to AF residue 696, etc.
         "res_seq_offset": -24,
@@ -288,12 +325,16 @@ BENCHMARK_PAIRS = [
         "experimental": "benchmark/structures/experimental/1HWL.pdb",
         "predicted": "benchmark/structures/predicted/AF-P04035-F1-model_v6.pdb",
         "description": "Human HMG-CoA reductase with statin — cardiovascular, large open site",
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
     },
     {
         "name": "HsDPP4",
         "experimental": "benchmark/structures/experimental/1X70.pdb",
         "predicted": "benchmark/structures/predicted/AF-P27487-F1-model_v6.pdb",
         "description": "Human DPP-4 with sitagliptin-like inhibitor — diabetes, beta-propeller",
+        "expected_organism_experimental": "HOMO SAPIENS",
+        "expected_organism_predicted": "HOMO SAPIENS",
     },
 ]
 
@@ -314,6 +355,13 @@ def run_benchmark() -> list[dict]:
         print(f"\n{'='*70}")
         print(f"  {pair['name']}: {pair['description']}")
         print(f"{'='*70}")
+
+        # Provenance gate: confirm SOURCE ORGANISM_SCIENTIFIC matches
+        # expectation on both sides before any parsing happens. This is
+        # what surfaced the pair-3 (4HJO=EGFR) and pair-5 (2BPR=DnaK)
+        # wrong-protein errors during PR-A.
+        verify_pdb_source(exp_path, pair["expected_organism_experimental"])
+        verify_pdb_source(af_path, pair["expected_organism_predicted"])
 
         # Parse structures
         exp_struct = parse_pdb(exp_path)

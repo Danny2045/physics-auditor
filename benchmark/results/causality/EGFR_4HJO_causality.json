@@ -1,6 +1,7 @@
 {
+  "audit_note": "Relabeled in PR fix/benchmark-mislabel-pair1-and-causality-artifacts (PR-A1). Numbers unchanged. Filename was previously HsHDAC8_causality.json but the input 4HJO.pdb is EGFR kinase domain (UniProt P00533), not HsHDAC8. See STATE_OF_PHYSICS_AUDITOR.md Finding 9.",
   "pair": {
-    "name": "HsHDAC8",
+    "name": "EGFR_4HJO",
     "description": "Human HDAC8 \u2014 Kira ortholog for SmHDAC8",
     "experimental_pdb": "4HJO.pdb",
     "predicted_pdb": "AF-Q9BY41-F1-model_v6.pdb",

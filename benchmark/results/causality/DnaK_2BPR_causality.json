@@ -1,6 +1,7 @@
 {
+  "audit_note": "Relabeled in PR fix/benchmark-mislabel-pair1-and-causality-artifacts (PR-A1). Numbers unchanged. Filename was previously LmPTR1_causality.json but the input 2BPR.pdb is DnaK from Escherichia coli (NMR heat-shock chaperone, UniProt P0A6Y8), not LmPTR1 from Leishmania major. See STATE_OF_PHYSICS_AUDITOR.md Finding 8.",
   "pair": {
-    "name": "LmPTR1",
+    "name": "DnaK_2BPR",
     "description": "Leishmania pteridine reductase 1 \u2014 antiparasitic target",
     "experimental_pdb": "2BPR.pdb",
     "predicted_pdb": "AF-Q01782-F1-model_v6.pdb",
