@@ -69,7 +69,7 @@ def run_one_pair(pair: dict, max_atoms: int = 4500) -> dict | None:
         print(f"  [skip] {name}: exceeds atom budget "
               f"(exp={exp_struct.n_atoms}, af={af_struct.n_atoms}, max={max_atoms}). "
               f"Causality layer needs O(n^2) memory; tighten benchmark pocket cutoff "
-              f"(see methodology caveats in preprint).")
+              f"(see methodology caveats in STATE_OF_PHYSICS_AUDITOR.md).")
         return None
 
     # Pocket from experimental ligand (or centroid for ligand-free)
