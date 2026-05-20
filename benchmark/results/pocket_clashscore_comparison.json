@@ -1,48 +1,18 @@
 [
   {
     "name": "HsDHODH",
-    "description": "Human DHODH \u2014 Kira ortholog, ESM-2 blind spot pair",
-    "experimental_pdb": "1MVS.pdb",
-    "predicted_pdb": "AF-Q02127-F1-model_v6.pdb",
-    "pocket_n_residues": 68,
-    "pocket_n_atoms_exp": 567,
-    "pocket_n_atoms_af": 524,
-    "exp_whole_clashscore": 45.4,
-    "exp_pocket_clashscore": 35.27,
-    "af_whole_clashscore": 3.97,
-    "af_pocket_clashscore": 5.73,
-    "whole_ratio": 11.43,
-    "pocket_ratio": 6.16
-  },
-  {
-    "name": "SmDHODH",
-    "description": "Parasite DHODH \u2014 30.8x selectivity target",
+    "description": "Human DHODH crystal (1D3H) vs HsDHODH AlphaFold (Q02127) \u2014 true intra-protein comparison",
     "experimental_pdb": "1D3H.pdb",
-    "predicted_pdb": "AF-G4VFD7-F1-model_v6.pdb",
+    "predicted_pdb": "AF-Q02127-F1-model_v6.pdb",
     "pocket_n_residues": 129,
     "pocket_n_atoms_exp": 989,
-    "pocket_n_atoms_af": 963,
-    "exp_whole_clashscore": 32.74,
+    "pocket_n_atoms_af": 976,
+    "exp_whole_clashscore": 31.79,
     "exp_pocket_clashscore": 23.26,
-    "af_whole_clashscore": 5.16,
-    "af_pocket_clashscore": 5.19,
-    "whole_ratio": 6.35,
-    "pocket_ratio": 4.48
-  },
-  {
-    "name": "HsHDAC8",
-    "description": "Human HDAC8 \u2014 Kira ortholog for SmHDAC8",
-    "experimental_pdb": "4HJO.pdb",
-    "predicted_pdb": "AF-Q9BY41-F1-model_v6.pdb",
-    "pocket_n_residues": 46,
-    "pocket_n_atoms_exp": 361,
-    "pocket_n_atoms_af": 364,
-    "exp_whole_clashscore": 19.43,
-    "exp_pocket_clashscore": 24.93,
-    "af_whole_clashscore": 5.11,
-    "af_pocket_clashscore": 5.49,
-    "whole_ratio": 3.8,
-    "pocket_ratio": 4.54
+    "af_whole_clashscore": 2.98,
+    "af_pocket_clashscore": 4.1,
+    "whole_ratio": 10.67,
+    "pocket_ratio": 5.67
   },
   {
     "name": "Ubiquitin",
@@ -52,27 +22,12 @@
     "pocket_n_residues": 24,
     "pocket_n_atoms_exp": 195,
     "pocket_n_atoms_af": 195,
-    "exp_whole_clashscore": 39.39,
+    "exp_whole_clashscore": 34.85,
     "exp_pocket_clashscore": 10.26,
-    "af_whole_clashscore": 3.51,
+    "af_whole_clashscore": 2.95,
     "af_pocket_clashscore": 0.0,
-    "whole_ratio": 11.23,
+    "whole_ratio": 11.8,
     "pocket_ratio": 1025.64
-  },
-  {
-    "name": "LmPTR1",
-    "description": "Leishmania pteridine reductase 1 \u2014 antiparasitic target",
-    "experimental_pdb": "2BPR.pdb",
-    "predicted_pdb": "AF-Q01782-F1-model_v6.pdb",
-    "pocket_n_residues": 24,
-    "pocket_n_atoms_exp": 182,
-    "pocket_n_atoms_af": 163,
-    "exp_whole_clashscore": 18.87,
-    "exp_pocket_clashscore": 32.97,
-    "af_whole_clashscore": 5.14,
-    "af_pocket_clashscore": 6.13,
-    "whole_ratio": 3.67,
-    "pocket_ratio": 5.37
   },
   {
     "name": "HsABL1",
@@ -84,9 +39,9 @@
     "pocket_n_atoms_af": 504,
     "exp_whole_clashscore": 29.3,
     "exp_pocket_clashscore": 32.88,
-    "af_whole_clashscore": 3.93,
+    "af_whole_clashscore": 3.59,
     "af_pocket_clashscore": 9.92,
-    "whole_ratio": 7.45,
+    "whole_ratio": 8.17,
     "pocket_ratio": 3.31
   },
   {
@@ -99,14 +54,14 @@
     "pocket_n_atoms_af": 883,
     "exp_whole_clashscore": 22.03,
     "exp_pocket_clashscore": 24.92,
-    "af_whole_clashscore": 5.91,
+    "af_whole_clashscore": 5.17,
     "af_pocket_clashscore": 1.13,
-    "whole_ratio": 3.73,
+    "whole_ratio": 4.26,
     "pocket_ratio": 22.0
   },
   {
     "name": "HsBRAF",
-    "description": "Human BRAF kinase domain with inhibitor \u2014 cancer, Ser/Thr kinase",
+    "description": "BRAF kinase domain crystallized as AKAP9-BRAF fusion construct (3OG7 DBREF: Q5IBP5 residues 1175-1446 = BRAF kinase domain). Measurements are real BRAF kinase pocket atoms including V600E and the PLX4032/vemurafenib binding pocket. See STATE_OF_PHYSICS_AUDITOR.md Finding 10 for construct-artifact discussion.",
     "experimental_pdb": "3OG7.pdb",
     "predicted_pdb": "AF-P15056-F1-model_v6.pdb",
     "pocket_n_residues": 52,
@@ -114,9 +69,9 @@
     "pocket_n_atoms_af": 416,
     "exp_whole_clashscore": 19.27,
     "exp_pocket_clashscore": 21.63,
-    "af_whole_clashscore": 3.54,
+    "af_whole_clashscore": 3.03,
     "af_pocket_clashscore": 2.4,
-    "whole_ratio": 5.45,
+    "whole_ratio": 6.35,
     "pocket_ratio": 9.0
   },
   {
@@ -129,10 +84,10 @@
     "pocket_n_atoms_af": 768,
     "exp_whole_clashscore": 56.17,
     "exp_pocket_clashscore": 35.67,
-    "af_whole_clashscore": 5.21,
-    "af_pocket_clashscore": 7.81,
-    "whole_ratio": 10.78,
-    "pocket_ratio": 4.57
+    "af_whole_clashscore": 3.91,
+    "af_pocket_clashscore": 3.91,
+    "whole_ratio": 14.37,
+    "pocket_ratio": 9.13
   },
   {
     "name": "HsAChE",
@@ -142,12 +97,12 @@
     "pocket_n_residues": 250,
     "pocket_n_atoms_exp": 2025,
     "pocket_n_atoms_af": 1097,
-    "exp_whole_clashscore": 24.99,
-    "exp_pocket_clashscore": 36.54,
-    "af_whole_clashscore": 5.63,
-    "af_pocket_clashscore": 7.29,
-    "whole_ratio": 4.44,
-    "pocket_ratio": 5.01
+    "exp_whole_clashscore": 23.22,
+    "exp_pocket_clashscore": 33.58,
+    "af_whole_clashscore": 3.13,
+    "af_pocket_clashscore": 4.56,
+    "whole_ratio": 7.42,
+    "pocket_ratio": 7.37
   },
   {
     "name": "MmCOX2",
@@ -157,12 +112,12 @@
     "pocket_n_residues": 684,
     "pocket_n_atoms_exp": 5657,
     "pocket_n_atoms_af": 1625,
-    "exp_whole_clashscore": 33.54,
-    "exp_pocket_clashscore": 38.36,
-    "af_whole_clashscore": 6.99,
-    "af_pocket_clashscore": 9.23,
-    "whole_ratio": 4.8,
-    "pocket_ratio": 4.16
+    "exp_whole_clashscore": 30.8,
+    "exp_pocket_clashscore": 33.76,
+    "af_whole_clashscore": 3.49,
+    "af_pocket_clashscore": 3.69,
+    "whole_ratio": 8.82,
+    "pocket_ratio": 9.14
   },
   {
     "name": "HsEGFR",
@@ -174,9 +129,9 @@
     "pocket_n_atoms_af": 403,
     "exp_whole_clashscore": 14.14,
     "exp_pocket_clashscore": 17.37,
-    "af_whole_clashscore": 11.39,
+    "af_whole_clashscore": 3.19,
     "af_pocket_clashscore": 4.96,
-    "whole_ratio": 1.24,
+    "whole_ratio": 4.43,
     "pocket_ratio": 3.5
   },
   {
@@ -189,9 +144,9 @@
     "pocket_n_atoms_af": 604,
     "exp_whole_clashscore": 11.1,
     "exp_pocket_clashscore": 13.84,
-    "af_whole_clashscore": 3.96,
+    "af_whole_clashscore": 3.38,
     "af_pocket_clashscore": 8.28,
-    "whole_ratio": 2.8,
+    "whole_ratio": 3.29,
     "pocket_ratio": 1.67
   },
   {
@@ -202,11 +157,11 @@
     "pocket_n_residues": 343,
     "pocket_n_atoms_exp": 2895,
     "pocket_n_atoms_af": 1654,
-    "exp_whole_clashscore": 41.43,
+    "exp_whole_clashscore": 39.26,
     "exp_pocket_clashscore": 49.74,
-    "af_whole_clashscore": 8.98,
+    "af_whole_clashscore": 6.25,
     "af_pocket_clashscore": 6.65,
-    "whole_ratio": 4.62,
+    "whole_ratio": 6.28,
     "pocket_ratio": 7.48
   }
 ]

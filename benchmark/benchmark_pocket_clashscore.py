@@ -339,8 +339,16 @@ BENCHMARK_PAIRS = [
 ]
 
 
-def run_benchmark() -> list[dict]:
-    """Run the binding-site clashscore benchmark."""
+def run_benchmark(output_path: Path | None = None) -> list[dict]:
+    """Run the binding-site clashscore benchmark.
+
+    Parameters
+    ----------
+    output_path : Path or None
+        Where to write the results JSON. Defaults to the canonical
+        repo path ``benchmark/results/pocket_clashscore_comparison.json``.
+        Tests pass a tempfile path to avoid touching the committed JSON.
+    """
 
     results = []
 
@@ -477,7 +485,9 @@ def run_benchmark() -> list[dict]:
                   f"{r['whole_ratio']:>11.1f}x {r['pocket_ratio']:>12.1f}x")
 
         # Save results
-        out_path = Path("benchmark/results/pocket_clashscore_comparison.json")
+        out_path = output_path if output_path is not None else Path(
+            "benchmark/results/pocket_clashscore_comparison.json"
+        )
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(results, indent=2))
         print(f"\n  Results saved to {out_path}")

@@ -507,11 +507,13 @@ The README makes a number of claims; verdict against the code as it stands at th
 
 ## 9. Outstanding work register
 
-The repository carries **eleven** findings. The first seven were surfaced by the original audit (Findings 1–7). The last four (Findings 8–11) were surfaced by PR-A1's `verify_pdb_source` enforcement work and planned benchmark rerun: Findings 8 and 9 are wrong-protein errors in the benchmark inputs (2BPR is DnaK, 4HJO is EGFR), Finding 10 is a construct-artifact annotation (3OG7 is an AKAP9-BRAF fusion), and Finding 11 is the cross-environment numerical drift of the pocket-clashscore pipeline that prevents PR-A1 from regenerating the benchmark JSON. Each finding pairs current status with a "Natural next-PR scope" line. The scope lines are suggestions for the future PR that closes the finding; they are not commitments and the engineer who picks up the work is expected to refine them.
+The repository carries **eleven** findings. The first seven were surfaced by the original audit (Findings 1–7). The last four (Findings 8–11) were surfaced by PR-A1's `verify_pdb_source` enforcement work and planned benchmark rerun: Findings 8 and 9 are wrong-protein errors in the benchmark inputs (2BPR is DnaK, 4HJO is EGFR), Finding 10 is a construct-artifact annotation (3OG7 is an AKAP9-BRAF fusion), and Finding 11 was originally framed as cross-environment numerical drift of the pocket-clashscore pipeline but was diagnosed by PR-DET as a stale benchmark JSON frozen since before the May 9 topology fix in commit `1e2d7a6`. Each finding pairs current status with a "Natural next-PR scope" line. The scope lines are suggestions for the future PR that closes the finding; they are not commitments and the engineer who picks up the work is expected to refine them.
+
+**Methodological pattern established by PR-DET (Finding 11 closure):** any benchmark whose output JSON is committed to the repository must have a corresponding regression test that locks the committed snapshot byte-for-byte against a fresh in-process rerun. This prevents the class of silent drift that Finding 11 documented — a topology change at `src/physics_auditor/core/topology.py` correctly altered the bonded mask, which is shared infrastructure between the LJ and clash kernels, but the change was claimed in its commit message to affect only LJ energies. Nobody regenerated `pocket_clashscore_comparison.json`, so it carried bug-inflated clashscore values through three subsequent PRs. The new test `tests/test_benchmark_clashscore_regression.py` makes that class of silent propagation impossible going forward: any future change that affects clashscore numbers must regenerate the JSON in the same commit or break this test.
 
 ### Finding 1 — Mislabel propagation in master-published benchmark and manuscript
 
-**Status:** Partially closed by PR `fix/benchmark-mislabel-pair1-and-causality-artifacts` (PR-A1). BENCHMARK_PAIRS schema corrected: pair 1 mapped to 1D3H ↔ AF-Q02127 (true HsDHODH-vs-HsDHODH); pairs 2, 3, 5 removed pending substitutions (PR-B, PR-D, PR-C); pair 8 annotated for AKAP9-BRAF construct. Causality artifact filenames and internal labels corrected. The `manuscript/preprint.md` edits and the `benchmark/results/pocket_clashscore_comparison.json` regeneration are deferred to PR-A2 pending Finding 11 resolution.
+**Status:** Partially closed by PR `fix/benchmark-mislabel-pair1-and-causality-artifacts` (PR-A1). BENCHMARK_PAIRS schema corrected: pair 1 mapped to 1D3H ↔ AF-Q02127 (true HsDHODH-vs-HsDHODH); pairs 2, 3, 5 removed pending substitutions (PR-B, PR-D, PR-C); pair 8 annotated for AKAP9-BRAF construct. Causality artifact filenames and internal labels corrected. The `benchmark/results/pocket_clashscore_comparison.json` regeneration shipped in PR-DET (Finding 11 closure). The `manuscript/preprint.md` edits are deferred to PR-A2, now unblocked.
 
 `benchmark/results/pocket_clashscore_comparison.json` (pair 2) labels `1D3H.pdb` as "SmDHODH" and pairs it with the AlphaFold model `AF-G4VFD7-F1-model_v6.pdb` (which *is* SmDHODH). But `1D3H.pdb`'s SOURCE record reads `ORGANISM_SCIENTIFIC: HOMO SAPIENS`; the structure is the catalytic construct of *human* DHODH (UniProt Q02127), not the parasite. The numerical clashscore values are valid for the underlying experimental structure (1D3H); the *label* "SmDHODH" attached to it is wrong.
 
@@ -635,7 +637,7 @@ The original `BENCHMARK_PAIRS` pair 5 paired `2BPR.pdb` with `AF-Q01782` (LmPTR1
 
 Structurally distinct from Findings 1 and 2: pair 5 was a wrong-PDB error — the file does not contain any version of LmPTR1.
 
-**Natural next-PR scope (PR-C):** substitute 2BPR with a real LmPTR1 crystal. The canonical PDB for *Leishmania major* PTR1 is **1E7W** (other candidates: 2BFM, 2BFA, 1E92). Commit the chosen PDB to `benchmark/structures/experimental/`. Restore the pair to `BENCHMARK_PAIRS` with verified `expected_organism_experimental = "LEISHMANIA MAJOR"`. Re-run the benchmark to produce the corrected row (after Finding 11 resolution). Update Methods, Discussion, and Table 1. Rename `benchmark/results/causality/DnaK_2BPR_causality.json` (present from PR-A1) back to `LmPTR1_causality.json` after substitution and update `CAUSALITY_FINDINGS.md` / `TOPOLOGY_FIXES.md` analogously.
+**Natural next-PR scope (PR-C):** substitute 2BPR with a real LmPTR1 crystal. The canonical PDB for *Leishmania major* PTR1 is **1E7W** (other candidates: 2BFM, 2BFA, 1E92). Commit the chosen PDB to `benchmark/structures/experimental/`. Restore the pair to `BENCHMARK_PAIRS` with verified `expected_organism_experimental = "LEISHMANIA MAJOR"`. Re-run the benchmark to produce the corrected row (PR-DET regenerated the canonical JSON; restoring this pair extends it). Update Methods, Discussion, and Table 1. Rename `benchmark/results/causality/DnaK_2BPR_causality.json` (present from PR-A1) back to `LmPTR1_causality.json` after substitution and update `CAUSALITY_FINDINGS.md` / `TOPOLOGY_FIXES.md` analogously.
 
 ### Finding 9 — Wrong-protein error: pair 3 of the 14-pair clashscore benchmark used EGFR as HsHDAC8
 
@@ -645,7 +647,7 @@ The original `BENCHMARK_PAIRS` pair 3 paired `4HJO.pdb` with `AF-Q9BY41` (HsHDAC
 
 Note: the benchmark previously had TWO EGFR rows (pair 3 mislabeled as HsHDAC8, pair 12 correctly labeled as HsEGFR) and ZERO HsHDAC8 rows. After PR-A1's withdrawal, pair 12 is the only EGFR row.
 
-**Natural next-PR scope (PR-D):** substitute 4HJO with a real HsHDAC8 crystal. Canonical PDB candidates: **1T64, 1T67, 2V5W** (all HsHDAC8 with various inhibitors). Commit the chosen PDB to `benchmark/structures/experimental/`. Restore the pair to `BENCHMARK_PAIRS` with verified `expected_organism_experimental = "HOMO SAPIENS"` and add a sanity-check that COMPND MOLECULE matches HISTONE DEACETYLASE 8 (Finding 9 is a worked example of why SOURCE-organism alone is insufficient — 4HJO passes the organism gate because it is also human). Re-run the benchmark to produce the corrected row (after Finding 11 resolution). Update Methods, Discussion (Group 2), and Table 1. Rename `benchmark/results/causality/EGFR_4HJO_causality.json` (present from PR-A1) back to `HsHDAC8_causality.json` after substitution and update `CAUSALITY_FINDINGS.md` / `TOPOLOGY_FIXES.md` analogously.
+**Natural next-PR scope (PR-D):** substitute 4HJO with a real HsHDAC8 crystal. Canonical PDB candidates: **1T64, 1T67, 2V5W** (all HsHDAC8 with various inhibitors). Commit the chosen PDB to `benchmark/structures/experimental/`. Restore the pair to `BENCHMARK_PAIRS` with verified `expected_organism_experimental = "HOMO SAPIENS"` and add a sanity-check that COMPND MOLECULE matches HISTONE DEACETYLASE 8 (Finding 9 is a worked example of why SOURCE-organism alone is insufficient — 4HJO passes the organism gate because it is also human). Re-run the benchmark to produce the corrected row (PR-DET regenerated the canonical JSON; restoring this pair extends it). Update Methods, Discussion (Group 2), and Table 1. Rename `benchmark/results/causality/EGFR_4HJO_causality.json` (present from PR-A1) back to `HsHDAC8_causality.json` after substitution and update `CAUSALITY_FINDINGS.md` / `TOPOLOGY_FIXES.md` analogously.
 
 ### Finding 10 — Construct-artifact annotation: pair 8 HsBRAF crystal 3OG7 is an AKAP9-BRAF fusion construct
 
@@ -657,31 +659,43 @@ PR-A1 annotates the `BENCHMARK_PAIRS` description for pair 8 to explicitly decla
 
 This finding is documented as a methodological flag for future provenance work: a future enhancement to `verify_pdb_source` could optionally cross-check DBREF UniProt against an expected_uniprot field per pair to surface this kind of construct-level annotation mismatch automatically. Out of scope for PR-A1.
 
-### Finding 11 — Pocket-clashscore pipeline produces environmentally-dependent numerical results
+### Finding 11 — Stale benchmark JSON: clashscore values frozen pre-1e2d7a6 (topology fix May 9)
 
-**Status:** Open. Surfaced by PR-A1's planned rerun of `benchmark_pocket_clashscore.py`. Resolution required before PR-A2 (manuscript update + benchmark JSON regeneration).
+**Status:** Closed by PR `fix/pr-det-stale-clashscore-json` (PR-DET). The committed `pocket_clashscore_comparison.json` is now regenerated against current code, and a regression test (`tests/test_benchmark_clashscore_regression.py`) locks the numbers byte-for-byte to prevent silent drift on future topology or kernel changes.
 
-During PR-A1's planned regeneration of `pocket_clashscore_comparison.json`, ten pairs that were not edited in this PR showed numerical drift between the committed master JSON (produced in a prior environment) and the current bio-builder environment. Within-environment reproducibility was confirmed: two consecutive runs in the current environment produce byte-identical output. The drift is exclusively across environments.
+PR-A1's planned regeneration of `pocket_clashscore_comparison.json` showed numerical drift up to 72% on AF-side clashscore values against the committed master JSON. Within-environment reproducibility held: consecutive runs were byte-identical. The PfDHODH selectivity dossier (`run_pfdhodh_vs_hsdhodh_selectivity.py`) reproduced byte-identically across environments, isolating the drift to the clashscore pipeline.
 
-Drift magnitude (selected): HsEGFR `af_whole_clashscore` 11.39 → 3.19 (−72%), MmCOX2 `af_pocket_clashscore` 9.23 → 3.69 (−60%), CoV2Mpro `af_pocket_clashscore` 7.81 → 3.91 (−50%), HsAChE `af_whole_clashscore` 5.63 → 3.13 (−44%). Experimental-side numbers are mostly stable; predicted-side (AF model) numbers drift more, suggesting hydrogen-handling sensitivity in either `parse_pdb`, `build_bonded_mask`, or `check_clashes`.
+PR-DET ran a four-probe diagnostic (see PR description for details):
 
-The PfDHODH selectivity dossier (`run_pfdhodh_vs_hsdhodh_selectivity.py`) reproduces byte-identically across environments, so the LJ attribution pipeline is unaffected. The drift is specific to the clashscore pipeline.
+- **Probe 1 (x64 toggle):** Forcing `jax_enable_x64=True` produced byte-identical output to float32. The parser stores coordinates as `np.float32` regardless of JAX configuration, so the x64 promotion never applied. **Drift is not precision-sensitive.**
+- **Probe 2 (NumPy reference):** A pure NumPy float64 reference implementation of the clash kernel produced identical results (30 clashes on HsEGFR AF) to both JAX float32 and JAX float64. **All three kernels agree.**
+- **Probe 3 (layered hashes):** Coordinate hashes, bond-inference hashes, and non-bonded-mask hashes were byte-identical between float32 and float64 modes. **No layer in the current pipeline is precision-dependent.**
+- **Probe 4 (borderline atom pairs):** Zero pairs flipped clash status between precisions in the current code. The 30 reported clashes are physically-typical short H-bonds (donor/acceptor pairs at 2.5–2.7 Å). **The kernel is precision-stable on production inputs.**
 
-Reference artifact: `/tmp/pocket_clashscore_current_env.json` (current-environment regeneration, not committed; preserved as evidence of the drift). The committed master `pocket_clashscore_comparison.json` is preserved as-is in PR-A1.
+Root cause, found in Probe 5: commit `1e2d7a6` (May 9 2026, *"fix: topology gaps surfaced by causality layer (disulfide + C-term OXT)"*) added two bond categories to `infer_bonds_from_topology`:
 
-Hypotheses, to be investigated in a dedicated PR before PR-A2:
+1. The C-terminal OXT atom in `BACKBONE_BONDS`. Previously the C-OXT pair was unbonded, generating one spurious clash per chain.
+2. Disulfide bond inference for CYS-SG pairs at 1.9–2.4 Å. Previously these read as ~2.05 Å clashes (sulfur vdW radius is ~1.8 Å, so two SG atoms at 2.05 Å with no bond mask correctly counted as overlap).
 
-- **Hypothesis A:** a JAX, jaxlib, or numpy upgrade silently changed reduction semantics in `check_clashes`.
-- **Hypothesis B:** hydrogen detection in `parse_pdb` is element-order or float-precision dependent.
-- **Hypothesis C:** the clashscore kernel has float-precision-sensitive borderline pairs at the vdW-radius threshold; small precision differences flip which pairs count.
+Both fixes correctly enlarged the bonded-pair set, shrinking the non-bonded mask, reducing clash counts. The direction matches the observed "drift" exactly: the master JSON had MORE clashes than the current code (e.g. HsEGFR `af_whole_clashscore` 11.39 → 3.19, a difference consistent with removing ~77 spurious clashes per chain across multiple disulfides plus OXTs).
 
-**Natural next-PR scope (PR-DET):** bisect the suspected dependencies (jax, jaxlib, numpy) until master JSON reproduces, identify the version where semantics changed, then choose between (a) pinning to the reproducing version with a CI determinism check, (b) hardening the kernel for cross-version determinism (float64 throughout, deterministic reductions, explicit tie-breaking at vdW threshold), or (c) accepting the new canonical and documenting the env-normalization event. Once Finding 11 is resolved, PR-A2 regenerates the JSON, updates manuscript Table 1, and ships the pair 1 new numbers.
+The commit message for `1e2d7a6` claimed *"Pocket clashscore numbers in the preprint are unchanged; this affects LJ-energy decomposition only."* This claim was incorrect because the bonded mask is shared infrastructure between the LJ kernel and the clash kernel. Nobody regenerated `pocket_clashscore_comparison.json` after the topology fix, so the JSON remained frozen at the pre-fix values (bug-inflated) through PR #1, PR #2, and PR-A1 (PR #3).
+
+The post-1e2d7a6 numbers are the correct values. The science of the benchmark (AF models have systematically higher clashscores than crystals) is unaffected — the direction of every ratio is preserved; only the magnitudes shrink as artifactual clashes are removed.
+
+**Resolution in PR-DET:**
+
+1. `pocket_clashscore_comparison.json` regenerated against current code (11 pairs, post-PR-A1 schema, correct topology).
+2. New regression test `tests/test_benchmark_clashscore_regression.py` locks the regenerated JSON byte-for-byte. Any future topology or kernel change that affects clashscore numbers will break this test, forcing the author to either regenerate the JSON or explain why the change shouldn't have.
+3. A methodological note added to this state document (§9 preamble): the May 9 commit's "clashscore unchanged" claim was a scope-of-impact error because shared infrastructure (the bonded mask) propagates across kernels. The regression test added in PR-DET defends against this class of silent propagation going forward.
+
+**Downstream:** PR-A2 (manuscript update) is now unblocked. The manuscript's Table 1 will be regenerated against the corrected numbers and the manuscript prose will be updated to reflect the post-1e2d7a6 values.
 
 ### Status summary
 
 | Finding | Status | Origin |
 |---|---|---|
-| 1. Mislabel propagation (1D3H labeled "SmDHODH" in master benchmark + manuscript) | Partially closed by PR-A1; manuscript update deferred to PR-A2 (blocked by Finding 11) | **Surfaced by this audit** |
+| 1. Mislabel propagation (1D3H labeled "SmDHODH" in master benchmark + manuscript) | Partially closed by PR-A1; manuscript update deferred to PR-A2 (unblocked by PR-DET closing Finding 11) | **Surfaced by this audit** |
 | 2. `verify_pdb_source` built but not enforced | Closed by PR-A1 for `benchmark_pocket_clashscore.py`; three other scripts still bypass | **Surfaced by this audit** |
 | 3. Eight-check suite is two checks (README contradicts SETUP.md) | Open | **Surfaced by this audit** |
 | 4. `fixes/technical-pass-1` was local-only | Branch pushed; rebase + PR pending | **Surfaced by this audit; operationally mitigated by Phase 2** |
@@ -691,7 +705,7 @@ Hypotheses, to be investigated in a dedicated PR before PR-A2:
 | 8. Wrong-protein error: pair 5 used 2BPR (DnaK) as LmPTR1 | Open. Withdrawn from benchmark in PR-A1; substitution tracked as PR-C | **Surfaced by PR-A1's `verify_pdb_source` enforcement work** |
 | 9. Wrong-protein error: pair 3 used 4HJO (EGFR) as HsHDAC8 | Open. Withdrawn from benchmark in PR-A1; substitution tracked as PR-D | **Surfaced by PR-A1's `verify_pdb_source` enforcement work** |
 | 10. Construct-artifact annotation: pair 8 3OG7 is an AKAP9-BRAF fusion | Annotated in place in PR-A1; no substitution planned | **Surfaced by PR-A1's DBREF cross-check** |
-| 11. Pocket-clashscore pipeline produces environmentally-dependent numerical results | Open. Resolution required before PR-A2; tracked as PR-DET | **Surfaced by PR-A1's planned rerun** |
+| 11. Stale benchmark JSON: clashscore values frozen pre-1e2d7a6 (topology fix May 9) | Closed by PR-DET. Regression test added (`tests/test_benchmark_clashscore_regression.py`). | **Surfaced by PR-A1's planned rerun; root-caused by PR-DET** |
 
 ---
 
