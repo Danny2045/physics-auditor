@@ -42,11 +42,15 @@ what it means for next steps.
 
 ### 1. The aromatase / cofactor-loss mechanism is now concrete at the residue level
 
-The preprint frames AlphaFold's "+490%" pocket-clashscore advantage
-on aromatase as: AF predicts apo, the experimental crystal carries
-the heme + substrate constraint, AF's pocket relaxes away from the
-catalytic geometry. The causality layer makes this **mechanistic at
-the residue level**:
+An earlier (withdrawn) preprint framed AlphaFold's "+490%"
+pocket-clashscore advantage on aromatase as: AF predicts apo, the
+experimental crystal carries the heme + substrate constraint, AF's
+pocket relaxes away from the catalytic geometry. (The corrected
+figure under the post-PR-DET benchmark is +416%; see
+`benchmark/results/pocket_clashscore_comparison.json`. The
+preprint itself was withdrawn from master — see
+STATE_OF_PHYSICS_AUDITOR.md §7.3.) The causality layer makes this
+**mechanistic at the residue level**:
 
 For **HsAromatase**, the top three residues unfavorable in AF (vs
 exp) are PHE429 (+3.0), THR309 (+3.0), SER112 (+2.6) — modest
@@ -148,7 +152,9 @@ the causality layer, it produces an **O(n²) memory blow-up** that
 forces 8 of 14 pairs to skip. The two issues have the same root
 cause and the same fix: **tighten the pocket definition to ~5.0Å
 around the ligand centroid, not 8.0Å around every ligand atom.**
-That's queued as the preprint sensitivity rerun.
+That sensitivity analysis remains a possible future direction; it
+is no longer tied to a preprint, which has been withdrawn from
+master.
 
 ## Skipped pairs
 

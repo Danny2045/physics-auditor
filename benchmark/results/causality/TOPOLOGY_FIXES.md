@@ -133,7 +133,13 @@ CAUSALITY_FINDINGS.md audit note).
   resolved structures (R > 3.0 Å) can drift outside this window
   and would be missed. Acceptable for now; revisit if a benchmark
   structure has a known disulfide that fails to bond.
-- These fixes do not change *binding-site clashscore* (which uses
-  the same bonded mask but on a much smaller atom set, where the
-  C-terminal OXT is rarely in the pocket). The benchmark
-  clashscore numbers in the preprint are unchanged.
+- These fixes WERE thought not to change *binding-site clashscore*
+  (the original reasoning: the bonded mask operates on a much
+  smaller atom set, where the C-terminal OXT is rarely in the
+  pocket). That reasoning was incorrect — the bonded mask is
+  shared infrastructure between the LJ and clash kernels, so the
+  benchmark clashscore numbers WERE affected by this topology
+  fix. The stale JSON was regenerated and locked under a
+  regression test in PR-DET (see STATE_OF_PHYSICS_AUDITOR.md
+  Finding 11). The original preprint that carried the stale
+  numbers has since been withdrawn from master.
