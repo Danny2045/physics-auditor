@@ -1,0 +1,563 @@
+{
+  "claims": {
+    "what_this_is": "Kabsch convergent validation of the v1 sequence-anchored PfDHODH (4ORM, ligand 2V6/DSM338) vs HsDHODH (1D3H, ligand A26/teriflunomide) selectivity finding. A structural residue correspondence is built by rigid-body superposition of the shared FMN cofactor (31 heavy atoms paired by canonical PDB atom name \u2014 sequence-INDEPENDENT) followed by spatial nearest-CA matching of pocket residues. The ORO cofactor (11 heavy atoms) provides an orthogonal cross-check anchor. Each literature-cluster pairing (HIS185, PHE188, ARG265) is reported with its v1 sequence-based partner alongside its v2 structural partner under each anchor, so agreement (or disagreement) is explicit.",
+    "what_this_is_not": "This is NOT a full structural alignment (TM-align/CE-class scoring is NOT performed; no SSE-aware weighting, no iterated refinement). The pocket correspondence is built by nearest-CA matching after a cofactor-anchored rigid transform \u2014 a deliberately simple convergent test, not a general-purpose structural aligner. Rigid-body only; domain motion or hinge bending between the two structures will inflate anchor_rmsd and mean_match_distance, which are the falsifiable signals that the rigid assumption is breaking. The conserved-residue interpretation in REALIGNED_FINDINGS.md is confirmed by THIS test only to the extent that the structural partners match the sequence partners \u2014 per-residue verdicts are in convergence_verdict.per_residue.",
+    "supported_finding": "See convergence_verdict.headline_agreement. Per-residue agreement (or disagreement) between v1 sequence pairings and v2 structural pairings is the result of this run; the interpretation (whether the v1 finding is convergently validated, partially validated, or contradicted) is to be made by the reviewer after inspecting the verdict.",
+    "pending_followup": "If any cluster pairing disagrees between FMN-anchored and ORO-anchored fits, escalate to a multi-anchor consensus or to TM-align gold-standard structural alignment before the v1 conserved-residue interpretation is treated as established. Independent of this run, the published structural-biology literature on 4ORM (Deng et al. J. Med. Chem. 2014) and PfDHODH selectivity reviews remains the next confirmation layer."
+  },
+  "anchors": {
+    "FMN": {
+      "method": "kabsch_cofactor_anchored",
+      "anchor_resname": "FMN",
+      "n_anchor_atoms": 31,
+      "anchor_rmsd": 0.2597,
+      "n_pocket_target": 21,
+      "n_pocket_ortholog": 19,
+      "n_spatially_matched": 21,
+      "max_match_distance": 4.0,
+      "mean_match_distance": 1.2393,
+      "n_unmatched_target": 0
+    },
+    "ORO": {
+      "method": "kabsch_cofactor_anchored",
+      "anchor_resname": "ORO",
+      "n_anchor_atoms": 11,
+      "anchor_rmsd": 0.0762,
+      "n_pocket_target": 21,
+      "n_pocket_ortholog": 19,
+      "n_spatially_matched": 20,
+      "max_match_distance": 4.0,
+      "mean_match_distance": 1.6899,
+      "n_unmatched_target": 1
+    }
+  },
+  "convergence_verdict": {
+    "primary_anchor": "FMN",
+    "cross_check_anchor": "ORO",
+    "headline_agreement": "3 of 3 literature-cluster pairings reproduced by FMN-anchored Kabsch superposition; 3 of 3 also reproduced by ORO-anchored Kabsch (orthogonal cross-check)",
+    "per_residue": [
+      {
+        "target_res_seq": 185,
+        "target_res_name": "HIS",
+        "v1_sequence_partner": {
+          "res_name": "HIS",
+          "res_seq": 56
+        },
+        "v2_structural_partner_FMN": {
+          "res_name": "HIS",
+          "res_seq": 56
+        },
+        "v2_FMN_nearest_distance": 1.3925,
+        "v2_FMN_runner_up_distance": 3.7479,
+        "v2_structural_partner_ORO": {
+          "res_name": "HIS",
+          "res_seq": 56
+        },
+        "v2_ORO_nearest_distance": 1.7278,
+        "v2_ORO_runner_up_distance": 3.4208,
+        "agrees_v1_vs_FMN": true,
+        "agrees_v1_vs_ORO": true,
+        "agrees_FMN_vs_ORO": true
+      },
+      {
+        "target_res_seq": 188,
+        "target_res_name": "PHE",
+        "v1_sequence_partner": {
+          "res_name": "ALA",
+          "res_seq": 59
+        },
+        "v2_structural_partner_FMN": {
+          "res_name": "ALA",
+          "res_seq": 59
+        },
+        "v2_FMN_nearest_distance": 1.7637,
+        "v2_FMN_runner_up_distance": 3.5408,
+        "v2_structural_partner_ORO": {
+          "res_name": "ALA",
+          "res_seq": 59
+        },
+        "v2_ORO_nearest_distance": 2.3475,
+        "v2_ORO_runner_up_distance": 2.8141,
+        "agrees_v1_vs_FMN": true,
+        "agrees_v1_vs_ORO": true,
+        "agrees_FMN_vs_ORO": true
+      },
+      {
+        "target_res_seq": 265,
+        "target_res_name": "ARG",
+        "v1_sequence_partner": {
+          "res_name": "ARG",
+          "res_seq": 136
+        },
+        "v2_structural_partner_FMN": {
+          "res_name": "ARG",
+          "res_seq": 136
+        },
+        "v2_FMN_nearest_distance": 1.4265,
+        "v2_FMN_runner_up_distance": 3.7359,
+        "v2_structural_partner_ORO": {
+          "res_name": "ARG",
+          "res_seq": 136
+        },
+        "v2_ORO_nearest_distance": 1.8909,
+        "v2_ORO_runner_up_distance": 4.2945,
+        "agrees_v1_vs_FMN": true,
+        "agrees_v1_vs_ORO": true,
+        "agrees_FMN_vs_ORO": true
+      }
+    ]
+  },
+  "pocket_match_tables": {
+    "FMN": [
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 172,
+        "nearest_distance": 3.5359,
+        "runner_up_distance": 3.94,
+        "accepted": true,
+        "ortholog_res_name": "MET",
+        "ortholog_res_seq": 43
+      },
+      {
+        "target_res_name": "CYS",
+        "target_res_seq": 175,
+        "nearest_distance": 0.625,
+        "runner_up_distance": 4.1119,
+        "accepted": true,
+        "ortholog_res_name": "LEU",
+        "ortholog_res_seq": 46
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 176,
+        "nearest_distance": 2.281,
+        "runner_up_distance": 3.6873,
+        "accepted": true,
+        "ortholog_res_name": "GLN",
+        "ortholog_res_seq": 47
+      },
+      {
+        "target_res_name": "GLY",
+        "target_res_seq": 181,
+        "nearest_distance": 1.4133,
+        "runner_up_distance": 4.0548,
+        "accepted": true,
+        "ortholog_res_name": "PRO",
+        "ortholog_res_seq": 52
+      },
+      {
+        "target_res_name": "GLU",
+        "target_res_seq": 182,
+        "nearest_distance": 1.249,
+        "runner_up_distance": 3.6723,
+        "accepted": true,
+        "ortholog_res_name": "GLU",
+        "ortholog_res_seq": 53
+      },
+      {
+        "target_res_name": "CYS",
+        "target_res_seq": 184,
+        "nearest_distance": 1.1345,
+        "runner_up_distance": 4.2686,
+        "accepted": true,
+        "ortholog_res_name": "ALA",
+        "ortholog_res_seq": 55
+      },
+      {
+        "target_res_name": "HIS",
+        "target_res_seq": 185,
+        "nearest_distance": 1.3925,
+        "runner_up_distance": 3.7479,
+        "accepted": true,
+        "ortholog_res_name": "HIS",
+        "ortholog_res_seq": 56
+      },
+      {
+        "target_res_name": "PHE",
+        "target_res_seq": 188,
+        "nearest_distance": 1.7637,
+        "runner_up_distance": 3.5408,
+        "accepted": true,
+        "ortholog_res_name": "ALA",
+        "ortholog_res_seq": 59
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 189,
+        "nearest_distance": 1.2131,
+        "runner_up_distance": 2.9813,
+        "accepted": true,
+        "ortholog_res_name": "VAL",
+        "ortholog_res_seq": 60
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 197,
+        "nearest_distance": 2.0192,
+        "runner_up_distance": 2.2977,
+        "accepted": true,
+        "ortholog_res_name": "LEU",
+        "ortholog_res_seq": 68
+      },
+      {
+        "target_res_name": "PHE",
+        "target_res_seq": 227,
+        "nearest_distance": 0.7703,
+        "runner_up_distance": 3.4743,
+        "accepted": true,
+        "ortholog_res_name": "PHE",
+        "ortholog_res_seq": 98
+      },
+      {
+        "target_res_name": "ILE",
+        "target_res_seq": 237,
+        "nearest_distance": 0.7965,
+        "runner_up_distance": 3.3552,
+        "accepted": true,
+        "ortholog_res_name": "LEU",
+        "ortholog_res_seq": 108
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 240,
+        "nearest_distance": 0.7613,
+        "runner_up_distance": 3.2216,
+        "accepted": true,
+        "ortholog_res_name": "MET",
+        "ortholog_res_seq": 111
+      },
+      {
+        "target_res_name": "ILE",
+        "target_res_seq": 263,
+        "nearest_distance": 0.8253,
+        "runner_up_distance": 3.5692,
+        "accepted": true,
+        "ortholog_res_name": "VAL",
+        "ortholog_res_seq": 134
+      },
+      {
+        "target_res_name": "ARG",
+        "target_res_seq": 265,
+        "nearest_distance": 1.4265,
+        "runner_up_distance": 3.7359,
+        "accepted": true,
+        "ortholog_res_name": "ARG",
+        "ortholog_res_seq": 136
+      },
+      {
+        "target_res_name": "ILE",
+        "target_res_seq": 272,
+        "nearest_distance": 0.626,
+        "runner_up_distance": 3.3864,
+        "accepted": true,
+        "ortholog_res_name": "VAL",
+        "ortholog_res_seq": 143
+      },
+      {
+        "target_res_name": "TYR",
+        "target_res_seq": 528,
+        "nearest_distance": 0.4213,
+        "runner_up_distance": 3.3992,
+        "accepted": true,
+        "ortholog_res_name": "TYR",
+        "ortholog_res_seq": 356
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 531,
+        "nearest_distance": 1.0662,
+        "runner_up_distance": 4.2555,
+        "accepted": true,
+        "ortholog_res_name": "LEU",
+        "ortholog_res_seq": 359
+      },
+      {
+        "target_res_name": "VAL",
+        "target_res_seq": 532,
+        "nearest_distance": 1.0308,
+        "runner_up_distance": 2.7878,
+        "accepted": true,
+        "ortholog_res_name": "THR",
+        "ortholog_res_seq": 360
+      },
+      {
+        "target_res_name": "GLY",
+        "target_res_seq": 535,
+        "nearest_distance": 0.8914,
+        "runner_up_distance": 3.0945,
+        "accepted": true,
+        "ortholog_res_name": "GLY",
+        "ortholog_res_seq": 363
+      },
+      {
+        "target_res_name": "MET",
+        "target_res_seq": 536,
+        "nearest_distance": 0.7831,
+        "runner_up_distance": 4.1181,
+        "accepted": true,
+        "ortholog_res_name": "PRO",
+        "ortholog_res_seq": 364
+      }
+    ],
+    "ORO": [
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 172,
+        "nearest_distance": 4.8404,
+        "runner_up_distance": 4.8469,
+        "accepted": false,
+        "ortholog_res_name": null,
+        "ortholog_res_seq": null
+      },
+      {
+        "target_res_name": "CYS",
+        "target_res_seq": 175,
+        "nearest_distance": 1.7477,
+        "runner_up_distance": 5.181,
+        "accepted": true,
+        "ortholog_res_name": "LEU",
+        "ortholog_res_seq": 46
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 176,
+        "nearest_distance": 2.8185,
+        "runner_up_distance": 2.963,
+        "accepted": true,
+        "ortholog_res_name": "GLN",
+        "ortholog_res_seq": 47
+      },
+      {
+        "target_res_name": "GLY",
+        "target_res_seq": 181,
+        "nearest_distance": 1.9144,
+        "runner_up_distance": 3.322,
+        "accepted": true,
+        "ortholog_res_name": "PRO",
+        "ortholog_res_seq": 52
+      },
+      {
+        "target_res_name": "GLU",
+        "target_res_seq": 182,
+        "nearest_distance": 1.5654,
+        "runner_up_distance": 3.4163,
+        "accepted": true,
+        "ortholog_res_name": "GLU",
+        "ortholog_res_seq": 53
+      },
+      {
+        "target_res_name": "CYS",
+        "target_res_seq": 184,
+        "nearest_distance": 1.7625,
+        "runner_up_distance": 3.4916,
+        "accepted": true,
+        "ortholog_res_name": "ALA",
+        "ortholog_res_seq": 55
+      },
+      {
+        "target_res_name": "HIS",
+        "target_res_seq": 185,
+        "nearest_distance": 1.7278,
+        "runner_up_distance": 3.4208,
+        "accepted": true,
+        "ortholog_res_name": "HIS",
+        "ortholog_res_seq": 56
+      },
+      {
+        "target_res_name": "PHE",
+        "target_res_seq": 188,
+        "nearest_distance": 2.3475,
+        "runner_up_distance": 2.8141,
+        "accepted": true,
+        "ortholog_res_name": "ALA",
+        "ortholog_res_seq": 59
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 189,
+        "nearest_distance": 1.6487,
+        "runner_up_distance": 2.762,
+        "accepted": true,
+        "ortholog_res_name": "VAL",
+        "ortholog_res_seq": 60
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 197,
+        "nearest_distance": 2.3025,
+        "runner_up_distance": 2.4245,
+        "accepted": true,
+        "ortholog_res_name": "LEU",
+        "ortholog_res_seq": 67
+      },
+      {
+        "target_res_name": "PHE",
+        "target_res_seq": 227,
+        "nearest_distance": 1.1264,
+        "runner_up_distance": 3.0758,
+        "accepted": true,
+        "ortholog_res_name": "PHE",
+        "ortholog_res_seq": 98
+      },
+      {
+        "target_res_name": "ILE",
+        "target_res_seq": 237,
+        "nearest_distance": 1.2632,
+        "runner_up_distance": 2.9507,
+        "accepted": true,
+        "ortholog_res_name": "LEU",
+        "ortholog_res_seq": 108
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 240,
+        "nearest_distance": 1.6661,
+        "runner_up_distance": 2.3388,
+        "accepted": true,
+        "ortholog_res_name": "MET",
+        "ortholog_res_seq": 111
+      },
+      {
+        "target_res_name": "ILE",
+        "target_res_seq": 263,
+        "nearest_distance": 1.1114,
+        "runner_up_distance": 3.9687,
+        "accepted": true,
+        "ortholog_res_name": "VAL",
+        "ortholog_res_seq": 134
+      },
+      {
+        "target_res_name": "ARG",
+        "target_res_seq": 265,
+        "nearest_distance": 1.8909,
+        "runner_up_distance": 4.2945,
+        "accepted": true,
+        "ortholog_res_name": "ARG",
+        "ortholog_res_seq": 136
+      },
+      {
+        "target_res_name": "ILE",
+        "target_res_seq": 272,
+        "nearest_distance": 0.9903,
+        "runner_up_distance": 3.6773,
+        "accepted": true,
+        "ortholog_res_name": "VAL",
+        "ortholog_res_seq": 143
+      },
+      {
+        "target_res_name": "TYR",
+        "target_res_seq": 528,
+        "nearest_distance": 0.7168,
+        "runner_up_distance": 3.5659,
+        "accepted": true,
+        "ortholog_res_name": "TYR",
+        "ortholog_res_seq": 356
+      },
+      {
+        "target_res_name": "LEU",
+        "target_res_seq": 531,
+        "nearest_distance": 1.8818,
+        "runner_up_distance": 4.8067,
+        "accepted": true,
+        "ortholog_res_name": "LEU",
+        "ortholog_res_seq": 359
+      },
+      {
+        "target_res_name": "VAL",
+        "target_res_seq": 532,
+        "nearest_distance": 1.6364,
+        "runner_up_distance": 2.5733,
+        "accepted": true,
+        "ortholog_res_name": "THR",
+        "ortholog_res_seq": 360
+      },
+      {
+        "target_res_name": "GLY",
+        "target_res_seq": 535,
+        "nearest_distance": 1.6945,
+        "runner_up_distance": 2.1721,
+        "accepted": true,
+        "ortholog_res_name": "GLY",
+        "ortholog_res_seq": 363
+      },
+      {
+        "target_res_name": "MET",
+        "target_res_seq": 536,
+        "nearest_distance": 1.9858,
+        "runner_up_distance": 5.0539,
+        "accepted": true,
+        "ortholog_res_name": "PRO",
+        "ortholog_res_seq": 364
+      }
+    ]
+  },
+  "literature_confirmation": {
+    "tier_scheme": "C0=computational-only; C1=multi-method computational convergence; C2=gold-standard-tool/strong-multi-source; C3=peer-reviewed primary literature.",
+    "reference_document": "benchmark/results/selectivity_maps/LITERATURE.md",
+    "per_residue": [
+      {
+        "target_res_seq": 185,
+        "target_res_name": "HIS",
+        "ortholog_partner": "HIS56",
+        "tier": "C3",
+        "sources": [
+          "ScienceDirect S0006295297001974 (1998 His->Ala mutagenesis; names His56 as Hs counterpart of Pf His185; Pf H185 mutation raises IC50 500-1000x)",
+          "PMC2883174 (class-2 DHODH review; H-bond H185 in three structures)"
+        ],
+        "structural_margin_note": "unambiguous under both anchors (FMN margin 2.36 \u00c5, ORO margin 1.69 \u00c5)"
+      },
+      {
+        "target_res_seq": 188,
+        "target_res_name": "PHE",
+        "ortholog_partner": "ALA59",
+        "tier": "C2-strong, FMN-clean / ORO-cutoff-sensitive",
+        "sources": [
+          "Pf side: PMC2883174 (Phe188 stacking); PMC4140291 (F188I/F188L resistance mutations)",
+          "Hs side: ACS Omega 10.1021/acsomega.5c12978; ACS Omega 10.1021/acsomega.5c01536; BMC Pharmacol Toxicol 10.1186/s40360-025-01007-w (Ala59 in Hs binding site)"
+        ],
+        "structural_margin_note": "FMN margin 1.78 \u00c5 (clean); ORO margin 0.47 \u00c5 (cutoff-sensitive). Pairing agrees across all methods, but tight structural margin is FMN-anchor-dependent \u2014 biologically coherent for the one substituted cluster residue."
+      },
+      {
+        "target_res_seq": 265,
+        "target_res_name": "ARG",
+        "ortholog_partner": "ARG136",
+        "tier": "C3",
+        "sources": [
+          "ScienceDirect S0006295297001974 (Arg265 mutagenesis, Pf side)",
+          "ACS Omega 10.1021/acsomega.5c12978 (Hs side, Arg136 salt bridge)",
+          "BMC Pharmacol Toxicol 10.1186/s40360-025-01007-w (Hs side, Arg136 binding-site)",
+          "PMC2883174 (class-2 DHODH review; H-bond R265 in three structures)"
+        ],
+        "structural_margin_note": "unambiguous under both anchors (FMN margin 2.31 \u00c5, ORO margin 2.40 \u00c5)"
+      }
+    ],
+    "wider_selectivity_set": {
+      "claim": "v1-realigned top-ranked selectivity residues match experimentally-selected PfDHODH inhibitor-resistance mutations.",
+      "tier": "C3",
+      "source": "PMC4140291 (in vitro resistance selection): resistance mutations E182D, F188I, F188L, F227I, I263F, L531F all map to residues surfaced by the v1 realigned dossier (Glu182, Phe188, Phe227, Ile263, Leu531)."
+    },
+    "structural_architecture": {
+      "claim": "Class-2 DHODH inhibitor tunnel runs from the protein surface to adjacent to FMN, supporting the geometric reach of an FMN-anchored superposition into the inhibitor pocket.",
+      "tier": "C3",
+      "source": "HsDHODH conformational-flexibility structural literature (see LITERATURE.md)"
+    },
+    "backlog_lead": {
+      "claim": "PDB 4OQV is HsDHODH bound to the SAME compound (DSM338) as 4ORM is bound to. A 4ORM-vs-4OQV rerun would remove the chemotype confound present in 4ORM-vs-1D3H (teriflunomide).",
+      "tier": "C3 (deposited structure + primary paper)",
+      "source": "RCSB PDB 4OQV; Deng et al. J Med Chem 2014, 10.1021/jm500481t (57:5381-5394).",
+      "status": "v2 backlog (high-priority next structural target)"
+    }
+  },
+  "self_corrections": [
+    {
+      "title": "'Tunnel is the most conformationally variable part' \u2014 refined",
+      "original_claim": "Stated from memory in earlier framing: the Class-2 inhibitor tunnel is the most conformationally variable part of DHODH.",
+      "refined_by_evidence": "Fetched literature shows the tunnel is flexible BETWEEN different inhibitor complexes, but any given BOUND complex is fairly rigid (RMSF < 1.5 \u00c5 reported for bound HsDHODH). Since both 4ORM and 1D3H are bound complexes, the rigid-body superposition assumption used here is better supported than the original caveat implied."
+    },
+    {
+      "title": "Rigidity caveat overstated",
+      "original_claim": "Earlier framing treated the rigid-body assumption as more borderline than the data warranted.",
+      "refined_by_evidence": "FMN anchor RMSD = 0.26 \u00c5, pocket-mean post-superposition match = 1.24 \u00c5, and tight per-residue cluster margins (HIS185 \u2248 2.4 \u00c5, ARG265 \u2248 2.3 \u00c5, PHE188 1.78 \u00c5 under FMN) support rigidity for the bound state at the cluster positions. 'Structurally pending' is appropriate as a process gate, but the data themselves are consistent with rigidity, not borderline."
+    }
+  ]
+}
