@@ -596,7 +596,7 @@
     "prediction_locked_before_literature": true,
     "prediction_lock_commit": null,
     "prediction_lock_timestamp_utc": "2026-05-22T18:11:36Z",
-    "literature_check_commit": null,
-    "note": "prediction_lock_commit will be the SHA of the commit introducing this file; the regression test asserts the commit exists. literature_check_commit is filled by the B-3 follow-up commit, never by this one."
+    "literature_check_commit": "da9a05c",
+    "note": "prediction_lock_commit will be the SHA of the commit introducing this file; the regression test asserts the commit exists. literature_check_commit is filled by the B-3 follow-up commit, never by this one. The B-3 commit fills it with the SHA of the literature-summary commit (da9a05c) — the commit that introduced LDH_LITERATURE.md — because a result commit cannot self-reference its own SHA. See LDH_BLIND_RESULT.md for the rubric verdict."
   }
 }

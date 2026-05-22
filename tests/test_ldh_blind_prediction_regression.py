@@ -234,10 +234,20 @@ def test_blindness_markers_are_in_locked_state():
     d = _load_dossier()
     b = d["blindness"]
     assert b["prediction_locked_before_literature"] is True
-    assert b["literature_check_commit"] is None, (
-        "literature_check_commit must be None at the lock commit. It is "
-        "filled by a SEPARATE B-3 commit, never by this one. A non-null "
-        "value here means the blind regime has been broken."
+    # B-3 update: literature_check_commit is filled by the B-3 result commit
+    # with the SHA of the literature-summary commit (da9a05c), since a
+    # commit cannot self-reference its own SHA. The blindness guarantee is
+    # preserved by the COMMIT ORDER (lock at 6dfa69b -> literature at
+    # da9a05c -> result), not by this field being null forever.
+    lit_check = b["literature_check_commit"]
+    assert lit_check is not None and isinstance(lit_check, str), (
+        "literature_check_commit must be filled by the B-3 result commit "
+        "with the SHA of the literature-summary commit. A null value here "
+        "means B-3 has not been recorded."
+    )
+    assert len(lit_check) >= 7, (
+        f"literature_check_commit must be a git SHA (>=7 hex chars): "
+        f"{lit_check!r}"
     )
     assert b["prediction_lock_timestamp_utc"]
 
