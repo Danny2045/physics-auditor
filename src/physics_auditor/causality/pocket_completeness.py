@@ -45,23 +45,32 @@ class MissingResidue:
     res_name : str
         3-letter residue code from SEQRES (or "???" if SEQRES was unavailable
         and the gap was inferred from res_seq numbering alone).
+    is_terminal : bool
+        True if the residue has resolved neighbors on only ONE sequence side
+        (no resolved residue before, or no resolved residue after, in the
+        same chain). Terminal tails are dangling and unconstrained; they are
+        reported in `unresolved_termini` and never trigger INCOMPLETE. False
+        means the residue is an INTERNAL gap, constrained on both sequence
+        sides by resolved anchors.
     in_pocket_region : bool
-        True if the missing residue can plausibly lie within `cutoff` of the
-        ligand given the position and ligand-distance of its nearest resolved
-        sequence neighbor. Formally: with the nearest resolved residue at
-        distance D from the ligand and k peptide steps away in sequence, the
-        residue's distance to the ligand is bounded below by
-        max(0, D - k * 3.8 Å). The flag is set when that lower bound is
-        within `cutoff`. This catches disordered loops anchored near the
-        pocket — including the 4PLZ substrate-specificity loop, whose
-        anchor residues sit ~12 Å from the ligand but whose 12-residue span
-        physically reaches into the active site when ordered.
+        Always False for terminal residues. For internal gaps: True iff the
+        residue can plausibly lie within `cutoff` Å of the ligand given the
+        position and ligand-distance of its nearest resolved sequence
+        neighbor. Formally: with the nearest resolved residue at distance D
+        from the ligand and k peptide steps away in sequence, the residue's
+        distance to the ligand is bounded below by max(0, D - k * 3.8 Å);
+        the flag is set when that lower bound is within `cutoff`. This
+        catches disordered loops anchored near the pocket — including the
+        4PLZ substrate-specificity loop, whose anchors sit ~12 Å from the
+        ligand but whose 12-residue span physically reaches into the active
+        site when ordered.
     """
 
     chain_id: str
     res_seq: int
     res_name: str
     in_pocket_region: bool
+    is_terminal: bool = False
 
 
 @dataclass
@@ -71,7 +80,10 @@ class PocketCompletenessResult:
     Attributes
     ----------
     verdict : "COMPLETE" or "INCOMPLETE"
-        COMPLETE iff no pocket-region residue is missing from the coordinates.
+        COMPLETE iff no INTERNAL-gap residue lies in the pocket region.
+        Terminal tails never trigger INCOMPLETE — they are reported in
+        `unresolved_termini` for transparency but a dangling terminus near
+        the pocket is not evidence of a structurally incomplete pocket.
     n_resolved_pocket_residues : int
         Count of protein residues within `cutoff` Å of the ligand that have
         coordinates in the deposit.
@@ -79,9 +91,15 @@ class PocketCompletenessResult:
         Identifiers of the resolved pocket residues.
     missing_residues : list of MissingResidue
         ALL residues expected by SEQRES but absent from ATOM records (across
-        all chains, irrespective of pocket region).
+        all chains, internal gaps and terminal tails together).
     missing_in_pocket : list of MissingResidue
-        Subset of `missing_residues` deemed to lie in the pocket region.
+        Subset of `missing_residues` that are INTERNAL gaps AND lie in the
+        pocket region (reach-bound to ligand ≤ cutoff). This is the set that
+        drives the verdict.
+    unresolved_termini : list of MissingResidue
+        Subset of `missing_residues` that are terminal tails (only one
+        resolved sequence neighbor). Reported informationally and NEVER
+        used to flip the verdict to INCOMPLETE.
     chain_offsets : dict
         Per-chain integer offset such that SEQRES position (1-indexed) =
         res_seq + offset. Reported for transparency.
@@ -92,6 +110,7 @@ class PocketCompletenessResult:
     resolved_pocket_residues: list[tuple[str, int, str]]
     missing_residues: list[MissingResidue]
     missing_in_pocket: list[MissingResidue]
+    unresolved_termini: list[MissingResidue] = field(default_factory=list)
     chain_offsets: dict[str, int] = field(default_factory=dict)
 
     @property
@@ -100,18 +119,24 @@ class PocketCompletenessResult:
 
     def summary(self) -> str:
         """One-line human-readable verdict."""
+        term_suffix = ""
+        if self.unresolved_termini:
+            term_suffix = (
+                f" [+{len(self.unresolved_termini)} unresolved terminal "
+                f"residue(s), informational only]"
+            )
         if self.verdict == "COMPLETE":
             return (
                 f"COMPLETE: pocket fully resolved "
                 f"({self.n_resolved_pocket_residues} residues, "
-                f"no gaps in pocket region)"
+                f"no internal-gap residues in pocket region){term_suffix}"
             )
         ids = ", ".join(
             f"{m.chain_id}/{m.res_name}{m.res_seq}" for m in self.missing_in_pocket
         )
         return (
-            f"INCOMPLETE: {len(self.missing_in_pocket)} pocket-region "
-            f"residue(s) missing: {ids}"
+            f"INCOMPLETE: {len(self.missing_in_pocket)} internal-gap "
+            f"pocket-region residue(s) missing: {ids}{term_suffix}"
         )
 
 
@@ -294,25 +319,36 @@ def pocket_completeness_gate(
     missing_all: list[MissingResidue] = []
     chain_offsets: dict[str, int] = {}
 
-    def _reach_in_pocket(chain_id: str, missing_rs: int, resolved_seqs: list[int]) -> bool:
-        """True iff the missing residue's reach-bound to the ligand is <= cutoff.
+    def _classify_missing(
+        chain_id: str, missing_rs: int, resolved_seqs: list[int]
+    ) -> tuple[bool, bool]:
+        """Decide (is_terminal, in_pocket_region) for one missing residue.
 
-        The nearest resolved residue before and after `missing_rs` in sequence
-        define two reach bounds; the residue is reachable if either is at or
-        below `cutoff`.
+        A residue is INTERNAL iff it has at least one resolved neighbor on
+        BOTH sequence sides (some `s < missing_rs` AND some `s > missing_rs`
+        in the same chain). Internal residues are eligible for the reach-
+        bound pocket check using the nearest resolved residue on each side.
+        Terminal residues have resolved neighbors on only one side; they are
+        unconstrained and `in_pocket_region` is forced False.
         """
         before = [s for s in resolved_seqs if s < missing_rs]
         after = [s for s in resolved_seqs if s > missing_rs]
-        bounds: list[float] = []
-        if before:
-            flank = max(before)
-            d = _min_distance_to_ligand(structure, chain_id, flank, lig_coords)
-            bounds.append(_reach_bound(d, missing_rs - flank))
-        if after:
-            flank = min(after)
-            d = _min_distance_to_ligand(structure, chain_id, flank, lig_coords)
-            bounds.append(_reach_bound(d, flank - missing_rs))
-        return any(b <= cutoff for b in bounds)
+        is_terminal = not (before and after)
+        if is_terminal:
+            return True, False
+        flank_before = max(before)
+        flank_after = min(after)
+        d_before = _min_distance_to_ligand(
+            structure, chain_id, flank_before, lig_coords
+        )
+        d_after = _min_distance_to_ligand(
+            structure, chain_id, flank_after, lig_coords
+        )
+        bound = min(
+            _reach_bound(d_before, missing_rs - flank_before),
+            _reach_bound(d_after, flank_after - missing_rs),
+        )
+        return False, bound <= cutoff
 
     if structure.seqres:
         for chain_id, seqres_codes in structure.seqres.items():
@@ -336,7 +372,7 @@ def pocket_completeness_gate(
                 implied_rs = pos1 - offset
                 if implied_rs in resolved_rs_set:
                     continue
-                in_pocket = _reach_in_pocket(
+                is_terminal, in_pocket = _classify_missing(
                     chain_id, implied_rs, resolved_seqs_sorted
                 )
                 missing_all.append(
@@ -345,6 +381,7 @@ def pocket_completeness_gate(
                         res_seq=implied_rs,
                         res_name=expected_name,
                         in_pocket_region=in_pocket,
+                        is_terminal=is_terminal,
                     )
                 )
     else:
@@ -357,22 +394,33 @@ def pocket_completeness_gate(
                 continue
             resolved_set = {rs for rs, _ in resolved}
             resolved_seqs_sorted = sorted(resolved_set)
+            # SEQRES-less fallback only walks the RESOLVED range, so every
+            # missing residue here is necessarily an internal gap (it has
+            # resolved neighbors on both sides by construction of the range).
             min_rs = resolved[0][0]
             max_rs = resolved[-1][0]
             for rs in range(min_rs, max_rs + 1):
                 if rs in resolved_set:
                     continue
-                in_pocket = _reach_in_pocket(chain_id, rs, resolved_seqs_sorted)
+                is_terminal, in_pocket = _classify_missing(
+                    chain_id, rs, resolved_seqs_sorted
+                )
                 missing_all.append(
                     MissingResidue(
                         chain_id=chain_id,
                         res_seq=rs,
                         res_name="???",
                         in_pocket_region=in_pocket,
+                        is_terminal=is_terminal,
                     )
                 )
 
-    missing_in_pocket = [m for m in missing_all if m.in_pocket_region]
+    # Only INTERNAL-gap residues drive INCOMPLETE. Terminal tails are
+    # reported separately and never flip the verdict.
+    missing_in_pocket = [
+        m for m in missing_all if m.in_pocket_region and not m.is_terminal
+    ]
+    unresolved_termini = [m for m in missing_all if m.is_terminal]
     verdict: Literal["COMPLETE", "INCOMPLETE"] = (
         "INCOMPLETE" if missing_in_pocket else "COMPLETE"
     )
@@ -383,5 +431,6 @@ def pocket_completeness_gate(
         resolved_pocket_residues=resolved_pocket_list,
         missing_residues=missing_all,
         missing_in_pocket=missing_in_pocket,
+        unresolved_termini=unresolved_termini,
         chain_offsets=chain_offsets,
     )

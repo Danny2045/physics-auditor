@@ -210,6 +210,62 @@ def test_missing_residue_outside_pocket_returns_complete():
     )
 
 
+def test_terminal_tail_does_not_trigger_incomplete():
+    """A disordered C-terminal tail near the pocket must NOT flip the verdict.
+
+    Even if the reach-bound from the last resolved residue would otherwise
+    drop below `cutoff` for the trailing tail residues, the tail is dangling
+    on the C-terminal side (no anchoring resolved residue AFTER it) so it is
+    classified as a terminal tail and reported informationally only. The
+    pocket-completeness verdict stays COMPLETE.
+
+    This pins the 4PLZ His-tag artifact: in W-1 the gate falsely flagged
+    HIS320/HIS321 in the pocket because the 5-residue reach from HIS316
+    (~19.9 Å from OXM) drops to ~0.9 Å. The terminal-vs-internal fix
+    suppresses that without losing the genuine internal-loop signal.
+    """
+    chain = "A"
+    # 9-residue chain; residues 1-4 resolved, 5-9 missing.
+    # Residue 4 sits ~16 Å from the ligand → reach bound at 5 peptide steps
+    # for residue 9 is max(0, 16 - 5*3.8) = max(0, -3) = 0, well within 5 Å.
+    # Under the W-1 reach-only rule this would have flipped INCOMPLETE.
+    # Under the W-2a fix it must stay COMPLETE (terminal tail).
+    codes = ["ALA"] * 9
+    resolved_coords = {
+        1: (0.0, 0.0, 0.0),
+        2: (2.0, 0.0, 0.0),
+        3: (4.0, 0.0, 0.0),
+        4: (6.0, 0.0, 0.0),
+    }
+    atom_block = ""
+    serial = 1
+    for rs, ca in resolved_coords.items():
+        block, serial = _build_residue(serial, chain, rs, "ALA", ca)
+        atom_block += block
+    lig_block, _ = _build_ligand(serial, (22.0, 0.0, 0.0))
+    pdb = _assemble_pdb(_seqres_lines(chain, codes), atom_block + lig_block)
+
+    structure = parse_pdb_string(pdb, name="synthetic_terminal_tail")
+    result = pocket_completeness_gate(structure, ligand_resname="LIG", cutoff=5.0)
+
+    assert result.verdict == "COMPLETE", (
+        f"a dangling C-terminal tail must not trigger INCOMPLETE; "
+        f"got {result.summary()}"
+    )
+    assert result.missing_in_pocket == [], (
+        "no INTERNAL residues are missing in this synthetic, so "
+        "missing_in_pocket must be empty"
+    )
+    term_seqs = sorted(m.res_seq for m in result.unresolved_termini)
+    assert term_seqs == [5, 6, 7, 8, 9], (
+        f"all 5 trailing missing residues must be reported as terminal; "
+        f"got {term_seqs}"
+    )
+    for m in result.unresolved_termini:
+        assert m.is_terminal is True
+        assert m.in_pocket_region is False
+
+
 def test_reach_criterion_flags_long_missing_loop_anchored_off_pocket():
     """A long disordered run anchored further than `cutoff` from the ligand
     is still flagged in_pocket if its peptide reach can plausibly span the
