@@ -1,0 +1,800 @@
+{
+  "what_this_is": "W-3 confirmatory selectivity run on wild-type PfLDH (1LDG, chain A) vs HsLDH-A (1I10, chain A), chemotype-matched on OXM + NAI. Tests the B-3 pre-registered hypothesis that the engine's miss of W107f on 4PLZ was input-shaped (the substrate-specificity loop was disordered in 4PLZ; with the loop ORDERED in 1LDG and the same LJ kernel, does the engine flag the active-site tryptophan?). Confirmatory and explicitly NOT blind.",
+  "what_this_is_not": "Not a free energy of binding (LJ-only). Not blind \u2014 the literature answer is already known. The W107f question is the only load-bearing claim; other ranking shifts vs the B-2 dossier are expected because the input structure changed.",
+  "pair": {
+    "target": {
+      "pdb": "1LDG",
+      "organism": "PLASMODIUM FALCIPARUM",
+      "ligand_resname": "OXM",
+      "cofactor_resname": "NAI",
+      "chain": "A"
+    },
+    "ortholog": {
+      "pdb": "1I10",
+      "organism": "HOMO SAPIENS",
+      "ligand_resname": "OXM",
+      "cofactor_resname": "NAI",
+      "chain": "A"
+    },
+    "chemotype_matched": true
+  },
+  "gates": {
+    "provenance_pf": "PASS",
+    "provenance_hs": "PASS",
+    "pocket_completeness_pf": {
+      "verdict": "COMPLETE",
+      "missing_in_pocket": [],
+      "n_resolved_pocket_residues": 11,
+      "n_unresolved_termini": 4
+    },
+    "pocket_completeness_hs": {
+      "verdict": "COMPLETE",
+      "missing_in_pocket": [],
+      "n_resolved_pocket_residues": 9,
+      "n_unresolved_termini": 0
+    },
+    "comparability": {
+      "n_pocket_target": 11,
+      "n_pocket_ortholog": 9,
+      "n_oxm_atoms_target": 6,
+      "n_oxm_atoms_ortholog": 6,
+      "nai_shared_atom_names": 44,
+      "nai_kabsch_anchor_rmsd": 0.8652,
+      "passed": true
+    }
+  },
+  "alignment_provenance": {
+    "sequence": {
+      "method": "global_sequence_nw",
+      "global_sequence_identity": 0.3311,
+      "n_pocket_target": 11,
+      "n_pocket_ortholog": 9,
+      "n_confidently_paired": 10,
+      "n_unpaired_target": 1,
+      "refused": false,
+      "min_identity_threshold": 0.25
+    },
+    "structural": {
+      "method": "kabsch_cofactor_anchored",
+      "anchor_resname": "NAI",
+      "n_anchor_atoms": 44,
+      "anchor_rmsd": 0.8652,
+      "n_pocket_target": 11,
+      "n_pocket_ortholog": 9,
+      "n_spatially_matched": 11,
+      "max_match_distance": 4.0,
+      "mean_match_distance": 1.2236,
+      "n_unmatched_target": 0
+    },
+    "convergence": {
+      "sequence_pairs_equal_structural_pairs": false,
+      "sequence_pairs": [
+        [
+          93,
+          104
+        ],
+        [
+          125,
+          136
+        ],
+        [
+          152,
+          163
+        ],
+        [
+          153,
+          164
+        ],
+        [
+          156,
+          167
+        ],
+        [
+          180,
+          191
+        ],
+        [
+          223,
+          236
+        ],
+        [
+          232,
+          245
+        ],
+        [
+          233,
+          246
+        ],
+        [
+          237,
+          250
+        ]
+      ],
+      "structural_pairs": [
+        [
+          91,
+          101
+        ],
+        [
+          93,
+          104
+        ],
+        [
+          125,
+          136
+        ],
+        [
+          152,
+          163
+        ],
+        [
+          153,
+          164
+        ],
+        [
+          156,
+          167
+        ],
+        [
+          180,
+          191
+        ],
+        [
+          223,
+          236
+        ],
+        [
+          232,
+          245
+        ],
+        [
+          233,
+          246
+        ],
+        [
+          237,
+          250
+        ]
+      ]
+    }
+  },
+  "selectivity_map_structural": {
+    "target_name": "1LDG_chainA",
+    "ortholog_name": "1I10_chainA",
+    "target_ligand_name": "OXM",
+    "ortholog_ligand_name": "OXM",
+    "n_aligned_pocket_residues": 11,
+    "total_target_interaction_kcal": -10.312,
+    "total_ortholog_interaction_kcal": -6.53,
+    "pocket_target_interaction_kcal": -4.068,
+    "pocket_ortholog_interaction_kcal": 0.237,
+    "pocket_delta_kcal": 4.304,
+    "top_n_target_selective": [
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "THR",
+        "res_seq_target": 246,
+        "res_seq_ortholog": 247,
+        "energy_target_kcal": -1.4901,
+        "energy_ortholog_kcal": 1.2793,
+        "delta_kcal": 2.7694
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 171,
+        "res_seq_ortholog": 168,
+        "energy_target_kcal": 1.4807,
+        "energy_ortholog_kcal": 2.4239,
+        "delta_kcal": 0.9432
+      },
+      {
+        "res_name_target": "TRP",
+        "res_name_ortholog": "GLY",
+        "res_seq_target": 107,
+        "res_seq_ortholog": 102,
+        "energy_target_kcal": -0.8758,
+        "energy_ortholog_kcal": -0.0065,
+        "delta_kcal": 0.8692
+      },
+      {
+        "res_name_target": "SER",
+        "res_name_ortholog": "TYR",
+        "res_seq_target": 245,
+        "res_seq_ortholog": 246,
+        "energy_target_kcal": -0.6189,
+        "energy_ortholog_kcal": -0.1173,
+        "delta_kcal": 0.5016
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "ILE",
+        "res_seq_target": 250,
+        "res_seq_ortholog": 251,
+        "energy_target_kcal": -0.3628,
+        "energy_ortholog_kcal": -0.2124,
+        "delta_kcal": 0.1504
+      },
+      {
+        "res_name_target": "ASN",
+        "res_name_ortholog": "ASN",
+        "res_seq_target": 140,
+        "res_seq_ortholog": 137,
+        "energy_target_kcal": -0.4881,
+        "energy_ortholog_kcal": -0.3728,
+        "delta_kcal": 0.1153
+      },
+      {
+        "res_name_target": "LEU",
+        "res_name_ortholog": "LEU",
+        "res_seq_target": 167,
+        "res_seq_ortholog": 164,
+        "energy_target_kcal": -0.7098,
+        "energy_ortholog_kcal": -0.6136,
+        "delta_kcal": 0.0962
+      },
+      {
+        "res_name_target": "ASP",
+        "res_name_ortholog": "ASP",
+        "res_seq_target": 168,
+        "res_seq_ortholog": 165,
+        "energy_target_kcal": -0.2483,
+        "energy_ortholog_kcal": -0.1546,
+        "delta_kcal": 0.0937
+      },
+      {
+        "res_name_target": "HIS",
+        "res_name_ortholog": "HIS",
+        "res_seq_target": 195,
+        "res_seq_ortholog": 192,
+        "energy_target_kcal": -0.2635,
+        "energy_ortholog_kcal": -0.1791,
+        "delta_kcal": 0.0844
+      },
+      {
+        "res_name_target": "ALA",
+        "res_name_ortholog": "ALA",
+        "res_seq_target": 236,
+        "res_seq_ortholog": 237,
+        "energy_target_kcal": -1.0882,
+        "energy_ortholog_kcal": -1.1292,
+        "delta_kcal": -0.0411
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 109,
+        "res_seq_ortholog": 105,
+        "energy_target_kcal": 0.5969,
+        "energy_ortholog_kcal": -0.4925,
+        "delta_kcal": -1.0894
+      }
+    ],
+    "top_n_ortholog_selective": [
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 109,
+        "res_seq_ortholog": 105,
+        "energy_target_kcal": 0.5969,
+        "energy_ortholog_kcal": -0.4925,
+        "delta_kcal": -1.0894
+      },
+      {
+        "res_name_target": "ALA",
+        "res_name_ortholog": "ALA",
+        "res_seq_target": 236,
+        "res_seq_ortholog": 237,
+        "energy_target_kcal": -1.0882,
+        "energy_ortholog_kcal": -1.1292,
+        "delta_kcal": -0.0411
+      },
+      {
+        "res_name_target": "HIS",
+        "res_name_ortholog": "HIS",
+        "res_seq_target": 195,
+        "res_seq_ortholog": 192,
+        "energy_target_kcal": -0.2635,
+        "energy_ortholog_kcal": -0.1791,
+        "delta_kcal": 0.0844
+      },
+      {
+        "res_name_target": "ASP",
+        "res_name_ortholog": "ASP",
+        "res_seq_target": 168,
+        "res_seq_ortholog": 165,
+        "energy_target_kcal": -0.2483,
+        "energy_ortholog_kcal": -0.1546,
+        "delta_kcal": 0.0937
+      },
+      {
+        "res_name_target": "LEU",
+        "res_name_ortholog": "LEU",
+        "res_seq_target": 167,
+        "res_seq_ortholog": 164,
+        "energy_target_kcal": -0.7098,
+        "energy_ortholog_kcal": -0.6136,
+        "delta_kcal": 0.0962
+      },
+      {
+        "res_name_target": "ASN",
+        "res_name_ortholog": "ASN",
+        "res_seq_target": 140,
+        "res_seq_ortholog": 137,
+        "energy_target_kcal": -0.4881,
+        "energy_ortholog_kcal": -0.3728,
+        "delta_kcal": 0.1153
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "ILE",
+        "res_seq_target": 250,
+        "res_seq_ortholog": 251,
+        "energy_target_kcal": -0.3628,
+        "energy_ortholog_kcal": -0.2124,
+        "delta_kcal": 0.1504
+      },
+      {
+        "res_name_target": "SER",
+        "res_name_ortholog": "TYR",
+        "res_seq_target": 245,
+        "res_seq_ortholog": 246,
+        "energy_target_kcal": -0.6189,
+        "energy_ortholog_kcal": -0.1173,
+        "delta_kcal": 0.5016
+      },
+      {
+        "res_name_target": "TRP",
+        "res_name_ortholog": "GLY",
+        "res_seq_target": 107,
+        "res_seq_ortholog": 102,
+        "energy_target_kcal": -0.8758,
+        "energy_ortholog_kcal": -0.0065,
+        "delta_kcal": 0.8692
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 171,
+        "res_seq_ortholog": 168,
+        "energy_target_kcal": 1.4807,
+        "energy_ortholog_kcal": 2.4239,
+        "delta_kcal": 0.9432
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "THR",
+        "res_seq_target": 246,
+        "res_seq_ortholog": 247,
+        "energy_target_kcal": -1.4901,
+        "energy_ortholog_kcal": 1.2793,
+        "delta_kcal": 2.7694
+      }
+    ],
+    "residues": [
+      {
+        "res_name_target": "TRP",
+        "res_name_ortholog": "GLY",
+        "res_seq_target": 107,
+        "res_seq_ortholog": 102,
+        "energy_target_kcal": -0.8758,
+        "energy_ortholog_kcal": -0.0065,
+        "delta_kcal": 0.8692
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 109,
+        "res_seq_ortholog": 105,
+        "energy_target_kcal": 0.5969,
+        "energy_ortholog_kcal": -0.4925,
+        "delta_kcal": -1.0894
+      },
+      {
+        "res_name_target": "ASN",
+        "res_name_ortholog": "ASN",
+        "res_seq_target": 140,
+        "res_seq_ortholog": 137,
+        "energy_target_kcal": -0.4881,
+        "energy_ortholog_kcal": -0.3728,
+        "delta_kcal": 0.1153
+      },
+      {
+        "res_name_target": "LEU",
+        "res_name_ortholog": "LEU",
+        "res_seq_target": 167,
+        "res_seq_ortholog": 164,
+        "energy_target_kcal": -0.7098,
+        "energy_ortholog_kcal": -0.6136,
+        "delta_kcal": 0.0962
+      },
+      {
+        "res_name_target": "ASP",
+        "res_name_ortholog": "ASP",
+        "res_seq_target": 168,
+        "res_seq_ortholog": 165,
+        "energy_target_kcal": -0.2483,
+        "energy_ortholog_kcal": -0.1546,
+        "delta_kcal": 0.0937
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 171,
+        "res_seq_ortholog": 168,
+        "energy_target_kcal": 1.4807,
+        "energy_ortholog_kcal": 2.4239,
+        "delta_kcal": 0.9432
+      },
+      {
+        "res_name_target": "HIS",
+        "res_name_ortholog": "HIS",
+        "res_seq_target": 195,
+        "res_seq_ortholog": 192,
+        "energy_target_kcal": -0.2635,
+        "energy_ortholog_kcal": -0.1791,
+        "delta_kcal": 0.0844
+      },
+      {
+        "res_name_target": "ALA",
+        "res_name_ortholog": "ALA",
+        "res_seq_target": 236,
+        "res_seq_ortholog": 237,
+        "energy_target_kcal": -1.0882,
+        "energy_ortholog_kcal": -1.1292,
+        "delta_kcal": -0.0411
+      },
+      {
+        "res_name_target": "SER",
+        "res_name_ortholog": "TYR",
+        "res_seq_target": 245,
+        "res_seq_ortholog": 246,
+        "energy_target_kcal": -0.6189,
+        "energy_ortholog_kcal": -0.1173,
+        "delta_kcal": 0.5016
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "THR",
+        "res_seq_target": 246,
+        "res_seq_ortholog": 247,
+        "energy_target_kcal": -1.4901,
+        "energy_ortholog_kcal": 1.2793,
+        "delta_kcal": 2.7694
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "ILE",
+        "res_seq_target": 250,
+        "res_seq_ortholog": 251,
+        "energy_target_kcal": -0.3628,
+        "energy_ortholog_kcal": -0.2124,
+        "delta_kcal": 0.1504
+      }
+    ]
+  },
+  "selectivity_map_sequence": {
+    "target_name": "1LDG_chainA",
+    "ortholog_name": "1I10_chainA",
+    "target_ligand_name": "OXM",
+    "ortholog_ligand_name": "OXM",
+    "n_aligned_pocket_residues": 10,
+    "total_target_interaction_kcal": -10.312,
+    "total_ortholog_interaction_kcal": -6.53,
+    "pocket_target_interaction_kcal": -4.068,
+    "pocket_ortholog_interaction_kcal": 0.237,
+    "pocket_delta_kcal": 4.304,
+    "top_n_target_selective": [
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "THR",
+        "res_seq_target": 246,
+        "res_seq_ortholog": 247,
+        "energy_target_kcal": -1.4901,
+        "energy_ortholog_kcal": 1.2793,
+        "delta_kcal": 2.7694
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 171,
+        "res_seq_ortholog": 168,
+        "energy_target_kcal": 1.4807,
+        "energy_ortholog_kcal": 2.4239,
+        "delta_kcal": 0.9432
+      },
+      {
+        "res_name_target": "SER",
+        "res_name_ortholog": "TYR",
+        "res_seq_target": 245,
+        "res_seq_ortholog": 246,
+        "energy_target_kcal": -0.6189,
+        "energy_ortholog_kcal": -0.1173,
+        "delta_kcal": 0.5016
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "ILE",
+        "res_seq_target": 250,
+        "res_seq_ortholog": 251,
+        "energy_target_kcal": -0.3628,
+        "energy_ortholog_kcal": -0.2124,
+        "delta_kcal": 0.1504
+      },
+      {
+        "res_name_target": "ASN",
+        "res_name_ortholog": "ASN",
+        "res_seq_target": 140,
+        "res_seq_ortholog": 137,
+        "energy_target_kcal": -0.4881,
+        "energy_ortholog_kcal": -0.3728,
+        "delta_kcal": 0.1153
+      },
+      {
+        "res_name_target": "LEU",
+        "res_name_ortholog": "LEU",
+        "res_seq_target": 167,
+        "res_seq_ortholog": 164,
+        "energy_target_kcal": -0.7098,
+        "energy_ortholog_kcal": -0.6136,
+        "delta_kcal": 0.0962
+      },
+      {
+        "res_name_target": "ASP",
+        "res_name_ortholog": "ASP",
+        "res_seq_target": 168,
+        "res_seq_ortholog": 165,
+        "energy_target_kcal": -0.2483,
+        "energy_ortholog_kcal": -0.1546,
+        "delta_kcal": 0.0937
+      },
+      {
+        "res_name_target": "HIS",
+        "res_name_ortholog": "HIS",
+        "res_seq_target": 195,
+        "res_seq_ortholog": 192,
+        "energy_target_kcal": -0.2635,
+        "energy_ortholog_kcal": -0.1791,
+        "delta_kcal": 0.0844
+      },
+      {
+        "res_name_target": "ALA",
+        "res_name_ortholog": "ALA",
+        "res_seq_target": 236,
+        "res_seq_ortholog": 237,
+        "energy_target_kcal": -1.0882,
+        "energy_ortholog_kcal": -1.1292,
+        "delta_kcal": -0.0411
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 109,
+        "res_seq_ortholog": 105,
+        "energy_target_kcal": 0.5969,
+        "energy_ortholog_kcal": -0.4925,
+        "delta_kcal": -1.0894
+      }
+    ],
+    "top_n_ortholog_selective": [
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 109,
+        "res_seq_ortholog": 105,
+        "energy_target_kcal": 0.5969,
+        "energy_ortholog_kcal": -0.4925,
+        "delta_kcal": -1.0894
+      },
+      {
+        "res_name_target": "ALA",
+        "res_name_ortholog": "ALA",
+        "res_seq_target": 236,
+        "res_seq_ortholog": 237,
+        "energy_target_kcal": -1.0882,
+        "energy_ortholog_kcal": -1.1292,
+        "delta_kcal": -0.0411
+      },
+      {
+        "res_name_target": "HIS",
+        "res_name_ortholog": "HIS",
+        "res_seq_target": 195,
+        "res_seq_ortholog": 192,
+        "energy_target_kcal": -0.2635,
+        "energy_ortholog_kcal": -0.1791,
+        "delta_kcal": 0.0844
+      },
+      {
+        "res_name_target": "ASP",
+        "res_name_ortholog": "ASP",
+        "res_seq_target": 168,
+        "res_seq_ortholog": 165,
+        "energy_target_kcal": -0.2483,
+        "energy_ortholog_kcal": -0.1546,
+        "delta_kcal": 0.0937
+      },
+      {
+        "res_name_target": "LEU",
+        "res_name_ortholog": "LEU",
+        "res_seq_target": 167,
+        "res_seq_ortholog": 164,
+        "energy_target_kcal": -0.7098,
+        "energy_ortholog_kcal": -0.6136,
+        "delta_kcal": 0.0962
+      },
+      {
+        "res_name_target": "ASN",
+        "res_name_ortholog": "ASN",
+        "res_seq_target": 140,
+        "res_seq_ortholog": 137,
+        "energy_target_kcal": -0.4881,
+        "energy_ortholog_kcal": -0.3728,
+        "delta_kcal": 0.1153
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "ILE",
+        "res_seq_target": 250,
+        "res_seq_ortholog": 251,
+        "energy_target_kcal": -0.3628,
+        "energy_ortholog_kcal": -0.2124,
+        "delta_kcal": 0.1504
+      },
+      {
+        "res_name_target": "SER",
+        "res_name_ortholog": "TYR",
+        "res_seq_target": 245,
+        "res_seq_ortholog": 246,
+        "energy_target_kcal": -0.6189,
+        "energy_ortholog_kcal": -0.1173,
+        "delta_kcal": 0.5016
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 171,
+        "res_seq_ortholog": 168,
+        "energy_target_kcal": 1.4807,
+        "energy_ortholog_kcal": 2.4239,
+        "delta_kcal": 0.9432
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "THR",
+        "res_seq_target": 246,
+        "res_seq_ortholog": 247,
+        "energy_target_kcal": -1.4901,
+        "energy_ortholog_kcal": 1.2793,
+        "delta_kcal": 2.7694
+      }
+    ],
+    "residues": [
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 109,
+        "res_seq_ortholog": 105,
+        "energy_target_kcal": 0.5969,
+        "energy_ortholog_kcal": -0.4925,
+        "delta_kcal": -1.0894
+      },
+      {
+        "res_name_target": "ASN",
+        "res_name_ortholog": "ASN",
+        "res_seq_target": 140,
+        "res_seq_ortholog": 137,
+        "energy_target_kcal": -0.4881,
+        "energy_ortholog_kcal": -0.3728,
+        "delta_kcal": 0.1153
+      },
+      {
+        "res_name_target": "LEU",
+        "res_name_ortholog": "LEU",
+        "res_seq_target": 167,
+        "res_seq_ortholog": 164,
+        "energy_target_kcal": -0.7098,
+        "energy_ortholog_kcal": -0.6136,
+        "delta_kcal": 0.0962
+      },
+      {
+        "res_name_target": "ASP",
+        "res_name_ortholog": "ASP",
+        "res_seq_target": 168,
+        "res_seq_ortholog": 165,
+        "energy_target_kcal": -0.2483,
+        "energy_ortholog_kcal": -0.1546,
+        "delta_kcal": 0.0937
+      },
+      {
+        "res_name_target": "ARG",
+        "res_name_ortholog": "ARG",
+        "res_seq_target": 171,
+        "res_seq_ortholog": 168,
+        "energy_target_kcal": 1.4807,
+        "energy_ortholog_kcal": 2.4239,
+        "delta_kcal": 0.9432
+      },
+      {
+        "res_name_target": "HIS",
+        "res_name_ortholog": "HIS",
+        "res_seq_target": 195,
+        "res_seq_ortholog": 192,
+        "energy_target_kcal": -0.2635,
+        "energy_ortholog_kcal": -0.1791,
+        "delta_kcal": 0.0844
+      },
+      {
+        "res_name_target": "ALA",
+        "res_name_ortholog": "ALA",
+        "res_seq_target": 236,
+        "res_seq_ortholog": 237,
+        "energy_target_kcal": -1.0882,
+        "energy_ortholog_kcal": -1.1292,
+        "delta_kcal": -0.0411
+      },
+      {
+        "res_name_target": "SER",
+        "res_name_ortholog": "TYR",
+        "res_seq_target": 245,
+        "res_seq_ortholog": 246,
+        "energy_target_kcal": -0.6189,
+        "energy_ortholog_kcal": -0.1173,
+        "delta_kcal": 0.5016
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "THR",
+        "res_seq_target": 246,
+        "res_seq_ortholog": 247,
+        "energy_target_kcal": -1.4901,
+        "energy_ortholog_kcal": 1.2793,
+        "delta_kcal": 2.7694
+      },
+      {
+        "res_name_target": "PRO",
+        "res_name_ortholog": "ILE",
+        "res_seq_target": 250,
+        "res_seq_ortholog": 251,
+        "energy_target_kcal": -0.3628,
+        "energy_ortholog_kcal": -0.2124,
+        "delta_kcal": 0.1504
+      }
+    ]
+  },
+  "trp_location": {
+    "method": "structural_proximity_to_ligand_no_residue_number_assumed",
+    "target_chain": "A",
+    "target_pdb": "1LDG",
+    "target_ligand_resname": "OXM",
+    "target_pocket_cutoff_angstroms": 5.0,
+    "trp_residues_within_cutoff": [
+      {
+        "res_seq": 107,
+        "res_name": "TRP",
+        "min_dist_to_ligand": 4.041535377502441
+      }
+    ],
+    "selected_trp_res_seq": 107
+  },
+  "trp_in_selectivity_map": {
+    "res_name_target": "TRP",
+    "res_seq_target": 107,
+    "res_name_ortholog": "GLY",
+    "res_seq_ortholog": 102,
+    "energy_target_kcal": -0.8758,
+    "energy_ortholog_kcal": -0.0065,
+    "delta_kcal": 0.8692,
+    "rank_signed_target_favorable_first": 3,
+    "rank_abs_magnitude": 4,
+    "n_pocket_aligned": 11
+  },
+  "outcome_classification": {
+    "outcome": "OUTCOME 1",
+    "reason": "TRP107 pairs to GLY102 \u2014 a non-identical residue, so the engine flags it as divergent. Under the pre-registered map this satisfies the OUTCOME 1 'flagged as divergent OR large favorable LJ delta' trigger."
+  },
+  "run_metadata": {
+    "timestamp_utc": "2026-05-23T19:21:57.040114+00:00",
+    "engine": "physics_auditor",
+    "pocket_cutoff_angstroms": 5.0
+  }
+}
