@@ -39,6 +39,7 @@ def validate(
     import jax.numpy as jnp
 
     from physics_auditor.checks.clashes import check_clashes
+    from physics_auditor.composite import compute_composite
     from physics_auditor.config import load_config
     from physics_auditor.core.energy import run_lj_analysis
     from physics_auditor.core.geometry import compute_distance_matrix, extract_backbone_dihedrals
@@ -92,9 +93,16 @@ def validate(
 
         runtime = time.time() - t0
 
-        # Compute preliminary composite (using available checks)
-        # Full composite will include all 8 checks — for now use clashes + LJ
-        composite = clash_result.subscore  # Simplified for v0.1
+        # Compute the honest PARTIAL composite. Only steric clashes is scored
+        # today; LJ + Ramachandran are computed-but-unscored and the five
+        # remaining checks are not implemented. The provenance records all of
+        # this so the score is never mistaken for a full eight-check audit.
+        # The scalar value equals clash_result.subscore (single scored check,
+        # normalized weight 1.0) — unchanged from the prior stand-in.
+        composite_prov = compute_composite(
+            {"steric_clashes": clash_result.subscore}, cfg.composite
+        )
+        composite = composite_prov.score
 
         # Recommendation
         if composite >= cfg.composite.accept_threshold:
@@ -112,8 +120,10 @@ def validate(
             "file": str(path),
             "global_score": round(composite, 3),
             "recommendation": recommendation,
+            "composite": composite_prov.to_dict(),
             "checks": {
                 "steric_clashes": {
+                    "scored": True,
                     "n_clashes": clash_result.n_clashes,
                     "n_severe": clash_result.n_severe_clashes,
                     "clashscore": round(clash_result.clashscore, 2),
@@ -121,10 +131,12 @@ def validate(
                     "subscore": round(clash_result.subscore, 3),
                 },
                 "lennard_jones": {
+                    "scored": False,  # computed but not folded into composite
                     "total_energy_kcal": round(lj_result["total_energy"], 2),
                     "n_hot_pairs": lj_result["n_hot_pairs"],
                 },
                 "backbone_dihedrals": {
+                    "scored": False,  # dihedrals extracted; no Ramachandran scoring yet
                     "n_phi": len(dihedrals["phi"]["res_indices"]),
                     "n_psi": len(dihedrals["psi"]["res_indices"]),
                     "n_omega": len(dihedrals["omega"]["res_indices"]),
@@ -185,6 +197,7 @@ def _print_rich_report(report: dict, verbose: bool, rec_color: str) -> None:
     name = Path(report["file"]).stem
     meta = report["metadata"]
     checks = report["checks"]
+    comp = report.get("composite", {})
 
     # Header
     score = report["global_score"]
@@ -197,6 +210,17 @@ def _print_rich_report(report: dict, verbose: bool, rec_color: str) -> None:
         title="Physics Auditor",
         border_style="blue",
     ))
+
+    # Partial-composite honesty: never let the score read as a full audit.
+    if comp.get("is_partial", False):
+        scored = ", ".join(c["check"] for c in comp.get("contributing_checks", []))
+        console.print(
+            f"  [yellow]⚠ PARTIAL composite[/yellow] [dim]over "
+            f"{comp.get('n_scored_checks')} of {comp.get('n_total_checks')} "
+            f"checks ({scored}); "
+            f"{len(comp.get('computed_but_unscored', []))} computed-but-unscored, "
+            f"{len(comp.get('not_implemented', []))} not-implemented[/dim]"
+        )
 
     # Summary table
     table = Table(show_header=True, header_style="bold")
