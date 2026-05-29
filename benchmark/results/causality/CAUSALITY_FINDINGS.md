@@ -25,11 +25,13 @@ what it means for next steps.
 - **6 of 14 pairs ran** to completion (using the original BENCHMARK_PAIRS
   labels, which PR-A1 has since corrected — see audit note above): the
   six dossier files are now `HsDHFR_causality.json` (was HsDHODH; input
-  1MVS = HsDHFR), `HsDHODH_causality.json` (was SmDHODH; input 1D3H =
-  HsDHODH), `EGFR_4HJO_causality.json` (was HsHDAC8; input 4HJO = EGFR),
-  `DnaK_2BPR_causality.json` (was LmPTR1; input 2BPR = DnaK from E. coli),
-  `HsAromatase_causality.json` (clean), and `CoV2Mpro_causality.json`
-  (clean).
+  1MVS = HsDHFR), `archive/HsDHODH_causality.json` (was SmDHODH; input 1D3H
+  = HsDHODH paired with the Schistosoma AF model AF-G4VFD7 — **retired
+  2026-05-29 to `archive/` as a mixed-provenance artifact; see
+  `archive/README.md`**), `EGFR_4HJO_causality.json` (was HsHDAC8; input
+  4HJO = EGFR), `DnaK_2BPR_causality.json` (was LmPTR1; input 2BPR = DnaK
+  from E. coli), `HsAromatase_causality.json` (clean), and
+  `CoV2Mpro_causality.json` (clean).
 - **8 of 14 pairs skipped** due to memory budget (4500 atoms).
   See "Skipped pairs" below.
 - For each pair that ran, both structures were decomposed into

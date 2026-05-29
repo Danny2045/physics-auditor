@@ -1,4 +1,5 @@
 # Labels relabeled in PR fix/benchmark-mislabel-pair1-and-causality-artifacts (PR-A1). HsDHODH→HsDHFR (1MVS=HsDHFR), SmDHODH→HsDHODH (1D3H=HsDHODH), HsHDAC8→EGFR_4HJO (4HJO=EGFR), LmPTR1→DnaK_2BPR (2BPR=DnaK). See STATE_OF_PHYSICS_AUDITOR.md Findings 1, 8, 9. Numbers unchanged.
+# 2026-05-29 (Step 3): the "HsDHODH" row below is a mixed-provenance summary (experimental 1D3H = human, paired with Schistosoma AF model AF-G4VFD7); its full dossier was retired to archive/HsDHODH_causality.json. Row left intact as a historical record, not regenerated. See archive/README.md. The "30.8x selectivity" label is the Kira slogan (compound CHEMBL155771), not a value computed here.
 name,description,exp_total_kcal,af_total_kcal,exp_pocket_kcal,af_pocket_kcal,pocket_delta_kcal,n_pocket_aligned,top_unfav_res_in_af,top_fav_res_in_af
 HsDHFR,"Human DHODH — Kira ortholog, ESM-2 blind spot pair",-433.28,-2111.09,-301.06,-355.3,-54.24,68,GLY112:+11.1,MET76:-31.0
 HsDHODH,Parasite DHODH — 30.8x selectivity target,-1301.15,-2020.85,-748.35,-695.41,52.83,128,GLU132:+8.0,PHE128:-18.9

@@ -158,11 +158,18 @@ def run_smdhodh_hsdhodh_sequence_pair() -> PairResult:
             "public UniProt sequences with no additional data.",
         ],
         notes=[
-            "Pocket-level divergence is not computed for this pair: no "
-            "SmDHODH co-crystal in the repo to anchor pocket-residue "
-            "indices via the compute_selectivity_map convention. A "
-            "future PDB pull of e.g. 6FMD (SmDHODH+inhibitor) would "
-            "enable the pocket leg of the comparison.",
+            "Pocket-level divergence is DEFERRED for this pair, by "
+            "deliberate decision, not omission: it is an external-data "
+            "dependency. Computing it needs a parasite-side DHODH "
+            "co-crystal WITH a bound ligand to anchor pocket-residue "
+            "indices via the compute_selectivity_map convention; the "
+            "repo's parasite side is the apo AlphaFold model AF-G4VFD7, "
+            "which has no ligand. The engine is ready; the input does "
+            "not exist in-repo. Closing this would require fetching and "
+            "provenance-verifying a SmDHODH co-crystal (candidate 6FMD, "
+            "SmDHODH+inhibitor) and committing it to "
+            "benchmark/structures/experimental/. See "
+            "STATE_OF_PHYSICS_AUDITOR.md section 10 item 6.",
         ],
     )
 
@@ -295,9 +302,11 @@ def aggregate(rows: list[PairResult]) -> dict:
             "note": (
                 "Only one pair produced a full cosine triple in this "
                 "checkout. σ is not reported because a single-sample "
-                "standard deviation is not meaningful. Adding parasite "
-                "co-crystals (e.g. 6FMD for SmDHODH) would lift n above "
-                "1 and unlock honest error bars."
+                "standard deviation is not meaningful. Lifting n above 1 "
+                "depends on committing additional parasite co-crystals "
+                "(candidate 6FMD for SmDHODH) — a deferred external-data "
+                "dependency, not an engine gap. See "
+                "STATE_OF_PHYSICS_AUDITOR.md section 10 item 6."
             ),
         }
     var = sum((a - mean_amp) ** 2 for a in amps) / (n - 1)
