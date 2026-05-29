@@ -1,5 +1,15 @@
 """Per-residue selectivity attribution: PfDHODH (4ORM) vs HsDHODH (1D3H).
 
+Comparability enforcement (as-implemented, not aspirational):
+    organism provenance only (verify_pdb_source). NO sequence-identity,
+    anchor-RMSD, pocket-size-parity, or shared-cofactor-atom criterion is
+    run by this script. The pocket pairing is positional-zip inside
+    compute_selectivity_map. The canonical three-criterion
+    comparability_gate() lives in physics_auditor.causality.comparability
+    and is called only by run_w107f_selectivity.py today; unifying the
+    standard across all benchmark scripts is a deferred, deliberate
+    scientific decision (see CLAUDE.md "Benchmark comparability gating").
+
 This is the corrected version of the run that was put on hold in commit
 a19a2a2 ("relabel 1D3H/1MVS run — HsDHODH vs HsDHFR, not Sm/Hs"). The
 earlier 1D3H/1MVS pair turned out to be HsDHODH-vs-HsDHFR — two

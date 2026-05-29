@@ -186,6 +186,11 @@ class Structure:
     residues: dict[tuple, Residue]
     chains: dict[str, Chain]
 
+    # SEQRES records: chain_id -> ordered list of 3-letter residue codes.
+    # Represents the full expected sequence per chain; compare against resolved
+    # ATOM residues to detect gaps (disordered/unresolved regions).
+    seqres: dict[str, list[str]] = field(repr=False, default_factory=dict)
+
     # Flat arrays for computation (built by _build_arrays)
     coords: np.ndarray = field(repr=False, default_factory=lambda: np.empty((0, 3)))
     elements: np.ndarray = field(repr=False, default_factory=lambda: np.empty(0))
@@ -318,7 +323,35 @@ def _parse_pdb_line(line: str, is_hetatm: bool) -> Atom | None:
     )
 
 
-def _build_structure(atoms: list[Atom], name: str) -> Structure:
+def _parse_seqres_line(line: str, seqres: dict[str, list[str]]) -> None:
+    """Append residues from a single SEQRES record to the per-chain list.
+
+    PDB SEQRES format (columns, 1-indexed):
+        1-6   "SEQRES"
+        12    chain ID
+        20-22 first residue 3-letter code, then 4-char repeats (space + code).
+
+    Parameters
+    ----------
+    line : str
+        Raw SEQRES line.
+    seqres : dict
+        Accumulator: chain_id -> list of 3-letter residue codes (mutated).
+    """
+    if len(line) < 19:
+        return
+    chain_id = line[11].strip() or "A"
+    tokens = line[19:].split()
+    if not tokens:
+        return
+    if chain_id not in seqres:
+        seqres[chain_id] = []
+    for tok in tokens:
+        if len(tok) <= 3 and tok.isalpha():
+            seqres[chain_id].append(tok.upper())
+
+
+def _build_structure(atoms: list[Atom], name: str, seqres: dict[str, list[str]] | None = None) -> Structure:
     """Assemble atoms into a Structure with residues, chains, and flat arrays.
 
     Parameters
@@ -394,6 +427,7 @@ def _build_structure(atoms: list[Atom], name: str) -> Structure:
         atoms=atoms,
         residues=residues,
         chains=chains,
+        seqres=seqres if seqres is not None else {},
         coords=coords,
         elements=elements,
         atom_names=atom_names_arr,
@@ -436,12 +470,16 @@ def parse_pdb(path: str | Path, keep_hydrogens: bool = False, keep_altloc: str =
         raise FileNotFoundError(f"PDB file not found: {path}")
 
     atoms: list[Atom] = []
+    seqres: dict[str, list[str]] = {}
 
     with open(path) as f:
         for line in f:
             record = line[:6].strip()
 
-            if record == "ATOM":
+            if record == "SEQRES":
+                _parse_seqres_line(line, seqres)
+                continue
+            elif record == "ATOM":
                 atom = _parse_pdb_line(line, is_hetatm=False)
             elif record == "HETATM":
                 atom = _parse_pdb_line(line, is_hetatm=True)
@@ -468,7 +506,7 @@ def parse_pdb(path: str | Path, keep_hydrogens: bool = False, keep_altloc: str =
         raise ValueError(f"No atoms parsed from {path}")
 
     name = path.stem
-    return _build_structure(atoms, name)
+    return _build_structure(atoms, name, seqres=seqres)
 
 
 def parse_pdb_string(pdb_string: str, name: str = "unknown",
@@ -492,11 +530,15 @@ def parse_pdb_string(pdb_string: str, name: str = "unknown",
         Parsed structure.
     """
     atoms: list[Atom] = []
+    seqres: dict[str, list[str]] = {}
 
     for line in pdb_string.splitlines():
         record = line[:6].strip()
 
-        if record == "ATOM":
+        if record == "SEQRES":
+            _parse_seqres_line(line, seqres)
+            continue
+        elif record == "ATOM":
             atom = _parse_pdb_line(line, is_hetatm=False)
         elif record == "HETATM":
             atom = _parse_pdb_line(line, is_hetatm=True)
@@ -520,4 +562,4 @@ def parse_pdb_string(pdb_string: str, name: str = "unknown",
     if not atoms:
         raise ValueError("No atoms parsed from PDB string")
 
-    return _build_structure(atoms, name)
+    return _build_structure(atoms, name, seqres=seqres)

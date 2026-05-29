@@ -3,7 +3,7 @@
 The pair labels used in the tables below ("HsDHODH", "SmDHODH", "HsHDAC8", "LmPTR1") are the original BENCHMARK_PAIRS labels at the time this document was written. PR-A1's identity audit found four of them mismatched the underlying experimental input:
 
 - "HsDHODH" pair used 1MVS, which is **HsDHFR** (P00374). Dossier renamed `HsDHFR_causality.json`.
-- "SmDHODH" pair used 1D3H, which is **HsDHODH** (Q02127). Dossier renamed `HsDHODH_causality.json`.
+- "SmDHODH" pair used 1D3H, which is **HsDHODH** (Q02127). Dossier renamed `HsDHODH_causality.json`, then **retired 2026-05-29 to `archive/HsDHODH_causality.json`** because that dossier pairs the human 1D3H with the Schistosoma AF model AF-G4VFD7 — a mixed-provenance cross-organism artifact whose label disagrees with its contents. See `archive/README.md`.
 - "HsHDAC8" pair used 4HJO, which is **EGFR kinase domain** (P00533). Dossier renamed `EGFR_4HJO_causality.json`.
 - "LmPTR1" pair used 2BPR, which is **DnaK** from *E. coli* (P0A6Y8). Dossier renamed `DnaK_2BPR_causality.json`.
 

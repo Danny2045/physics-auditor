@@ -1,5 +1,15 @@
 """PfDHODH-vs-HsDHODH selectivity attribution with sequence-anchored alignment.
 
+Comparability enforcement (as-implemented, not aspirational):
+    organism provenance (verify_pdb_source) + sequence identity
+    (MIN_GLOBAL_IDENTITY=0.25, via build_pocket_alignment). NO anchor-RMSD,
+    pocket-size-parity, or shared-cofactor-atom criterion is run by this
+    script. The canonical three-criterion comparability_gate() lives in
+    physics_auditor.causality.comparability and is called only by
+    run_w107f_selectivity.py today; unifying the standard across all
+    benchmark scripts is a deferred, deliberate scientific decision (see
+    CLAUDE.md "Benchmark comparability gating").
+
 This is the v1 realigned rerun of run_pfdhodh_vs_hsdhodh_selectivity.py.
 It replaces the original's positional-zip pocket pairing with a real
 global pairwise sequence alignment via the correspondence engine, then
