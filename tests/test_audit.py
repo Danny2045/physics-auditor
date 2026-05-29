@@ -208,6 +208,71 @@ def test_cli_ready_tri_ala_preserves_global_score_and_adds_readiness_only():
     assert report["readiness"]["pocket_level"] == "NOT_ASSESSED"
 
 
+def test_cli_does_not_swallow_unexpected_exceptions(monkeypatch):
+    """A real bug inside audit() must surface — not be masked as a friendly
+    "Failed to audit ..." line and a green exit.
+
+    The CLI's try/except is allowed to absorb FileNotFoundError and
+    ValueError (the expected user/data error surface: file disappeared,
+    malformed PDB, ligand resname not present). Anything else — TypeError,
+    AttributeError, KeyError, RuntimeError — means we have a real bug and
+    we want a noisy crash, not a silent skip-and-continue that risks
+    succeeding a batch run where every file actually failed.
+    """
+    import physics_auditor.audit as audit_module
+
+    def _explode(request):
+        raise RuntimeError("simulated internal bug")
+
+    monkeypatch.setattr(audit_module, "audit", _explode)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        ["validate", str(FIXTURES / "tri_ala.pdb"), "--json"],
+    )
+
+    assert result.exit_code != 0, (
+        "CLI should not exit cleanly when audit() raises an unexpected "
+        "exception; got exit_code=0 with stdout:\n" + result.stdout
+    )
+    assert isinstance(result.exception, RuntimeError), (
+        f"the unexpected RuntimeError must propagate through the CLI "
+        f"unchanged; got exception={result.exception!r}"
+    )
+
+
+def test_cli_swallows_expected_value_error_and_continues(monkeypatch):
+    """A ValueError from audit() (e.g. malformed PDB, missing ligand) IS in
+    the expected user/data error surface — the CLI prints a "Failed to
+    audit" line and exits 0 so a batch run can keep processing the next
+    file. This pins the asymmetry: ValueError swallowed, RuntimeError not.
+    """
+    import physics_auditor.audit as audit_module
+
+    def _user_error(request):
+        raise ValueError("synthetic user-data error")
+
+    monkeypatch.setattr(audit_module, "audit", _user_error)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        ["validate", str(FIXTURES / "tri_ala.pdb")],
+    )
+
+    assert result.exit_code == 0, (
+        f"the CLI should swallow ValueError and continue; "
+        f"got exit_code={result.exit_code}, exception={result.exception!r}"
+    )
+    # Rich may line-wrap stdout; collapse whitespace before substring search.
+    import re
+
+    flat = re.sub(r"\s+", " ", result.stdout)
+    assert "Failed to audit" in flat
+    assert "synthetic user-data error" in flat
+
+
 @pytest.mark.parametrize("fixture", ["tri_ala", "clashing"])
 def test_cli_ready_fixtures_keep_partial_composite_honesty(fixture):
     """The Step-0 partial-composite provenance must survive the audit refactor:

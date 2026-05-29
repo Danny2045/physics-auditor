@@ -65,6 +65,10 @@ def validate(
             console.print(f"[red]File not found: {path}[/red]")
             continue
 
+        # Only catch expected user/data errors here. Anything else is a real
+        # bug and must propagate — silently masking an unexpected exception as
+        # "Failed to audit ..." and continuing risks a green exit on a batch
+        # run where every file actually failed.
         try:
             request = StructureAuditRequest(
                 pdb_path=path,
@@ -73,7 +77,7 @@ def validate(
                 pocket_cutoff=pocket_cutoff,
             )
             result = audit(request)
-        except (ValueError, Exception) as e:
+        except (FileNotFoundError, ValueError) as e:
             console.print(f"[red]Failed to audit {path}: {e}[/red]")
             continue
 
