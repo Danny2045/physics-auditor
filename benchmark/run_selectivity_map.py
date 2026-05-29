@@ -4,6 +4,16 @@ Output: per-residue protein–ligand LJ-attribution JSON dossier plus a
 formatted markdown report under
 ``benchmark/results/selectivity_maps/``.
 
+Comparability enforcement (as-implemented, not aspirational):
+    NONE. No provenance check, no completeness gate, no sequence-identity
+    threshold, no anchor-RMSD / pocket-size-parity / shared-cofactor-atom
+    criterion. Pocket pairing is positional-zip on two unrelated human
+    enzymes (HsDHODH and HsDHFR). The framing in this script labels the
+    output a "functional-paralog sanity check on the per-residue
+    attribution machinery", NOT a selectivity claim. **This script is the
+    highest-priority gap to revisit when unifying the comparability
+    standard** — see CLAUDE.md "Benchmark comparability gating".
+
 PENDING — true parasite-vs-human selectivity attribution
 --------------------------------------------------------
 The current 1D3H / 1MVS pair is a *functional paralog* comparison

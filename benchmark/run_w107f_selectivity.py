@@ -28,6 +28,7 @@ from pathlib import Path
 import numpy as np
 
 from physics_auditor.causality.binding_site import extract_binding_site
+from physics_auditor.causality.comparability import comparability_gate
 from physics_auditor.causality.correspondence import build_pocket_alignment
 from physics_auditor.causality.pocket_completeness import pocket_completeness_gate
 from physics_auditor.causality.selectivity_map import (
@@ -169,12 +170,17 @@ def main():
     R, t, anchor_rmsd = kabsch_superpose(P, Q)
     print(f"  NAI shared atom-name pairs: {len(shared_names)} / 44")
     print(f"  NAI Kabsch anchor RMSD: {anchor_rmsd:.4f} Å")
-    comparability_pass = (
-        anchor_rmsd <= 1.0
-        and abs(pf_pocket.n_residues - hs_pocket.n_residues) <= 4
-        and len(shared_names) >= 3
+    comparability = comparability_gate(
+        anchor_rmsd=float(anchor_rmsd),
+        anchor_rmsd_cutoff=1.0,
+        target_pocket_size=pf_pocket.n_residues,
+        ortholog_pocket_size=hs_pocket.n_residues,
+        pocket_parity_tolerance=4,
+        shared_atom_names=list(shared_names),
+        min_shared_atoms=3,
     )
-    print(f"  comparability gate: {'PASS' if comparability_pass else 'FAIL'}")
+    comparability_pass = comparability.passed
+    print(f"  comparability gate: {comparability.verdict}")
     if not comparability_pass:
         print()
         print("FATAL: comparability gate did NOT pass on this pair.")

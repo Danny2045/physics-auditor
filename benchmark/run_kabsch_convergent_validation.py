@@ -1,5 +1,16 @@
 """Kabsch convergent validation of the v1 PfDHODH-vs-HsDHODH finding.
 
+Comparability enforcement (as-implemented, not aspirational):
+    organism provenance (verify_pdb_source) + the library-enforced ≥3
+    shared anchor atoms inside build_anchor_pairing (a geometric Kabsch
+    requirement, not a comparability threshold). anchor_rmsd and pocket
+    sizes for FMN and ORO are REPORTED but NOT gated at the script level.
+    The canonical three-criterion comparability_gate() lives in
+    physics_auditor.causality.comparability and is called only by
+    run_w107f_selectivity.py today; unifying the standard across all
+    benchmark scripts is a deferred, deliberate scientific decision (see
+    CLAUDE.md "Benchmark comparability gating").
+
 Asks the falsifiable convergence question: does a STRUCTURAL residue
 correspondence built from a sequence-independent shared-cofactor
 superposition reproduce the SEQUENCE-anchored pairings the v1

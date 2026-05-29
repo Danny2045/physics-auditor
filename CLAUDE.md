@@ -14,7 +14,7 @@ differentiator. See "Score honesty" below before trusting the composite.
 - `src/physics_auditor/core/` — parser, geometry, topology, energy (JAX kernels)
 - `src/physics_auditor/checks/` — clash detection
 - `src/physics_auditor/causality/` — binding site extraction, pocket comparison,
-  pocket + structure completeness gates
+  pocket + structure completeness gates, comparability gate
 - `benchmark/` — experimental vs AI-predicted structure comparison
 - `src/physics_auditor/composite.py` — single source of truth for what the
   composite covers (the check registry + honest provenance)
@@ -61,6 +61,34 @@ for SEQRES-vs-ATOM gap detection; the pocket gate layers a ligand-dependent
 reach-bound (peptide step length 3.8 Å) on top to decide pocket-region
 membership. This caught the W107f failure mode (4PLZ's disordered substrate-
 specificity loop, residues 82-93) on a bare-PDB audit with no ligand supplied.
+
+## Benchmark comparability gating
+Pair-level comparability enforcement (cross-structure benchmarks: parasite
+vs human, etc.) is **non-uniform across the benchmark suite by
+design-as-it-stands, not by intent**. The canonical three-criterion gate —
+anchor RMSD ≤ cutoff, pocket-size parity, shared cofactor atom-name count —
+lives in `src/physics_auditor/causality/comparability.py` as
+`comparability_gate()`. Each criterion is opt-in by data (provide the
+threshold + observed value to enable it). Today only one script calls it:
+
+- `run_w107f_selectivity.py` — full three-criterion gate (NAI anchor RMSD
+  ≤ 1.0 Å, |Δn_pocket| ≤ 4, ≥3 shared NAI atoms). FATAL exit on FAIL.
+- `run_pfdhodh_realigned_comparison.py`, `run_pfdhodh_vs_hsdhodh_selectivity.py` —
+  organism provenance (+ sequence identity for the realigned variant) only.
+- `run_kabsch_convergent_validation.py` — organism provenance + the
+  library-enforced ≥3 shared anchor atoms inside `build_anchor_pairing`
+  (a geometric Kabsch requirement, not a script-level comparability
+  threshold). `anchor_rmsd` and pocket sizes are REPORTED, not gated.
+- `run_selectivity_map.py` — **NONE** (positional-zip pairing on two
+  unrelated human enzymes; framed as a sanity check, not a selectivity
+  claim). This is the **highest-priority gap to revisit** when unifying
+  the comparability standard.
+
+**Unifying the standard — deciding which comparisons should be gated and
+to what threshold — is a deferred, deliberate scientific decision.** The
+consolidation refactor canonicalized the one extant gate and made each
+call site's check-set visible in its module docstring; it did NOT port
+w107f's thresholds onto scripts that never had them.
 
 ## Current benchmark finding
 AlphaFold predictions score 4-11x better than experimental crystal structures on
