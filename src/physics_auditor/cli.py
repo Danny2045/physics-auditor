@@ -1,6 +1,9 @@
 """Physics Auditor CLI.
 
-Entry point for structure validation and mechanistic analysis.
+Entry point for structure validation and mechanistic analysis. The CLI is a
+thin renderer over the library-level ``audit()`` function: it builds a
+``StructureAuditRequest``, invokes ``audit()``, and prints the typed
+``StructureAuditResult`` as either JSON or a Rich-formatted table.
 
 Usage:
     physics-auditor validate structure.pdb
@@ -11,7 +14,6 @@ Usage:
 from __future__ import annotations
 
 import json
-import time
 from pathlib import Path
 
 import typer
@@ -34,17 +36,24 @@ def validate(
     config: Path | None = typer.Option(None, "--config", "-c", help="YAML config file"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show per-residue details"),
     json_output: bool = typer.Option(False, "--json", help="Print JSON to stdout"),
+    ligand_resname: str | None = typer.Option(
+        None,
+        "--ligand-resname",
+        help=(
+            "3-letter HETATM resname identifying the bound ligand. When set, "
+            "the pocket-completeness check runs in addition to the always-on "
+            "structure-level gap check."
+        ),
+    ),
+    pocket_cutoff: float = typer.Option(
+        5.0,
+        "--pocket-cutoff",
+        help="Pocket-defining distance in Å (used when --ligand-resname is set).",
+    ),
 ):
     """Validate one or more protein structures."""
-    import jax.numpy as jnp
-
-    from physics_auditor.checks.clashes import check_clashes
-    from physics_auditor.composite import compute_composite
+    from physics_auditor.audit import StructureAuditRequest, audit
     from physics_auditor.config import load_config
-    from physics_auditor.core.energy import run_lj_analysis
-    from physics_auditor.core.geometry import compute_distance_matrix, extract_backbone_dihedrals
-    from physics_auditor.core.parser import parse_pdb
-    from physics_auditor.core.topology import build_bonded_mask, infer_bonds_from_topology
 
     cfg = load_config(str(config) if config else None)
 
@@ -56,106 +65,24 @@ def validate(
             console.print(f"[red]File not found: {path}[/red]")
             continue
 
-        t0 = time.time()
-
         try:
-            struct = parse_pdb(path)
+            request = StructureAuditRequest(
+                pdb_path=path,
+                config=cfg,
+                ligand_resname=ligand_resname,
+                pocket_cutoff=pocket_cutoff,
+            )
+            result = audit(request)
         except (ValueError, Exception) as e:
-            console.print(f"[red]Failed to parse {path}: {e}[/red]")
+            console.print(f"[red]Failed to audit {path}: {e}[/red]")
             continue
 
-        # Build topology
-        bonds = infer_bonds_from_topology(struct)
-        mask = build_bonded_mask(struct.n_atoms, bonds)
-
-        # Compute distance matrix (the foundation)
-        coords = jnp.array(struct.coords)
-        dist_matrix = compute_distance_matrix(coords)
-        mask_jnp = jnp.array(mask)
-
-        # Run checks
-        clash_result = check_clashes(
-            dist_matrix, struct.elements, mask_jnp,
-            struct.res_indices, struct.n_residues, cfg.clashes,
-        )
-
-        # Run LJ analysis
-        lj_result = run_lj_analysis(
-            dist_matrix, struct.elements, mask_jnp,
-            struct.res_indices, struct.n_residues, cfg.lennard_jones.energy_cap,
-        )
-
-        # Extract backbone dihedrals
-        dihedrals = extract_backbone_dihedrals(
-            struct.coords, struct.atom_names, struct.res_indices,
-            struct.is_protein_mask, struct.chain_ids_array,
-        )
-
-        runtime = time.time() - t0
-
-        # Compute the honest PARTIAL composite. Only steric clashes is scored
-        # today; LJ + Ramachandran are computed-but-unscored and the five
-        # remaining checks are not implemented. The provenance records all of
-        # this so the score is never mistaken for a full eight-check audit.
-        # The scalar value equals clash_result.subscore (single scored check,
-        # normalized weight 1.0) — unchanged from the prior stand-in.
-        composite_prov = compute_composite(
-            {"steric_clashes": clash_result.subscore}, cfg.composite
-        )
-        composite = composite_prov.score
-
-        # Recommendation
-        if composite >= cfg.composite.accept_threshold:
-            recommendation = "accept"
-            rec_color = "green"
-        elif composite >= cfg.composite.short_md_threshold:
-            recommendation = "short_md"
-            rec_color = "yellow"
-        else:
-            recommendation = "discard"
-            rec_color = "red"
-
-        # Build report dict
-        report = {
-            "file": str(path),
-            "global_score": round(composite, 3),
-            "recommendation": recommendation,
-            "composite": composite_prov.to_dict(),
-            "checks": {
-                "steric_clashes": {
-                    "scored": True,
-                    "n_clashes": clash_result.n_clashes,
-                    "n_severe": clash_result.n_severe_clashes,
-                    "clashscore": round(clash_result.clashscore, 2),
-                    "worst_overlap_angstrom": round(clash_result.worst_overlap, 3),
-                    "subscore": round(clash_result.subscore, 3),
-                },
-                "lennard_jones": {
-                    "scored": False,  # computed but not folded into composite
-                    "total_energy_kcal": round(lj_result["total_energy"], 2),
-                    "n_hot_pairs": lj_result["n_hot_pairs"],
-                },
-                "backbone_dihedrals": {
-                    "scored": False,  # dihedrals extracted; no Ramachandran scoring yet
-                    "n_phi": len(dihedrals["phi"]["res_indices"]),
-                    "n_psi": len(dihedrals["psi"]["res_indices"]),
-                    "n_omega": len(dihedrals["omega"]["res_indices"]),
-                },
-            },
-            "metadata": {
-                "n_atoms": struct.n_atoms,
-                "n_residues": struct.n_residues,
-                "n_chains": struct.n_chains,
-                "n_bonds_inferred": len(bonds),
-                "protein_chains": len(struct.protein_chains),
-                "runtime_seconds": round(runtime, 3),
-            },
-        }
+        report = result.to_dict()
 
         if json_output:
             print(json.dumps(report, indent=2))
         else:
-            _print_rich_report(report, verbose, rec_color)
+            _print_rich_report(report, verbose)
 
         if output_dir:
             out_path = output_dir / f"{path.stem}_report.json"
@@ -192,27 +119,66 @@ def info(
     console.print(table)
 
 
-def _print_rich_report(report: dict, verbose: bool, rec_color: str) -> None:
-    """Print a formatted report to the terminal."""
+def _print_rich_report(report: dict, verbose: bool) -> None:
+    """Print a formatted audit report to the terminal."""
     name = Path(report["file"]).stem
     meta = report["metadata"]
     checks = report["checks"]
-    comp = report.get("composite", {})
+    comp = report.get("composite") or {}
+    readiness = report.get("readiness") or {}
 
-    # Header
-    score = report["global_score"]
-    rec = report["recommendation"]
+    score = report.get("global_score")
+    rec = report.get("recommendation")
+    ready = readiness.get("ready", True)
+
+    if ready and score is not None and rec is not None:
+        rec_color = (
+            "green" if rec == "accept"
+            else "yellow" if rec == "short_md"
+            else "red"
+        )
+        header = (
+            f"[bold]{name}[/bold]  |  "
+            f"Score: [bold]{score:.3f}[/bold]  |  "
+            f"Recommendation: [{rec_color}][bold]{rec.upper()}[/bold][/{rec_color}]"
+        )
+    else:
+        header = (
+            f"[bold]{name}[/bold]  |  "
+            f"Score: [bold]n/a (unready)[/bold]  |  "
+            f"Recommendation: [red][bold]WITHHELD[/bold][/red]"
+        )
+
     console.print()
-    console.print(Panel(
-        f"[bold]{name}[/bold]  |  "
-        f"Score: [bold]{score:.3f}[/bold]  |  "
-        f"Recommendation: [{rec_color}][bold]{rec.upper()}[/bold][/{rec_color}]",
-        title="Physics Auditor",
-        border_style="blue",
-    ))
+    console.print(Panel(header, title="Physics Auditor", border_style="blue"))
+
+    # Readiness banner — always show; UNREADY is loud, READY is one dim line.
+    if not ready:
+        console.print(
+            f"  [red]✗ UNREADY[/red] [dim]({readiness.get('reason', '')})[/dim]"
+        )
+        n_gaps = len(readiness.get("structure_internal_gaps", []))
+        n_term = len(readiness.get("structure_unresolved_termini", []))
+        if n_gaps or n_term:
+            console.print(
+                f"  [dim]structure: {n_gaps} internal gap(s), "
+                f"{n_term} terminal residue(s)[/dim]"
+            )
+        n_pocket = len(readiness.get("pocket_missing", []))
+        if n_pocket:
+            console.print(
+                f"  [dim]pocket: {n_pocket} pocket-region residue(s) missing[/dim]"
+            )
+    else:
+        struct_lvl = readiness.get("structure_level", "?")
+        pocket_lvl = readiness.get("pocket_level", "?")
+        console.print(
+            f"  [dim]✓ ready (structure: {struct_lvl}, "
+            f"pocket: {pocket_lvl})[/dim]"
+        )
 
     # Partial-composite honesty: never let the score read as a full audit.
-    if comp.get("is_partial", False):
+    if ready and comp.get("is_partial", False):
         scored = ", ".join(c["check"] for c in comp.get("contributing_checks", []))
         console.print(
             f"  [yellow]⚠ PARTIAL composite[/yellow] [dim]over "
@@ -228,24 +194,23 @@ def _print_rich_report(report: dict, verbose: bool, rec_color: str) -> None:
     table.add_column("Result", style="white")
     table.add_column("Score", style="white")
 
-    # Clashes
     cl = checks["steric_clashes"]
-    clash_str = f"{cl['n_clashes']} clashes ({cl['n_severe']} severe), clashscore={cl['clashscore']}"
+    clash_str = (
+        f"{cl['n_clashes']} clashes ({cl['n_severe']} severe), "
+        f"clashscore={cl['clashscore']}"
+    )
     table.add_row("Steric Clashes", clash_str, f"{cl['subscore']:.3f}")
 
-    # LJ
     lj = checks["lennard_jones"]
     lj_str = f"E={lj['total_energy_kcal']:.1f} kcal/mol, {lj['n_hot_pairs']} hot pairs"
     table.add_row("Lennard-Jones", lj_str, "—")
 
-    # Backbone
     bb = checks["backbone_dihedrals"]
     bb_str = f"φ={bb['n_phi']}, ψ={bb['n_psi']}, ω={bb['n_omega']}"
     table.add_row("Backbone Dihedrals", bb_str, "—")
 
     console.print(table)
 
-    # Metadata
     console.print(
         f"  [dim]{meta['n_atoms']} atoms | {meta['n_residues']} residues | "
         f"{meta['n_chains']} chains | {meta['n_bonds_inferred']} bonds | "
