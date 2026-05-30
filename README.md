@@ -16,10 +16,12 @@ implemented today (steric clashes; Lennard-Jones energy). The causality
 engine — per-residue energy decomposition, two convergent correspondence
 methods, a selectivity map across homologous protein pairs, and the
 safeguards that gate every analysis — is the differentiator and is what
-the benchmark runners under `benchmark/` exercise end-to-end. Six
-further physics checks (bond geometry, Ramachandran, peptide planarity,
-chirality, rotamer outliers, disulfide-geometry validation) are on the
-roadmap; see the "Not implemented yet — planned" section below.
+the benchmark runners under `benchmark/` exercise end-to-end. Five
+further physics checks (bond geometry, peptide planarity, chirality,
+rotamer outliers, disulfide-geometry validation) are on the roadmap; see
+the "Not implemented yet — planned" section below. (Backbone φ/ψ
+dihedrals are already extracted and emitted as metadata but not scored —
+see below — so Ramachandran is *computed-but-unscored*, not unbuilt.)
 
 ## Physics validation (current)
 
@@ -46,19 +48,31 @@ inference, **not** a disulfide-geometry validation check.
 
 ### Composite score and recommendation — honest disclosure
 
-The CLI emits a `global_score ∈ [0, 1]` and a recommendation of
-`accept` / `short_md` / `discard` (thresholds in
+The CLI emits a `global_score` (a float in `[0, 1]`, or `null`) and a
+recommendation of `accept` / `short_md` / `discard` (thresholds in
 `src/physics_auditor/config.py:CompositeConfig`).
 
-**Today the reported score reflects steric clashes ONLY.** The LJ
+**The score is withheld on incomplete input.** Every audit first runs a
+readiness gate — an always-on structure-completeness check, plus a
+pocket-completeness check when a ligand is supplied. When the gate
+returns *unready* (an internal SEQRES-vs-ATOM gap, or a missing
+pocket-region residue), `audit()` sets `global_score`, `composite`, and
+`recommendation` all to `None` (`src/physics_auditor/audit.py:271–274`);
+the raw per-check results are still computed and reported. The auditor
+abstains rather than emit a confident verdict on a structure it cannot
+fully see.
+
+**When ready, the reported score reflects steric clashes ONLY.** The LJ
 pipeline runs and its output is included as a separate field in the
-report, but it is **not** folded into the score. See
-`src/physics_auditor/cli.py` line 97 — the score is literally
-`clash_result.subscore`. The `accept` / `short_md` / `discard`
-recommendation is therefore a **clash-based** recommendation, not a
-multi-check composite, despite the `global_score` field name. Folding
-LJ into the composite (and renaming the field) is tracked as roadmap
-work.
+report, but it is **not** folded into the score. The composite is built
+at `src/physics_auditor/audit.py:261–264`, which calls
+`compute_composite({"steric_clashes": clash_result.subscore}, …)`; with
+a single scored check the normalized weight is 1.0, so `global_score`
+equals `clash_result.subscore` exactly. The `accept` / `short_md` /
+`discard` recommendation is therefore a **clash-based** recommendation,
+not a multi-check composite, despite the `global_score` field name.
+Folding LJ into the composite (and renaming the field) is tracked as
+roadmap work.
 
 ## Causality engine
 
@@ -216,13 +230,18 @@ pip install git+https://github.com/Danny2045/physics-auditor.git
 The items below are **not** in the engine today; they are tracked as
 roadmap work. Each has a dataclass placeholder in
 `src/physics_auditor/config.py`
-(`BondGeometryConfig`, `RamachandranConfig`, `PeptideConfig`,
-`ChiralityConfig`, `RotamerConfig`, `DisulfideConfig`) — these
-**placeholders are currently unused** by any check.
+(`BondGeometryConfig`, `PeptideConfig`, `ChiralityConfig`,
+`RotamerConfig`, `DisulfideConfig`) — these **placeholders are currently
+unused** by any check.
+
+(Ramachandran is **not** in this list: backbone φ/ψ are already extracted
+and emitted as metadata but not scored against allowed / favoured
+regions, so it is *computed-but-unscored* rather than unbuilt. Wiring a
+Ramachandran subscore — like the LJ subscore — is the deferred scoring
+work, distinct from the five unbuilt checks below.)
 
 - **Bond geometry** — bond-length and bond-angle deviation vs
   Engh-Huber ideals.
-- **Ramachandran** — backbone φ/ψ against allowed / favoured regions.
 - **Peptide planarity** — ω-angle deviation from trans/cis ideals.
 - **Chirality** — L-amino-acid verification at Cα centres.
 - **Rotamer outliers** — sidechain χ angles vs a rotamer library.

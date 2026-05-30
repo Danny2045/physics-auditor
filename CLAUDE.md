@@ -6,7 +6,7 @@ differentiator. See "Score honesty" below before trusting the composite.
 
 ## Key commands
 - `pip install -e ".[dev]"` to install
-- `pytest tests/ -v` to test (~155 tests, all must pass)
+- `pytest tests/ -v` to test (182 passed, 1 skipped; all must pass)
 - `ruff check src/ tests/ --select E,F,I,W --ignore E501` must pass before commit
 - `physics-auditor validate <file.pdb>` to validate a structure
 
