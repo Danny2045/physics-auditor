@@ -16,10 +16,13 @@ implemented today (steric clashes; Lennard-Jones energy). The causality
 engine — per-residue energy decomposition, two convergent correspondence
 methods, a selectivity map across homologous protein pairs, and the
 safeguards that gate every analysis — is the differentiator and is what
-the benchmark runners under `benchmark/` exercise end-to-end. Six
-further physics checks (bond geometry, Ramachandran, peptide planarity,
-chirality, rotamer outliers, disulfide-geometry validation) are on the
-roadmap; see the "Not implemented yet — planned" section below.
+the benchmark runners under `benchmark/` exercise end-to-end. Five
+further physics checks (bond geometry, peptide planarity, chirality,
+rotamer outliers, disulfide-geometry validation) are on the roadmap; see
+the "Not implemented yet — planned" section below. (Backbone φ/ψ/ω
+dihedrals are computed, but only their counts (n_phi/n_psi/n_omega)
+appear in the report — the angle values are not surfaced — and they are
+not scored, so Ramachandran is *computed-but-unscored*, not unbuilt.)
 
 ## Physics validation (current)
 
@@ -33,11 +36,12 @@ Two checks are implemented and wired into the CLI:
   landscape, with total, per-atom, and per-residue rollups
   (`src/physics_auditor/core/energy.py:run_lj_analysis`).
 
-Backbone φ/ψ/ω dihedrals are extracted as available building blocks
+Backbone φ/ψ/ω dihedrals are computed
 (`src/physics_auditor/core/geometry.py:extract_backbone_dihedrals`),
 but **no check currently scores them** against Ramachandran maps,
-peptide-planarity thresholds, or any reference distribution — the
-dihedrals are emitted as metadata only.
+peptide-planarity thresholds, or any reference distribution — and only
+their counts (n_phi/n_psi/n_omega) appear in the report; the angle
+values themselves are not surfaced.
 
 S–S bonds are inferred from Cys-SG distances during topology
 construction (`src/physics_auditor/core/topology.py`) so that
@@ -46,19 +50,34 @@ inference, **not** a disulfide-geometry validation check.
 
 ### Composite score and recommendation — honest disclosure
 
-The CLI emits a `global_score ∈ [0, 1]` and a recommendation of
-`accept` / `short_md` / `discard` (thresholds in
+The CLI emits a `global_score` (a float in `[0, 1]`, or `null`) and a
+recommendation of `accept` / `short_md` / `discard` (thresholds in
 `src/physics_auditor/config.py:CompositeConfig`).
 
-**Today the reported score reflects steric clashes ONLY.** The LJ
+**The score is withheld on incomplete input.** Every audit first runs a
+readiness gate — an always-on structure-completeness check, plus a
+pocket-completeness check when a ligand is supplied. The gate flags
+*internal* missing residues — inferred from SEQRES-vs-ATOM differences,
+or from numeric residue-numbering gaps when no SEQRES record is present —
+and, for ligand-bound structures, the internal gaps that fall in the
+pocket region (terminal gaps never trigger *unready*). When the gate
+returns *unready*, `audit()` sets `global_score`, `composite`, and
+`recommendation` all to `None` (`src/physics_auditor/audit.py:271–274`);
+the raw per-check results are still computed and reported. The auditor
+abstains rather than emit a confident verdict on a structure it cannot
+fully see.
+
+**When ready, the reported score reflects steric clashes ONLY.** The LJ
 pipeline runs and its output is included as a separate field in the
-report, but it is **not** folded into the score. See
-`src/physics_auditor/cli.py` line 97 — the score is literally
-`clash_result.subscore`. The `accept` / `short_md` / `discard`
-recommendation is therefore a **clash-based** recommendation, not a
-multi-check composite, despite the `global_score` field name. Folding
-LJ into the composite (and renaming the field) is tracked as roadmap
-work.
+report, but it is **not** folded into the score. The composite is built
+at `src/physics_auditor/audit.py:261–264`, which calls
+`compute_composite({"steric_clashes": clash_result.subscore}, …)`; with
+a single scored check the normalized weight is 1.0, so `global_score`
+equals `clash_result.subscore` exactly. The `accept` / `short_md` /
+`discard` recommendation is therefore a **clash-based** recommendation,
+not a multi-check composite, despite the `global_score` field name.
+Folding LJ into the composite (and renaming the field) is tracked as
+roadmap work.
 
 ## Causality engine
 
@@ -213,16 +232,20 @@ pip install git+https://github.com/Danny2045/physics-auditor.git
 
 ## Not implemented yet — planned
 
-The items below are **not** in the engine today; they are tracked as
-roadmap work. Each has a dataclass placeholder in
-`src/physics_auditor/config.py`
+There are **five** unbuilt checks (listed below), but **six** unused
+config-dataclass placeholders in `src/physics_auditor/config.py`
 (`BondGeometryConfig`, `RamachandranConfig`, `PeptideConfig`,
-`ChiralityConfig`, `RotamerConfig`, `DisulfideConfig`) — these
-**placeholders are currently unused** by any check.
+`ChiralityConfig`, `RotamerConfig`, `DisulfideConfig`) — all six are
+defined, attached to `AuditorConfig`, and YAML-loadable, yet **read by
+no check**. The difference is Ramachandran: the Ramachandran *check* is
+not in the unbuilt list below — its φ/ψ dihedrals are already computed
+(only their counts appear in the report), so the check is
+*computed-but-unscored*, like the LJ subscore — but `RamachandranConfig`
+the *dataclass* is an unused placeholder exactly like the other five,
+because no check consumes it.
 
 - **Bond geometry** — bond-length and bond-angle deviation vs
   Engh-Huber ideals.
-- **Ramachandran** — backbone φ/ψ against allowed / favoured regions.
 - **Peptide planarity** — ω-angle deviation from trans/cis ideals.
 - **Chirality** — L-amino-acid verification at Cα centres.
 - **Rotamer outliers** — sidechain χ angles vs a rotamer library.

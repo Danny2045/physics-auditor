@@ -6,7 +6,7 @@ differentiator. See "Score honesty" below before trusting the composite.
 
 ## Key commands
 - `pip install -e ".[dev]"` to install
-- `pytest tests/ -v` to test (~155 tests, all must pass)
+- `pytest tests/ -v` to test (182 passed, 1 skipped; all must pass)
 - `ruff check src/ tests/ --select E,F,I,W --ignore E501` must pass before commit
 - `physics-auditor validate <file.pdb>` to validate a structure
 
@@ -33,10 +33,12 @@ check is fed in, so no unbuilt check is ever silently weighted.
 
 The eight-check registry's current status:
 - **Scored (1):** steric clashes.
-- **Computed but NOT scored (2):** Lennard-Jones energy and Ramachandran
-  backbone dihedrals — both run and are reported, but neither has a subscore,
-  so neither is folded into the composite (wiring LJ in would require inventing
-  a normalization rubric; deferred, not faked).
+- **Computed but NOT scored (2):** Lennard-Jones energy (total energy +
+  hot-pair count reported) and Ramachandran backbone dihedrals (computed,
+  but only the φ/ψ/ω counts appear in the report — the angle values are
+  not surfaced). Both run, but neither has a subscore, so neither is
+  folded into the composite (wiring LJ in would require inventing a
+  normalization rubric; deferred, not faked).
 - **Not implemented (5):** bond_geometry, peptide_planarity, chirality,
   rotamers, disulfides — config weights only, no implementing code. Do not
   implement these as a side effect of other work.
