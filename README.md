@@ -19,9 +19,10 @@ safeguards that gate every analysis — is the differentiator and is what
 the benchmark runners under `benchmark/` exercise end-to-end. Five
 further physics checks (bond geometry, peptide planarity, chirality,
 rotamer outliers, disulfide-geometry validation) are on the roadmap; see
-the "Not implemented yet — planned" section below. (Backbone φ/ψ
-dihedrals are already extracted and emitted as metadata but not scored —
-see below — so Ramachandran is *computed-but-unscored*, not unbuilt.)
+the "Not implemented yet — planned" section below. (Backbone φ/ψ/ω
+dihedrals are computed, but only their counts (n_phi/n_psi/n_omega)
+appear in the report — the angle values are not surfaced — and they are
+not scored, so Ramachandran is *computed-but-unscored*, not unbuilt.)
 
 ## Physics validation (current)
 
@@ -35,11 +36,12 @@ Two checks are implemented and wired into the CLI:
   landscape, with total, per-atom, and per-residue rollups
   (`src/physics_auditor/core/energy.py:run_lj_analysis`).
 
-Backbone φ/ψ/ω dihedrals are extracted as available building blocks
+Backbone φ/ψ/ω dihedrals are computed
 (`src/physics_auditor/core/geometry.py:extract_backbone_dihedrals`),
 but **no check currently scores them** against Ramachandran maps,
-peptide-planarity thresholds, or any reference distribution — the
-dihedrals are emitted as metadata only.
+peptide-planarity thresholds, or any reference distribution — and only
+their counts (n_phi/n_psi/n_omega) appear in the report; the angle
+values themselves are not surfaced.
 
 S–S bonds are inferred from Cys-SG distances during topology
 construction (`src/physics_auditor/core/topology.py`) so that
@@ -54,9 +56,12 @@ recommendation of `accept` / `short_md` / `discard` (thresholds in
 
 **The score is withheld on incomplete input.** Every audit first runs a
 readiness gate — an always-on structure-completeness check, plus a
-pocket-completeness check when a ligand is supplied. When the gate
-returns *unready* (an internal SEQRES-vs-ATOM gap, or a missing
-pocket-region residue), `audit()` sets `global_score`, `composite`, and
+pocket-completeness check when a ligand is supplied. The gate flags
+*internal* missing residues — inferred from SEQRES-vs-ATOM differences,
+or from numeric residue-numbering gaps when no SEQRES record is present —
+and, for ligand-bound structures, the internal gaps that fall in the
+pocket region (terminal gaps never trigger *unready*). When the gate
+returns *unready*, `audit()` sets `global_score`, `composite`, and
 `recommendation` all to `None` (`src/physics_auditor/audit.py:271–274`);
 the raw per-check results are still computed and reported. The auditor
 abstains rather than emit a confident verdict on a structure it cannot
@@ -227,18 +232,17 @@ pip install git+https://github.com/Danny2045/physics-auditor.git
 
 ## Not implemented yet — planned
 
-The items below are **not** in the engine today; they are tracked as
-roadmap work. Each has a dataclass placeholder in
-`src/physics_auditor/config.py`
-(`BondGeometryConfig`, `PeptideConfig`, `ChiralityConfig`,
-`RotamerConfig`, `DisulfideConfig`) — these **placeholders are currently
-unused** by any check.
-
-(Ramachandran is **not** in this list: backbone φ/ψ are already extracted
-and emitted as metadata but not scored against allowed / favoured
-regions, so it is *computed-but-unscored* rather than unbuilt. Wiring a
-Ramachandran subscore — like the LJ subscore — is the deferred scoring
-work, distinct from the five unbuilt checks below.)
+There are **five** unbuilt checks (listed below), but **six** unused
+config-dataclass placeholders in `src/physics_auditor/config.py`
+(`BondGeometryConfig`, `RamachandranConfig`, `PeptideConfig`,
+`ChiralityConfig`, `RotamerConfig`, `DisulfideConfig`) — all six are
+defined, attached to `AuditorConfig`, and YAML-loadable, yet **read by
+no check**. The difference is Ramachandran: the Ramachandran *check* is
+not in the unbuilt list below — its φ/ψ dihedrals are already computed
+(only their counts appear in the report), so the check is
+*computed-but-unscored*, like the LJ subscore — but `RamachandranConfig`
+the *dataclass* is an unused placeholder exactly like the other five,
+because no check consumes it.
 
 - **Bond geometry** — bond-length and bond-angle deviation vs
   Engh-Huber ideals.
