@@ -13,11 +13,15 @@ so the inputs are deterministic.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from physics_auditor.causality.pocket_completeness import (
     pocket_completeness_gate,
     structure_completeness_gate,
 )
 from physics_auditor.core.parser import parse_pdb_string
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _atom_line(
@@ -335,7 +339,7 @@ def test_4plz_real_structure_is_incomplete_without_ligand():
     from physics_auditor.core.parser import parse_pdb
 
     pdb_path = (
-        "/Users/danielngabonziza/physics-auditor/benchmark/structures/experimental/4PLZ.pdb"
+        REPO_ROOT / "benchmark" / "structures" / "experimental" / "4PLZ.pdb"
     )
     structure = parse_pdb(pdb_path)
     result = structure_completeness_gate(structure)
