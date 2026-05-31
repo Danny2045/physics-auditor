@@ -82,11 +82,13 @@ Static physical and chemical plausibility of predicted structures is already cov
 comprehensively by established suites — notably PoseBusters (Buttenschoen et al.,
 *Chem. Sci.* 2024, 15, 3130–3139), an RDKit-based standard that checks chirality,
 stereochemistry, bond lengths and angles, ring planarity, internal and external clashes,
-and an energy ratio against relaxed conformers, and is integrated into PLINDER and
-OpenStructure. This auditor's single scored check (steric clashes) is a *subset* of that
+and an energy ratio against relaxed conformers, and has become the de facto standard for
+validating predicted ligand poses (used, e.g., within the PLINDER evaluation pipeline).
+This auditor's single scored check (steric clashes) is a *subset* of that
 standard and does not exceed it; the not-implemented checks listed below (chirality, bond
-geometry, peptide planarity, …) are likewise already covered there. What this tool adds is
-not broader plausibility coverage but a narrower discipline — deriving its partial-ness from
+geometry, peptide planarity, …) are likewise long-addressed in established
+structure- and pose-validation tooling. What this tool adds is not broader plausibility
+coverage but a narrower discipline — deriving its partial-ness from
 an explicit check registry, and withholding the verdict entirely when the input is too
 incomplete to judge (the readiness gate). It is not a competitor to PoseBusters on
 static-pose validity and should not be described as one.
