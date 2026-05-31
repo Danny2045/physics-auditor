@@ -56,8 +56,9 @@ a known antimalarial DHODH selectivity cluster (the HIS185 / PHE188 / ARG265 fam
 Bounds, stated plainly: not binding free energy, not a same-compound comparison, and
 not a blind result for PfDHODH (the cluster was within the evaluation context). A
 sequence-anchored realignment then corrected the original story — HIS185 and ARG265
-pair to *conserved* residues (HIS56, ARG136) repositioned in the pocket, so their
-contribution is pocket-context/geometry, not residue substitution; the cluster
+pair to *conserved* residues (HIS56, ARG136) — spatially near-coincident after
+superposition — so the cluster's apparent contribution traces to pocket context and
+geometry, not residue substitution; the cluster
 survived the top-10, but the original "substitution explains selectivity" reading did
 not survive intact. Two of three confirmation steps (Kabsch, literature) are closed;
 TM-align is outstanding. Numbers and residue maps:
