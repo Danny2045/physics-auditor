@@ -76,6 +76,21 @@ flagged divergent. A clean, fully-worked instance of the discipline this tool ex
 to enforce — lock the prediction, score against the answer, admit the miss, explain
 it falsifiably, confirm. Details: `LDH_BLIND_RESULT.md`, `W107F_MECHANISTIC_CHECK.md`.
 
+## Relation to existing physical-validity tooling
+
+Static physical and chemical plausibility of predicted structures is already covered
+comprehensively by established suites — notably PoseBusters (Buttenschoen et al.,
+*Chem. Sci.* 2024, 15, 3130–3139), an RDKit-based standard that checks chirality,
+stereochemistry, bond lengths and angles, ring planarity, internal and external clashes,
+and an energy ratio against relaxed conformers, and is integrated into PLINDER and
+OpenStructure. This auditor's single scored check (steric clashes) is a *subset* of that
+standard and does not exceed it; the not-implemented checks listed below (chirality, bond
+geometry, peptide planarity, …) are likewise already covered there. What this tool adds is
+not broader plausibility coverage but a narrower discipline — deriving its partial-ness from
+an explicit check registry, and withholding the verdict entirely when the input is too
+incomplete to judge (the readiness gate). It is not a competitor to PoseBusters on
+static-pose validity and should not be described as one.
+
 ## Non-claims (explicit)
 
 Physics Auditor must **not** be described as doing any of the following. This list is
