@@ -32,7 +32,10 @@ an engine that always answers.
   When the gate returns *unready*, `global_score`, `composite`, and `recommendation`
   are all set to `None`; the raw per-check results are still computed and reported.
   The auditor abstains rather than emit a confident verdict on a structure it cannot
-  fully see.
+  fully see. This is *residue-level* completeness only — it detects missing residues,
+  not missing atoms or side chains, protonation/hydrogens, altloc/occupancy, ligand
+  completeness, or atom typing; a structure that passes the gate may still be incomplete
+  in those respects.
 
 ## What it does NOT prove
 
@@ -57,8 +60,8 @@ Bounds, stated plainly: not binding free energy, not a same-compound comparison,
 not a blind result for PfDHODH (the cluster was within the evaluation context). A
 sequence-anchored realignment then corrected the original story — HIS185 and ARG265
 pair to *conserved* residues (HIS56, ARG136) — spatially near-coincident after
-superposition — so the cluster's apparent contribution traces to pocket context and
-geometry, not residue substitution; the cluster
+superposition — so *their* contribution traces to pocket context and geometry rather
+than substitution — while PHE188 is a genuine Phe→Ala substitution; the cluster
 survived the top-10, but the original "substitution explains selectivity" reading did
 not survive intact. Two of three confirmation steps (Kabsch, literature) are closed;
 TM-align is outstanding. Numbers and residue maps:
@@ -78,20 +81,22 @@ it falsifiably, confirm. Details: `LDH_BLIND_RESULT.md`, `W107F_MECHANISTIC_CHEC
 
 ## Relation to existing physical-validity tooling
 
-Static physical and chemical plausibility of predicted structures is already covered
-comprehensively by established suites — notably PoseBusters (Buttenschoen et al.,
-*Chem. Sci.* 2024, 15, 3130–3139), an RDKit-based standard that checks chirality,
-stereochemistry, bond lengths and angles, ring planarity, internal and external clashes,
-and an energy ratio against relaxed conformers, and has become the de facto standard for
-validating predicted ligand poses (used, e.g., within the PLINDER evaluation pipeline).
-This auditor's single scored check (steric clashes) is a *subset* of that
-standard and does not exceed it; the not-implemented checks listed below (chirality, bond
-geometry, peptide planarity, …) are likewise long-addressed in established
-structure- and pose-validation tooling. What this tool adds is not broader plausibility
-coverage but a narrower discipline — deriving its partial-ness from
-an explicit check registry, and withholding the verdict entirely when the input is too
-incomplete to judge (the readiness gate). It is not a competitor to PoseBusters on
-static-pose validity and should not be described as one.
+Static physical and chemical plausibility is a mature area served by established
+tooling. For predicted *ligand poses*, PoseBusters (Buttenschoen et al.,
+*Chem. Sci.* 2024, 15, 3130–3139) is a widely used RDKit-based suite that checks
+chirality, stereochemistry, bond lengths and angles, ring planarity, internal and
+external clashes, and an energy ratio against relaxed conformers (used, e.g., within
+the PLINDER evaluation pipeline). For *protein geometry*, MolProbity-style validation
+has long covered all-atom clashes, Ramachandran, and rotamer outliers. This auditor's
+single scored check — steric clashes — is a standard structure-QC check that overlaps
+with, and is no broader than, that established clash validation; it adds nothing those
+tools do not already do. The not-implemented checks listed below (chirality, bond
+geometry, peptide planarity, …) are likewise long-addressed in that tooling. What this
+auditor adds is not broader coverage but a narrower discipline — deriving its
+partial-ness from an explicit check registry, and withholding the verdict when
+residue-level completeness is insufficient (the readiness gate; see its scope above).
+It is not a competitor to PoseBusters or MolProbity on static validity and should not
+be described as one.
 
 ## Non-claims (explicit)
 
@@ -113,7 +118,8 @@ requires a dated amendment, not a quiet change of phrasing.
 - **Five unbuilt checks** — bond geometry, peptide planarity, chirality, rotamer
   outliers, disulfide-geometry. Each has an unused config-dataclass placeholder; none
   has implementing code. Not to be built as a side effect of other work.
-- **LJ scoring and Ramachandran scoring** — both checks compute; neither scores.
+- **LJ scoring and Ramachandran scoring** — LJ computes an interaction energy and
+  Ramachandran extracts backbone φ/ψ/ω dihedrals (counts only); neither is scored.
   Wiring a subscore requires a defensible normalization rubric (and, for Ramachandran,
   a reference distribution). Deferred until that rubric exists.
 - **True SmDHODH / HsDHODH pocket divergence** — gated on a parasite-side co-crystal
