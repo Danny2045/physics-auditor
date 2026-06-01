@@ -1,7 +1,6 @@
 """PDB file parser.
 
-Reads PDB and minimal mmCIF files into a Structure dataclass
-optimized for downstream JAX computation.
+Reads PDB files into a Structure dataclass, optimized for downstream JAX computation.
 
 The parser extracts ATOM/HETATM records and builds a flat array
 representation suitable for vectorized distance/energy calculations.
