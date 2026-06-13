@@ -7,6 +7,13 @@ file and in the code — this is the claims layer, not a restatement of the mech
 The source of truth for what is scored is `CHECK_REGISTRY` in
 `src/physics_auditor/composite.py`.*
 
+*Pre-registered discrimination bar:* `CHARTER_clash_discrimination_v0.1.md`
+adds a **quantitative** native-vs-decoy AUROC bar for the one scored check
+(`steric_clashes`), fixed before any discrimination code — addressing audit
+gaps 1 and 2, with empirical calibration and the HTML Trust Report explicitly
+deferred. It is additive to the qualitative scope here and changes neither the
+scored-check count (still one) nor any claim in this document.
+
 ## In one line
 
 Physics Auditor is a structural-claims adjudicator: it scores one physics check it

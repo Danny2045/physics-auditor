@@ -79,6 +79,15 @@ not a multi-check composite, despite the `global_score` field name.
 Folding LJ into the composite (and renaming the field) is tracked as
 roadmap work.
 
+**Pre-registered discrimination bar.** `CHARTER_clash_discrimination_v0.1.md`
+pre-registers a quantitative native-vs-decoy AUROC bar for this one scored
+check (`steric_clashes`), fixed before any discrimination code — addressing
+audit gaps 1 (no pre-registered bar) and 2 (no native-vs-decoy capability),
+with empirical calibration and the HTML Trust Report explicitly deferred. It
+is additive to the qualitative scope docs (`SCOPE_CONTRACT.md`,
+`CLAIMS_AND_LIMITS.md`) and changes neither the scored-check count (still one)
+nor any claim here.
+
 ## Causality engine
 
 This is the differentiator. AI representation models can score ~99 %
