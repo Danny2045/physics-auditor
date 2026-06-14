@@ -14,6 +14,8 @@ gaps 1 and 2, with empirical calibration and the HTML Trust Report explicitly
 deferred. It is additive to the qualitative scope here and changes neither the
 scored-check count (still one) nor any claim in this document.
 
+*Discrimination result (non-claim):* the pre-registered benchmark (`bdfac1f`) confirmed the clash check fires on packing defects (Tier-1 control, AUROC 1.0) but established **no fold-discrimination power**. On 3DRobot, raw native-vs-decoy AUROC ≈ 1.0 is a coordinate-provenance confound — near-native-fold decoys (~0.5 Å RMSD) still clash ~5× more than natives in 30/30 targets — not fold recognition. **The auditor does NOT claim to discriminate native from non-native folds.** See `benchmark/discrimination/DISCRIMINATION_FINDINGS.md`.
+
 ## In one line
 
 Physics Auditor is a structural-claims adjudicator: it scores one physics check it

@@ -82,3 +82,6 @@ This makes the **clash check's discrimination claim** undeniable. It does not by
 ---
 
 **Operative note:** this charter is additive to SCOPE_CONTRACT.md and CLAIMS_AND_LIMITS.md (it adds a pre-registered *quantitative* bar where those fix qualitative scope). It is committed before any discrimination code is written. A v0.2 is issued only by pre-data amendment (e.g., the §4 substitution clause).
+
+---
+**POST-RESULTS CLOSURE (2026-06-13, commit bdfac1f).** This charter was executed. Tier 1 fired §6 row 1 (AUROC 1.0 @ σ=2.0 — PASS, positive control holds). Tier 2 fired §6 row 4 (raw AUROC ≈ 1.0 — surprising positive); the required investigation found the signal is a **coordinate-provenance confound, not fold discrimination** — near-native-fold decoys (~0.5 Å RMSD) clash ~5× more than natives in 30/30 targets, so the clash check has no demonstrated fold-recognition power. The rung is closed on this honest finding (option A): the pre-registered expectation that clash cannot recognize correct folds among realistic structures holds; the high literal AUROC reflects coordinate provenance, not fold quality. Gaps 3 (calibration) and 4 (HTML) remain explicitly deferred. Full writeup: `benchmark/discrimination/DISCRIMINATION_FINDINGS.md`.

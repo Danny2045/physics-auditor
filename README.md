@@ -88,6 +88,8 @@ is additive to the qualitative scope docs (`SCOPE_CONTRACT.md`,
 `CLAIMS_AND_LIMITS.md`) and changes neither the scored-check count (still one)
 nor any claim here.
 
+**Discrimination result — honest null on fold recognition.** The charter's benchmark ran (`bdfac1f`). The Tier-1 positive control passed: the clash check fires on real packing defects (AUROC 1.0 at 2.0 Å perturbation, monotone dose-response). On 3DRobot (Tier 2), raw native-vs-decoy AUROC came out ≈ 1.0 — but a near-native control shows this is a **coordinate-provenance confound, not fold discrimination**: for all 30 targets, decoys within ~0.5 Å RMSD of the native fold still clash ~5× more than the native, so the check separates experimentally-refined coordinates from computationally-generated ones, *not* correct folds from wrong ones. The clash check has **no demonstrated fold-recognition power**; the instrument's abstention on realistic structures stands. (Methodological note: raw native-vs-decoy AUROC on provenance-mismatched sets conflates fold quality with coordinate provenance.) See `benchmark/discrimination/DISCRIMINATION_FINDINGS.md`.
+
 ## Causality engine
 
 This is the differentiator. AI representation models can score ~99 %
