@@ -1,0 +1,608 @@
+{
+  "charter": "CHARTER_clash_discrimination_v0.1.md (6dad2dc)",
+  "native_draw_lock_commit": "575a4af",
+  "seed": 20260613,
+  "numpy_version": "2.4.4",
+  "jax_version": "0.9.2",
+  "python_version": "3.13.12",
+  "repo_commit": "575a4af6844b8075a12db5926295b3b633904d4a",
+  "clashscore_source": "physics_auditor.checks.clashes.check_clashes (committed, unmodified)",
+  "clash_config": {
+    "vdw_tolerance": 0.4,
+    "ignore_bonded_neighbors": 3,
+    "severe_clash_threshold": 0.2
+  },
+  "preprocessing": "parse_pdb defaults (keep_hydrogens=False \u2192 H stripped; keep_altloc='A'); then infer_bonds_from_topology \u2192 build_bonded_mask \u2192 compute_distance_matrix \u2192 check_clashes; identical for natives and all decoys.",
+  "n_targets_requested": 30,
+  "n_targets_scored": 30,
+  "excluded_targets": [],
+  "tier1": {
+    "design": {
+      "sigmas": [
+        0.5,
+        1.0,
+        1.5,
+        2.0
+      ],
+      "k_p_per_native_per_sigma": 50,
+      "rng_method": "numpy.random.default_rng([20260613, target_index, sigma_index]); target_index over sorted(native_ids), sigma_index over [0.5,1.0,1.5,2.0]; decoy = native_coords + N(0,sigma), float32"
+    },
+    "native_mean_clashscore": 8.2582,
+    "per_sigma": {
+      "0.5": {
+        "auroc": 1.0,
+        "mean_decoy_clashscore": 462.3424,
+        "n_decoys": 1500
+      },
+      "1.0": {
+        "auroc": 1.0,
+        "mean_decoy_clashscore": 1057.0399,
+        "n_decoys": 1500
+      },
+      "1.5": {
+        "auroc": 1.0,
+        "mean_decoy_clashscore": 1425.2087,
+        "n_decoys": 1500
+      },
+      "2.0": {
+        "auroc": 1.0,
+        "mean_decoy_clashscore": 1567.585,
+        "n_decoys": 1500
+      }
+    },
+    "auroc_sigma_2.0": 1.0,
+    "bar": 0.95,
+    "passed": true,
+    "n_decoys_total": 6000,
+    "n_decoys_excluded": 0
+  },
+  "tier2": {
+    "auroc_pooled": 0.999996,
+    "bar": 0.65,
+    "meets_bar": true,
+    "native_recognition_rate": 1.0,
+    "n_targets_recognized": 30,
+    "zscore_summary": {
+      "mean": -4.365,
+      "median": -4.1801,
+      "min": -5.9409,
+      "max": -3.0172,
+      "std": 0.7938,
+      "n_targets": 30
+    },
+    "zscore_definition": "(native_clashscore - decoy_mean) / decoy_std; negative = native below decoy mean",
+    "n_native_scored": 30,
+    "n_decoys_scored": 9000,
+    "n_decoys_excluded": 0,
+    "nearnative_control": {
+      "description": "POST-HOC (not pre-registered): for each target, the single lowest-RMSD 3DRobot decoy (closest to the native fold) vs the native clashscore. If near-native-fold decoys still clash far more than the native, the Tier-2 separation is a preparation/provenance signal (experimentally-refined natives vs computationally-generated decoys), not fold-quality discrimination.",
+      "n_targets": 30,
+      "mean_min_rmsd_angstrom": 0.555,
+      "max_min_rmsd_angstrom": 0.95,
+      "mean_native_clashscore": 8.2582,
+      "mean_nearnative_decoy_clashscore": 42.2854,
+      "n_targets_nearnative_exceeds_native": 30,
+      "per_target": [
+        {
+          "id": "1SAUA",
+          "min_rmsd_angstrom": 0.46,
+          "nearnative_decoy_clashscore": 42.5532,
+          "native_clashscore": 13.8151,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "1TJXA",
+          "min_rmsd_angstrom": 0.48,
+          "nearnative_decoy_clashscore": 44.0098,
+          "native_clashscore": 6.5147,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "1W0NA",
+          "min_rmsd_angstrom": 0.41,
+          "nearnative_decoy_clashscore": 53.6913,
+          "native_clashscore": 5.5866,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "1WPUA",
+          "min_rmsd_angstrom": 0.41,
+          "nearnative_decoy_clashscore": 30.0885,
+          "native_clashscore": 9.0253,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "256BA",
+          "min_rmsd_angstrom": 0.64,
+          "nearnative_decoy_clashscore": 29.0909,
+          "native_clashscore": 7.2639,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "2BMOB",
+          "min_rmsd_angstrom": 0.63,
+          "nearnative_decoy_clashscore": 42.2794,
+          "native_clashscore": 3.6832,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "2BT9A",
+          "min_rmsd_angstrom": 0.87,
+          "nearnative_decoy_clashscore": 30.5233,
+          "native_clashscore": 4.3605,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "2C2UA",
+          "min_rmsd_angstrom": 0.63,
+          "nearnative_decoy_clashscore": 38.8693,
+          "native_clashscore": 10.5932,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "2C4JA",
+          "min_rmsd_angstrom": 0.56,
+          "nearnative_decoy_clashscore": 57.0637,
+          "native_clashscore": 9.9668,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "2FHZB",
+          "min_rmsd_angstrom": 0.42,
+          "nearnative_decoy_clashscore": 41.1523,
+          "native_clashscore": 8.2305,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "2NSZA",
+          "min_rmsd_angstrom": 0.87,
+          "nearnative_decoy_clashscore": 49.4767,
+          "native_clashscore": 6.7502,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "2OVJA",
+          "min_rmsd_angstrom": 0.78,
+          "nearnative_decoy_clashscore": 52.2341,
+          "native_clashscore": 10.8835,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "3HNYM",
+          "min_rmsd_angstrom": 0.56,
+          "nearnative_decoy_clashscore": 43.4783,
+          "native_clashscore": 5.6361,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "3M9QA",
+          "min_rmsd_angstrom": 0.25,
+          "nearnative_decoy_clashscore": 35.7616,
+          "native_clashscore": 13.4048,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "3NE0A",
+          "min_rmsd_angstrom": 0.43,
+          "nearnative_decoy_clashscore": 39.559,
+          "native_clashscore": 7.129,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "3QZXA",
+          "min_rmsd_angstrom": 0.95,
+          "nearnative_decoy_clashscore": 31.5856,
+          "native_clashscore": 18.9394,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "3RHBA",
+          "min_rmsd_angstrom": 0.37,
+          "nearnative_decoy_clashscore": 31.8878,
+          "native_clashscore": 6.3776,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "3SY1A",
+          "min_rmsd_angstrom": 0.8,
+          "nearnative_decoy_clashscore": 43.9498,
+          "native_clashscore": 6.2785,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4AQOA",
+          "min_rmsd_angstrom": 0.24,
+          "nearnative_decoy_clashscore": 41.9907,
+          "native_clashscore": 7.8493,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4B62A",
+          "min_rmsd_angstrom": 0.45,
+          "nearnative_decoy_clashscore": 56.3124,
+          "native_clashscore": 5.5453,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4B97A",
+          "min_rmsd_angstrom": 0.6,
+          "nearnative_decoy_clashscore": 51.7666,
+          "native_clashscore": 5.7471,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4BK7A",
+          "min_rmsd_angstrom": 0.55,
+          "nearnative_decoy_clashscore": 41.4297,
+          "native_clashscore": 11.4566,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4EETB",
+          "min_rmsd_angstrom": 0.69,
+          "nearnative_decoy_clashscore": 55.9211,
+          "native_clashscore": 4.386,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4FTFA",
+          "min_rmsd_angstrom": 0.71,
+          "nearnative_decoy_clashscore": 36.1446,
+          "native_clashscore": 2.4096,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4GAIA",
+          "min_rmsd_angstrom": 0.65,
+          "nearnative_decoy_clashscore": 44.4984,
+          "native_clashscore": 15.3722,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4I2UA",
+          "min_rmsd_angstrom": 0.39,
+          "nearnative_decoy_clashscore": 20.5314,
+          "native_clashscore": 3.6232,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4IZXA",
+          "min_rmsd_angstrom": 0.46,
+          "nearnative_decoy_clashscore": 57.3477,
+          "native_clashscore": 5.3715,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4J1PA",
+          "min_rmsd_angstrom": 0.47,
+          "nearnative_decoy_clashscore": 26.4609,
+          "native_clashscore": 13.1291,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4JFIA",
+          "min_rmsd_angstrom": 0.36,
+          "nearnative_decoy_clashscore": 34.8361,
+          "native_clashscore": 7.2765,
+          "nearnative_exceeds_native": true
+        },
+        {
+          "id": "4KZVA",
+          "min_rmsd_angstrom": 0.55,
+          "nearnative_decoy_clashscore": 64.0669,
+          "native_clashscore": 11.1421,
+          "nearnative_exceeds_native": true
+        }
+      ]
+    },
+    "per_target": [
+      {
+        "id": "1SAUA",
+        "native_clashscore": 13.8151,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 58.7411,
+        "decoy_std_clashscore": 10.887,
+        "native_zscore": -4.1266,
+        "native_is_lowest": true
+      },
+      {
+        "id": "1TJXA",
+        "native_clashscore": 6.5147,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 59.4322,
+        "decoy_std_clashscore": 12.5917,
+        "native_zscore": -4.2026,
+        "native_is_lowest": true
+      },
+      {
+        "id": "1W0NA",
+        "native_clashscore": 5.5866,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 62.8784,
+        "decoy_std_clashscore": 13.0887,
+        "native_zscore": -4.3772,
+        "native_is_lowest": true
+      },
+      {
+        "id": "1WPUA",
+        "native_clashscore": 9.0253,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 54.8319,
+        "decoy_std_clashscore": 11.0176,
+        "native_zscore": -4.1576,
+        "native_is_lowest": true
+      },
+      {
+        "id": "256BA",
+        "native_clashscore": 7.2639,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 41.2121,
+        "decoy_std_clashscore": 10.2475,
+        "native_zscore": -3.3128,
+        "native_is_lowest": true
+      },
+      {
+        "id": "2BMOB",
+        "native_clashscore": 3.6832,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 55.4596,
+        "decoy_std_clashscore": 13.9491,
+        "native_zscore": -3.7118,
+        "native_is_lowest": true
+      },
+      {
+        "id": "2BT9A",
+        "native_clashscore": 4.3605,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 47.6114,
+        "decoy_std_clashscore": 11.2303,
+        "native_zscore": -3.8513,
+        "native_is_lowest": true
+      },
+      {
+        "id": "2C2UA",
+        "native_clashscore": 10.5932,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 52.6078,
+        "decoy_std_clashscore": 8.4676,
+        "native_zscore": -4.9618,
+        "native_is_lowest": true
+      },
+      {
+        "id": "2C4JA",
+        "native_clashscore": 9.9668,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 71.7101,
+        "decoy_std_clashscore": 10.393,
+        "native_zscore": -5.9409,
+        "native_is_lowest": true
+      },
+      {
+        "id": "2FHZB",
+        "native_clashscore": 8.2305,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 62.62,
+        "decoy_std_clashscore": 13.1726,
+        "native_zscore": -4.129,
+        "native_is_lowest": true
+      },
+      {
+        "id": "2NSZA",
+        "native_clashscore": 6.7502,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 64.177,
+        "decoy_std_clashscore": 13.176,
+        "native_zscore": -4.3584,
+        "native_is_lowest": true
+      },
+      {
+        "id": "2OVJA",
+        "native_clashscore": 10.8835,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 70.4091,
+        "decoy_std_clashscore": 11.9727,
+        "native_zscore": -4.9718,
+        "native_is_lowest": true
+      },
+      {
+        "id": "3HNYM",
+        "native_clashscore": 5.6361,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 53.234,
+        "decoy_std_clashscore": 8.6992,
+        "native_zscore": -5.4715,
+        "native_is_lowest": true
+      },
+      {
+        "id": "3M9QA",
+        "native_clashscore": 13.4048,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 54.9581,
+        "decoy_std_clashscore": 12.4308,
+        "native_zscore": -3.3428,
+        "native_is_lowest": true
+      },
+      {
+        "id": "3NE0A",
+        "native_clashscore": 7.129,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 76.4419,
+        "decoy_std_clashscore": 18.8077,
+        "native_zscore": -3.6853,
+        "native_is_lowest": true
+      },
+      {
+        "id": "3QZXA",
+        "native_clashscore": 18.9394,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 57.9659,
+        "decoy_std_clashscore": 11.4421,
+        "native_zscore": -3.4108,
+        "native_is_lowest": true
+      },
+      {
+        "id": "3RHBA",
+        "native_clashscore": 6.3776,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 52.8784,
+        "decoy_std_clashscore": 15.4118,
+        "native_zscore": -3.0172,
+        "native_is_lowest": true
+      },
+      {
+        "id": "3SY1A",
+        "native_clashscore": 6.2785,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 61.5335,
+        "decoy_std_clashscore": 10.3274,
+        "native_zscore": -5.3503,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4AQOA",
+        "native_clashscore": 7.8493,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 51.6122,
+        "decoy_std_clashscore": 10.9343,
+        "native_zscore": -4.0023,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4B62A",
+        "native_clashscore": 5.5453,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 62.0587,
+        "decoy_std_clashscore": 10.6299,
+        "native_zscore": -5.3164,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4B97A",
+        "native_clashscore": 5.7471,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 61.8406,
+        "decoy_std_clashscore": 11.3647,
+        "native_zscore": -4.9358,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4BK7A",
+        "native_clashscore": 11.4566,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 52.9569,
+        "decoy_std_clashscore": 10.5961,
+        "native_zscore": -3.9166,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4EETB",
+        "native_clashscore": 4.386,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 55.3874,
+        "decoy_std_clashscore": 11.702,
+        "native_zscore": -4.3584,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4FTFA",
+        "native_clashscore": 2.4096,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 51.3695,
+        "decoy_std_clashscore": 9.6118,
+        "native_zscore": -5.0937,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4GAIA",
+        "native_clashscore": 15.3722,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 57.1386,
+        "decoy_std_clashscore": 12.1507,
+        "native_zscore": -3.4374,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4I2UA",
+        "native_clashscore": 3.6232,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 51.4775,
+        "decoy_std_clashscore": 12.2282,
+        "native_zscore": -3.9134,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4IZXA",
+        "native_clashscore": 5.3715,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 69.543,
+        "decoy_std_clashscore": 10.884,
+        "native_zscore": -5.896,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4J1PA",
+        "native_clashscore": 13.1291,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 55.926,
+        "decoy_std_clashscore": 11.6639,
+        "native_zscore": -3.6692,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4JFIA",
+        "native_clashscore": 7.2765,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 54.8839,
+        "decoy_std_clashscore": 10.4849,
+        "native_zscore": -4.5406,
+        "native_is_lowest": true
+      },
+      {
+        "id": "4KZVA",
+        "native_clashscore": 11.1421,
+        "n_decoys_scored": 300,
+        "n_decoys_excluded": 0,
+        "decoy_mean_clashscore": 69.9164,
+        "decoy_std_clashscore": 10.7039,
+        "native_zscore": -5.4909,
+        "native_is_lowest": true
+      }
+    ],
+    "excluded_decoys": []
+  },
+  "stopped_after_tier1": false,
+  "outcome_table_mapping": {
+    "tier1_row": "AUROC 1.0000 \u2265 0.95 @ \u03c3=2.0 \u2014 positive control holds: the scored check fires on real packing defects. [charter \u00a76 row 1]",
+    "tier2_row": "AUROC 1.0000 \u2265 0.65 \u2014 clash UNEXPECTEDLY discriminates 3DRobot decoys: surprising positive, investigate (e.g. a clash-rich decoy subpopulation). [charter \u00a76 row 4]"
+  },
+  "runtime_seconds": 195.6
+}
